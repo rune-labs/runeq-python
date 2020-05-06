@@ -1,0 +1,107 @@
+version: 2.1
+
+executors:
+    python3_6:
+        docker:
+            - image: circleci/python:3.6-buster
+
+    python3_7:
+        docker:
+            - image: circleci/python:3.7-buster
+
+    python3_8:
+        docker:
+            - image: circleci/python:3.8-buster
+
+jobs:
+    lint:
+        working_directory: ~/runeq-python/
+        docker:
+            - image: circleci/python:3.8-buster
+        steps:
+            - checkout:
+                path: ~/runeq-python
+            - restore_cache:
+                  key: runeq-python-{{ checksum "requirements/common.txt" }}-{{ checksum "requirements/dev.txt" }}
+            - run:
+                name: Install flake8
+                command: |
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip3 install flake8
+            - run:
+                name: Lint
+                command: |
+                    . venv/bin/activate
+                    flake8
+
+    test:
+        parameters:
+            executor:
+                type: executor
+        executor: << parameters.executor >>
+        working_directory: ~/runeq-python/
+        steps:
+            - checkout:
+                  path: ~/runeq-python
+            - restore_cache:
+                  key: runeq-python-{{ checksum "requirements/common.txt" }}-{{ checksum "requirements/dev.txt" }}
+            - run:
+                  name: Install Dependencies
+                  command: |
+                      python3 -m venv venv
+                      . venv/bin/activate
+                      pip3 install -r requirements/dev.txt
+            - save_cache:
+                  key: runeq-python-{{ checksum "requirements/common.txt" }}-{{ checksum "requirements/dev.txt" }}
+                  paths:
+                      - venv
+            - run:
+                  name: Run Tests and Coverage
+                  command: |
+                      . venv/bin/activate
+                      coverage run --source runeq -m xmlrunner discover -v -s tests -p '*.py' -o test-reports
+                      coverage report
+                      coverage html
+                      coverage xml
+                  environment:
+                      LD_LIBRARY_PATH: /usr/local/lib
+            - store_test_results:
+                  path: test-reports
+            - store_artifacts:
+                  path: htmlcov
+
+    docs:
+        working_directory: ~/runeq-python/docs/
+        docker:
+            - image: circleci/python:3.8-buster
+        steps:
+            - checkout:
+                path: ~/runeq-python
+            - restore_cache:
+                key: runeq-python-{{ checksum "requirements/common.txt" }}-{{ checksum "requirements/dev.txt" }}
+            - run:
+                name: Install Sphinx
+                command: |
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip3 install sphinx
+            - run:
+                name: Build docs
+                command: |
+                    . venv/bin/activate
+                    sphinx-build -b html . _build/html
+                    tar -cvf html_docs.tar _build/html
+            - store_artifacts:
+                path: html_docs.tar
+
+workflows:
+    version: 2
+    runeq:
+        jobs:
+            - lint
+            - test:
+                matrix:
+                    parameters:
+                        executor: ["python3_6", "python3_7", "python3_8"]
+            - docs

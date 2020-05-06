@@ -1,0 +1,16 @@
+# Rune SDK configuration example
+
+##################
+# Authentication #
+##################
+
+# Client Key Pair
+client_key_id: TODO
+client_access_key: TODO
+
+########
+# URLs #
+########
+
+# To override the base URL used to access the Rune Stream API, uncomment.
+# stream_url: https://stream.runelabs.io
