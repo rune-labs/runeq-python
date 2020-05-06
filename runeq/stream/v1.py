@@ -21,7 +21,7 @@ except ImportError:
 log = getLogger(__name__)
 
 
-def _str2float(s: str) -> Union[float, np.float64, str]:
+def _str2float(s: str) -> Union[float, str]:
     """
     Convert string to a numeric type, if possible.
 
