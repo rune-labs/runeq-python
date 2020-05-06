@@ -1,0 +1,25 @@
+[flake8]
+ignore =
+    D200
+    D204
+    D205
+    D400
+    D401
+    D402
+    E126
+    E201
+    E202
+    E303
+    E305
+    E402
+    W391
+    W503
+    W504
+exclude =
+    .git,
+    __pycache__,
+    .eggs,
+    *.egg-info,
+    build,
+    venv,
+    .venv
