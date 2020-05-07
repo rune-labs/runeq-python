@@ -6,7 +6,18 @@
 :mod:`runeq` - Rune Labs Python SDK
 ===================================
 
-.. TODO: add badges for public repo (python versions, license)
+.. image:: https://img.shields.io/pypi/l/runeq
+   :alt: PyPI - License
+.. image:: https://img.shields.io/pypi/pyversions/runeq
+   :alt: PyPI - Python Version
+.. image:: https://img.shields.io/pypi/v/runeq
+   :alt: PyPI
+.. image:: https://readthedocs.org/projects/runeq/badge/?version=latest
+   :target: https://runeq.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
+.. image:: https://circleci.com/gh/rune-labs/runeq-python.svg?style=shield
+   :target: https://app.circleci.com/pipelines/gh/rune-labs/runeq-python
+   :alt: CircleCI Status
 
 Python SDK to query data from the `Rune Labs <https://runelabs.io/>`_ `API <https://docs.runelabs.io>`_
 
