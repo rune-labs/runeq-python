@@ -72,28 +72,29 @@ jobs:
                   path: htmlcov
 
     docs:
-        working_directory: ~/runeq-python/docs/
+        working_directory: ~/runeq-python/
         docker:
             - image: circleci/python:3.8-buster
         steps:
             - checkout:
                 path: ~/runeq-python
             - restore_cache:
-                key: runeq-python-{{ checksum "requirements/common.txt" }}-{{ checksum "requirements/dev.txt" }}
+                key: runeq-python-{{ checksum "requirements/common.txt" }}-{{ checksum "requirements/docs.txt" }}
             - run:
-                name: Install Sphinx
+                name: Install docs requirements
                 command: |
                     python3 -m venv venv
                     . venv/bin/activate
-                    pip3 install sphinx
+                    pip3 install -r requirements/docs.txt
             - run:
                 name: Build docs
                 command: |
                     . venv/bin/activate
+                    cd docs/
                     sphinx-build -b html . _build/html
                     tar -cvf html_docs.tar _build/html
             - store_artifacts:
-                path: html_docs.tar
+                path: docs/html_docs.tar
 
 workflows:
     version: 2
