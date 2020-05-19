@@ -5,7 +5,7 @@ Query data from the Rune Labs Stream API (V1).
 import csv
 from logging import getLogger
 from typing import Generator, Union
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlencode
 
 import requests
 
@@ -66,9 +66,6 @@ class StreamV1Base:
     # Name of the resource (e.g. lfp, accel)
     _resource: str
 
-    # Indicates if a CSV endpoint exists for the resource.
-    _support_csv = True
-
     # Expression to use to query the availability timeseries for a resource.
     # Not supported for all resources.
     _availability = None
@@ -115,6 +112,7 @@ class StreamV1Base:
             self.config.stream_url,
             '/v1/{}.json'.format(self._resource)
         )
+        log.debug(f'GET {url}?{urlencode(params)}')
         return requests.get(
             url,
             headers=self.config.auth_headers,
@@ -149,6 +147,49 @@ class StreamV1Base:
             params['page'] = next_page
             yield data['result']
 
+    @property
+    def expr_availability(self):
+        """
+        Availability expression for this resource.
+
+        Raises:
+            NotImplementedError: if the resource doesn't support an
+                availability query expression.
+
+        """
+        if not self._availability:
+            raise NotImplementedError(f'{self.__class__.__name__} does not '
+                                      f'support an availability query')
+
+        return self._availability
+
+    def iter_json_availability(self, **params) -> Generator[dict, None, None]:
+        """
+        Convenience method to query the JSON endpoint, using the availability
+        expression. This may not be supported for all endpoints.
+
+        Args:
+            **params: Query parameters for the request. These override
+                self.defaults, on a key-by-key basis.
+
+        Yields:
+             dict with the "result" from the JSON body of each response.
+
+        Raises:
+            NotImplementedError: if the resource doesn't support an
+                availability query expression.
+        """
+        params['expression'] = self.expr_availability
+        yield from self.iter_json_data(**params)
+
+
+class StreamV1CSVBase(StreamV1Base):
+    """
+    Base class for requesting data from the Stream V1 API, for resources that
+    support both JSON and CSV data formats.
+
+    """
+
     def get_csv_response(self, **params) -> requests.Response:
         """
         Make a GET request to the resource's CSV endpoint.
@@ -159,15 +200,7 @@ class StreamV1Base:
 
         Returns:
             requests.Response
-
-        Raises:
-            NotImplementedError: for resources that do not support
-                a CSV endpoint.
         """
-        if not self._support_csv:
-            raise NotImplementedError(
-                f'{self.__class__.__name__} does not support CSV')
-
         self._update_params(params)
 
         url = urljoin(
@@ -175,6 +208,7 @@ class StreamV1Base:
             '/v1/{}.csv'.format(self._resource)
         )
 
+        log.debug(f'GET {url}?{urlencode(params)}')
         return requests.get(
             url,
             headers=self.config.auth_headers,
@@ -200,10 +234,6 @@ class StreamV1Base:
         Raises:
             APIError: when a request fails
         """
-        # set the default page size to something reasonable
-        if not params.get('page_size'):
-            params['page_size'] = 100000
-
         if 'page' not in params:
             params['page'] = 0
 
@@ -215,6 +245,25 @@ class StreamV1Base:
 
             yield r.text
             params['page'] += 1
+
+    def iter_csv_availability(self, **params) -> Generator[dict, None, None]:
+        """
+        Convenience method to query the CSV endpoint, using the availability
+        expression. May not be supported for all resources.
+
+        Args:
+            **params: Query parameters for the request. These override
+                self.defaults, on a key-by-key basis.
+
+        Yields:
+             text body of each response.
+
+        Raises:
+            NotImplementedError: if the resource doesn't support an
+                availability query expression.
+        """
+        params['expression'] = self.expr_availability
+        yield from self.iter_csv_text(**params)
 
     def points(self, **params) -> Generator[dict, None, None]:
         """
@@ -265,28 +314,7 @@ class StreamV1Base:
 
         :meta public:
         """
-        for p in self.points():
-            yield p
-
-    def iter_json_availability(self, **params) -> Generator[dict, None, None]:
-        """
-        Convenience method to query the JSON endpoint for availability. May
-        not be supported for all endpoints.
-
-        Args:
-            **params: Query parameters for the request. These override
-                self.defaults, on a key-by-key basis.
-
-        Yields:
-             dict with the "result" from the JSON body of each response.
-        """
-        if not self._availability:
-            raise NotImplementedError(f'{self.__class__.__name__} does not '
-                                      f'support an availability query')
-
-        params['expression'] = self._availability
-        for r in self.iter_json_data(**params):
-            yield r
+        yield from self.points()
 
 
 ####################
@@ -294,7 +322,7 @@ class StreamV1Base:
 ####################
 
 
-class Accel(StreamV1Base):
+class Accel(StreamV1CSVBase):
     """
     Query accelerometry data streams.
 
@@ -309,10 +337,9 @@ class Event(StreamV1Base):
 
     """
     _resource = 'event'
-    _support_csv = False
 
 
-class LFP(StreamV1Base):
+class LFP(StreamV1CSVBase):
     """
     Query local field potential (LFP) data streams.
 
@@ -321,7 +348,7 @@ class LFP(StreamV1Base):
     _availability = 'availability(lfp)'
 
 
-class ProbabilitySymptom(StreamV1Base):
+class ProbabilitySymptom(StreamV1CSVBase):
     """
     Query the probability of a symptom.
 
@@ -330,7 +357,7 @@ class ProbabilitySymptom(StreamV1Base):
     _availability = 'availability(probability)'
 
 
-class Rotation(StreamV1Base):
+class Rotation(StreamV1CSVBase):
     """
     Query rotation data streams.
 
@@ -339,7 +366,7 @@ class Rotation(StreamV1Base):
     _availability = 'availability(rotation)'
 
 
-class State(StreamV1Base):
+class State(StreamV1CSVBase):
     """
     Query device state.
 
