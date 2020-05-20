@@ -119,7 +119,6 @@ class TestStreamV1Client(TestCase):
         Test the signature of CSV requests.
 
         """
-        # CSV-supported
         for test_num, case in enumerate((
             (self.client.Accel, '/v1/accel.csv'),
             (self.client.LFP, '/v1/lfp.csv'),
@@ -142,10 +141,6 @@ class TestStreamV1Client(TestCase):
                     }
                 ),
             ])
-
-        # CSV not supported
-        with self.assertRaises(NotImplementedError):
-            self.client.Event().get_csv_response()
 
     def test_iter_json_data(self):
         """
@@ -258,11 +253,10 @@ class TestStreamV1Client(TestCase):
 
             # Check that all parameters were kept the same across calls,
             # except for "page" (which must be incremented)
-            # Page and page size have defaults, if they aren't set
             self.assertEqual(calls, [
-                ((), {'test_num': test_num, 'page': 0, 'page_size': 100000}),
-                ((), {'test_num': test_num, 'page': 1, 'page_size': 100000}),
-                ((), {'test_num': test_num, 'page': 2, 'page_size': 100000}),
+                ((), {'test_num': test_num, 'page': 0}),
+                ((), {'test_num': test_num, 'page': 1}),
+                ((), {'test_num': test_num, 'page': 2}),
             ])
 
             #
