@@ -1,12 +1,17 @@
 from unittest import mock, TestCase
-from typing import List
+from typing import List, Dict
 
 import numpy as np
 
 from runeq import Config, stream, errors
 
 
-def mock_get_json_response(bodies: List[dict], calls: List, status_code=200):
+def mock_get_json_response(
+        bodies: List[dict],
+        calls: List,
+        status_code=200,
+        headers: List[Dict[str, str]] = None
+):
     """Return a function that can be used to mock .get_json_response()
 
     Args:
@@ -14,7 +19,10 @@ def mock_get_json_response(bodies: List[dict], calls: List, status_code=200):
         calls: list. Every time the function is called, args and kwargs will
             be appended to this list.
         status_code: status code to return for each response
+        headers: the response header to apply
     """
+    headers = headers or [{}] * len(bodies)
+
     num = 0
 
     def _func(*args, **kwargs):
@@ -23,6 +31,7 @@ def mock_get_json_response(bodies: List[dict], calls: List, status_code=200):
         calls.append((args, kwargs))
 
         resp = mock.MagicMock()
+        resp.headers = headers[num]
         resp.status_code = status_code
         resp.ok = (status_code < 400)
         resp.json.return_value = bodies[num]
@@ -32,7 +41,12 @@ def mock_get_json_response(bodies: List[dict], calls: List, status_code=200):
     return _func
 
 
-def mock_get_csv_response(bodies: List[str], calls: List, status_code=200):
+def mock_get_csv_response(
+        bodies: List[str],
+        calls: List,
+        status_code=200,
+        headers: List[Dict[str, str]] = None
+):
     """Return a function that can be used to mock .get_csv_response()
 
     Args:
@@ -40,7 +54,10 @@ def mock_get_csv_response(bodies: List[str], calls: List, status_code=200):
         calls: list. Every time the function is called, args and kwargs will
             be appended to this list.
         status_code: status code to return for each response
+        headers: the response header to apply
     """
+    headers = headers or [{}] * len(bodies)
+
     num = 0
 
     def _func(*args, **kwargs):
@@ -49,6 +66,7 @@ def mock_get_csv_response(bodies: List[str], calls: List, status_code=200):
         calls.append((args, kwargs))
 
         resp = mock.MagicMock()
+        resp.headers = headers[num]
         resp.status_code = status_code
         resp.ok = (status_code < 400)
         resp.text = bodies[num]
@@ -91,13 +109,16 @@ class TestStreamV1Client(TestCase):
 
         """
         for test_num, case in enumerate((
-            (self.client.Accel, '/v1/accel.json'),
-            (self.client.Event, '/v1/event.json'),
-            (self.client.LFP, '/v1/lfp.json'),
-            (self.client.ProbabilitySymptom, '/v1/probability_symptom.json'),
-            (self.client.Rotation, '/v1/rotation.json'),
-            (self.client.State, '/v1/state.json'),
-        )):
+                (self.client.Accel, '/v1/accel.json'),
+                (self.client.Event, '/v1/event.json'),
+                (self.client.LFP, '/v1/lfp.json'),
+                (
+                        self.client.ProbabilitySymptom,
+                        '/v1/probability_symptom.json'
+                ),
+                (self.client.Rotation, '/v1/rotation.json'),
+                (self.client.State, '/v1/state.json'))
+        ):
             resource_creator, endpoint = case
             resource = resource_creator(leslie='knope')
             resource.get_json_response(ron='swanson', test_num=test_num)
@@ -120,11 +141,14 @@ class TestStreamV1Client(TestCase):
 
         """
         for test_num, case in enumerate((
-            (self.client.Accel, '/v1/accel.csv'),
-            (self.client.LFP, '/v1/lfp.csv'),
-            (self.client.ProbabilitySymptom, '/v1/probability_symptom.csv'),
-            (self.client.Rotation, '/v1/rotation.csv'),
-            (self.client.State, '/v1/state.csv'),
+                (self.client.Accel, '/v1/accel.csv'),
+                (self.client.LFP, '/v1/lfp.csv'),
+                (
+                        self.client.ProbabilitySymptom,
+                        '/v1/probability_symptom.csv'
+                ),
+                (self.client.Rotation, '/v1/rotation.csv'),
+                (self.client.State, '/v1/state.csv'),
         )):
             resource_creator, endpoint = case
             resource = resource_creator(leslie='knope')
@@ -140,6 +164,52 @@ class TestStreamV1Client(TestCase):
                         'test_num': test_num,
                     }
                 ),
+            ])
+
+    def test_iter_json_data_with_token(self):
+        """
+        Test the iterator over JSON responses, with new pagination.
+
+        """
+        for test_num, resource_creator in enumerate((
+                self.client.Accel,
+                self.client.LFP,
+                self.client.ProbabilitySymptom,
+                self.client.Rotation,
+                self.client.State,
+        )):
+            resource = resource_creator()
+
+            mock_responses = [
+                {'success': True, 'result': [], 'next_page': 1},
+                {'success': True, 'result': []}
+            ]
+
+            calls = []
+            resource.get_json_response = mock_get_json_response(
+                mock_responses,
+                calls,
+                200,
+                [
+                    {'X-Rune-Next-Page-Token': 'MTIzNDU2MDAwMA=='},
+                    {},
+                ]
+            )
+
+            iterator = resource.iter_json_data(test_num=test_num)
+            self.assertEqual(len(list(iterator)), 2)
+
+            # Check that all parameters were kept the same across calls,
+            # except for "page" (which must be incremented)
+            self.assertEqual(calls, [
+                ((), {'test_num': test_num}),
+                (
+                    (),
+                    {
+                        'test_num': test_num,
+                        'next_page_token': 'MTIzNDU2MDAwMA=='
+                    }
+                )
             ])
 
     def test_iter_json_data(self):
@@ -212,6 +282,66 @@ class TestStreamV1Client(TestCase):
             self.assertEqual(err.status_code, 404)
             self.assertEqual(err.details, err_details)
 
+    def test_iter_csv_data_with_token(self):
+        """
+        Test the iterator over CSV responses, which follows new pagination
+
+        """
+        mock_responses = [
+            'good,better\nskiing,hiking\n',
+            'good,better\ncupcakes,brownies\n',
+            '',
+        ]
+
+        for test_num, resource_creator in enumerate((
+                self.client.Accel,
+                self.client.LFP,
+                self.client.ProbabilitySymptom,
+                self.client.Rotation,
+                self.client.State,
+        )):
+            resource = resource_creator()
+
+            #
+            # Successful Requests
+            #
+            calls = []
+            resource.get_csv_response = mock_get_csv_response(
+                mock_responses,
+                calls,
+                200,
+                [
+                    {'X-Rune-Next-Page-Token': 'MTIzNDU2MDAwMA=='},
+                    {'X-Rune-Next-Page-Token': 'MTIzNDU2MDAwMA=='},
+                    {},
+                ],
+            )
+
+            # Check the results
+            iterator = resource.iter_csv_text(test_num=test_num)
+            self.assertEqual(len(list(iterator)), 2)
+
+            # Check that all parameters were kept the same across calls,
+            # except for "next_page_token" (which will normally be different
+            # for each response)
+            self.assertEqual(calls, [
+                ((), {'test_num': test_num}),
+                (
+                    (),
+                    {
+                        'test_num': test_num,
+                        'next_page_token': 'MTIzNDU2MDAwMA=='
+                    }
+                ),
+                (
+                    (),
+                    {
+                        'test_num': test_num,
+                        'next_page_token': 'MTIzNDU2MDAwMA=='
+                    }
+                ),
+            ])
+
     def test_iter_csv_data(self):
         """
         Test the iterator over CSV responses, which follows pagination
@@ -254,7 +384,7 @@ class TestStreamV1Client(TestCase):
             # Check that all parameters were kept the same across calls,
             # except for "page" (which must be incremented)
             self.assertEqual(calls, [
-                ((), {'test_num': test_num, 'page': 0}),
+                ((), {'test_num': test_num}),
                 ((), {'test_num': test_num, 'page': 1}),
                 ((), {'test_num': test_num, 'page': 2}),
             ])

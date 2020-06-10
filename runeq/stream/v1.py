@@ -145,6 +145,14 @@ class StreamV1Base:
 
             next_page = data.get('next_page')
             params['page'] = next_page
+            next_page_token = r.headers.get('X-Rune-Next-Page-Token')
+
+            if next_page_token is not None:
+                params['next_page_token'] = next_page_token
+                params.pop('page', None)
+            else:
+                params.pop('next_page_token', None)
+
             yield data['result']
 
     @property
@@ -234,8 +242,16 @@ class StreamV1CSVBase(StreamV1Base):
         Raises:
             APIError: when a request fails
         """
-        if 'page' not in params:
-            params['page'] = 0
+
+        # page will be maintained independently of the params value
+        # to keep the page synchronized with the offset when the next
+        # page token header field is present. This will allow the page
+        # parameter to be added back to the params in the event that
+        # the next page token header field is absent from the response.
+        page = 0
+
+        if 'page' in params:
+            page = params['page']
 
         while True:
             r = self.get_csv_response(**params)
@@ -244,7 +260,16 @@ class StreamV1CSVBase(StreamV1Base):
                 return
 
             yield r.text
-            params['page'] += 1
+
+            page += 1
+            next_page_token = r.headers.get('X-Rune-Next-Page-Token')
+
+            if next_page_token is not None:
+                params['next_page_token'] = next_page_token
+                params.pop('page', None)
+            else:
+                params['page'] = page
+                params.pop('next_page_token', None)
 
     def iter_csv_availability(self, **params) -> Generator[dict, None, None]:
         """
