@@ -1,0 +1,2 @@
+# Bad client keys config test case: incomplete client key pair specified
+client_key_id: abc

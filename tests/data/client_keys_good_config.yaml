@@ -1,4 +1,4 @@
-# Good config test case
+# Good client keys config test case
 client_key_id: abc
 client_access_key: def
 stream_url: https://foo.runelabs.io

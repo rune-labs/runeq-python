@@ -1,0 +1,3 @@
+# Bad access token config test case:
+# incomplete as access_token_secret is not specified
+access_token_id: abc

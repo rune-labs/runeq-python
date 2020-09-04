@@ -17,6 +17,12 @@ Auth method to use a JWT for authentication.
 
 """
 
+AUTH_METHOD_ACCESS_TOKEN = 'access_token'
+"""
+Auth method to use a user access token for authentication.
+
+"""
+
 
 class Config:
     """
@@ -52,6 +58,8 @@ class Config:
         self._client_access_key = None
         self._client_key_id = None
         self._jwt = None
+        self._access_token_id = None
+        self._access_token_secret = None
 
         if args and kwargs:
             raise TypeError(
@@ -89,16 +97,21 @@ class Config:
                    client_access_key=None,
                    jwt=None,
                    stream_url=None,
+                   access_token_id=None,
+                   access_token_secret=None,
                    **kwargs):
         """
         Set configuration values.
 
         Args:
-            auth_method: One of 'client_keys' or 'jwt'. If falsy, the auth
+            auth_method: One of 'client_keys' or 'jwt' or 'access_token'.
+            If falsy, the auth
             method is inferred based on which kwargs are specified.
             client_key_id: Client key ID
             client_access_key: Client access key
             jwt: JWT
+            user_access_token_id: User access token ID
+            user_access_token_secret: User access token secret
             stream_url: base URL to use for the stream API
 
         """
@@ -106,7 +119,13 @@ class Config:
             self.stream_url = stream_url
 
         if auth_method is None:
-            if jwt and (client_access_key or client_key_id):
+            num_auth_methods_set = [
+                bool(jwt),
+                bool(client_access_key or client_key_id),
+                bool(access_token_id or access_token_secret)
+            ].count(True)
+
+            if num_auth_methods_set > 1:
                 raise ValueError(
                     'Cannot infer auth method: multiple credentials were '
                     'provided. Specify auth_method kwarg to disambiguate.'
@@ -115,6 +134,8 @@ class Config:
                 auth_method = AUTH_METHOD_JWT
             elif client_key_id and client_access_key:
                 auth_method = AUTH_METHOD_CLIENT_KEYS
+            elif access_token_id and access_token_secret:
+                auth_method = AUTH_METHOD_ACCESS_TOKEN
             else:
                 raise ValueError(
                     'Cannot infer auth method: a complete set of credentials '
@@ -131,6 +152,12 @@ class Config:
 
         if jwt is not None:
             self._jwt = jwt
+
+        if access_token_id is not None:
+            self._access_token_id = access_token_id
+
+        if access_token_secret is not None:
+            self._access_token_secret = access_token_secret
 
         # access auth headers to ensure they're valid
         _ = self.auth_headers
@@ -165,6 +192,23 @@ class Config:
         }
 
     @property
+    def access_token_auth_headers(self):
+        """
+        Authentication headers for HTTP requests, using a User access token.
+
+        """
+        if not self._access_token_secret:
+            raise ValueError('Access token secret is not set')
+
+        if not self._access_token_id:
+            raise ValueError('Access token id is not set')
+
+        return {
+            'X-Rune-User-Access-Token-Id': self._access_token_id,
+            'X-Rune-User-Access-Token-Secret': self._access_token_secret
+        }
+
+    @property
     def auth_headers(self):
         """
         Authentication headers for HTTP requests.
@@ -174,6 +218,8 @@ class Config:
             return self.client_auth_headers
         elif self.auth_method == AUTH_METHOD_JWT:
             return self.jwt_auth_headers
+        elif self.auth_method == AUTH_METHOD_ACCESS_TOKEN:
+            return self.access_token_auth_headers
         else:
             raise ValueError(
                 f'Invalid auth_method "{self.auth_method}": expected one of '

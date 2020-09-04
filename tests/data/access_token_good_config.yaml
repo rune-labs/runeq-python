@@ -1,0 +1,4 @@
+# Good access tokens config test case
+access_token_id: foo
+access_token_secret: bar
+stream_url: https://foo.runelabs.io
