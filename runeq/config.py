@@ -104,7 +104,7 @@ class Config:
         Set configuration values.
 
         Args:
-            auth_method: One of 'client_keys' or 'jwt' or 'access_token'.
+            auth_method: One of 'access_token' or 'client_keys' or 'jwt'.
             If falsy, the auth
             method is inferred based on which kwargs are specified.
             client_key_id: Client key ID
