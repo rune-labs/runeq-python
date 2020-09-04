@@ -7,3 +7,9 @@
 # Client Key Pair
 client_key_id: TODO
 client_access_key: TODO
+
+# OR
+
+# User access token
+access_token_id: TODO
+access_token_secret: TODO
