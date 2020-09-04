@@ -221,7 +221,6 @@ class Config:
             return self.client_auth_headers
         elif self.auth_method == AUTH_METHOD_JWT:
             return self.jwt_auth_headers
-
         else:
             raise ValueError(
                 f'Invalid auth_method "{self.auth_method}": expected one of '
