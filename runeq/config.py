@@ -119,11 +119,11 @@ class Config:
             self.stream_url = stream_url
 
         if auth_method is None:
-            num_auth_methods_set = [
+            num_auth_methods_set = sum([
                 bool(access_token_id or access_token_secret),
                 bool(client_access_key or client_key_id),
                 bool(jwt)
-            ].count(True)
+            ])
 
             if num_auth_methods_set > 1:
                 raise ValueError(
