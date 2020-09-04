@@ -4,7 +4,7 @@
 # Authentication #
 ##################
 
-# User access token
+# User Access Token
 access_token_id: TODO
 access_token_secret: TODO
 
