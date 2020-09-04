@@ -13,22 +13,15 @@ and settings for accessing the API:
 
     from runeq import Config
 
-    cfg = Config('./rune_config.yaml')
+    cfg = Config('~/.rune/config.yaml')
 
 
 In the example above, configuration was loaded from a `YAML <https://yaml.org/>`_-formatted
 file. See the `example config <https://github.com/rune-labs/runeq-python/blob/master/example_config.yaml>`_
 for the expected contents of this file.
 
-If you are using **multiple** sets of authentication credentials (e.g. to access
-different patients), you can create multiple :class:`~runeq.config.Config` objects:
-
-.. code-block:: python
-
-    from runeq import Config
-
-    patient1_cfg = Config('/path/to/patient1_config.yaml')
-    patient2_cfg = Config('/path/to/patient2_config.yaml')
+If you are doing multi patient analysis it is recommended to use an access token
+as this method of authentication will give you access to all patients in your org.
 
 
 Stream API
