@@ -107,11 +107,11 @@ class Config:
             auth_method: One of 'access_token' or 'client_keys' or 'jwt'.
             If falsy, the auth
             method is inferred based on which kwargs are specified.
+            access_token_id: User access token ID
+            access_token_secret: User access token secret
             client_key_id: Client key ID
             client_access_key: Client access key
             jwt: JWT
-            user_access_token_id: User access token ID
-            user_access_token_secret: User access token secret
             stream_url: base URL to use for the stream API
 
         """
