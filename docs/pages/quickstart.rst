@@ -20,8 +20,8 @@ In the example above, configuration was loaded from a `YAML <https://yaml.org/>`
 file. See the `example config <https://github.com/rune-labs/runeq-python/blob/master/example_config.yaml>`_
 for the expected contents of this file.
 
-If you are doing multi patient analysis it is recommended to use an access token
-as this method of authentication will give you access to all patients in your org.
+For multi-patient analyses, it is recommended to use an **access token** to
+authenticate, as it will provide access to all the patients in your organization.
 
 
 Stream API
