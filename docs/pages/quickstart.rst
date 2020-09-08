@@ -45,8 +45,8 @@ fetch accelerometry data:
 .. code-block:: python
 
     accel = v1client.Accel(
-        patient_id='patient-ABC',
-        device_id='patient-ABC,device-123',
+        patient_id='992967a09cad48378f7b628aff5bdf6c',
+        device_id='ABCDEF',
         start_time=1562482800,
         end_time=1563692400,
     )
