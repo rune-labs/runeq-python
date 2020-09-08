@@ -4,6 +4,12 @@
 # Authentication #
 ##################
 
+# Authentication method
+auth_method: access_token
+# Only required if multiple authentication
+# credentials are present in config
+# One of 'access_token' or 'client_keys' or 'jwt'
+
 # User Access Token
 access_token_id: TODO
 access_token_secret: TODO
@@ -11,5 +17,5 @@ access_token_secret: TODO
 # OR
 
 # Client Key Pair
-client_key_id: TODO
-client_access_key: TODO
+# client_key_id: TODO
+# client_access_key: TODO
