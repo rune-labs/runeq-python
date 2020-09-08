@@ -13,22 +13,15 @@ and settings for accessing the API:
 
     from runeq import Config
 
-    cfg = Config('./rune_config.yaml')
+    cfg = Config('~/.rune/config.yaml')
 
 
 In the example above, configuration was loaded from a `YAML <https://yaml.org/>`_-formatted
 file. See the `example config <https://github.com/rune-labs/runeq-python/blob/master/example_config.yaml>`_
 for the expected contents of this file.
 
-If you are using **multiple** sets of authentication credentials (e.g. to access
-different patients), you can create multiple :class:`~runeq.config.Config` objects:
-
-.. code-block:: python
-
-    from runeq import Config
-
-    patient1_cfg = Config('/path/to/patient1_config.yaml')
-    patient2_cfg = Config('/path/to/patient2_config.yaml')
+For multi-patient analyses, it is recommended to use an **access token** to
+authenticate, as it will provide access to all the patients in your organization.
 
 
 Stream API
@@ -52,8 +45,8 @@ fetch accelerometry data:
 .. code-block:: python
 
     accel = v1client.Accel(
-        patient_id='patient-ABC',
-        device_id='patient-ABC,device-123',
+        patient_id='992967a09cad48378f7b628aff5bdf6c',
+        device_id='ABCDEF',
         start_time=1562482800,
         end_time=1563692400,
     )
