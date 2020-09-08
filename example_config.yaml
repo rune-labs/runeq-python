@@ -4,11 +4,11 @@
 # Authentication #
 ##################
 
-# Authentication method
-auth_method: access_token
-# Only required if multiple authentication
+## Authentication method
+# This key is only required if multiple kinds of authentication
 # credentials are present in config
 # One of 'access_token' or 'client_keys' or 'jwt'
+auth_method: access_token
 
 # User Access Token
 access_token_id: TODO
