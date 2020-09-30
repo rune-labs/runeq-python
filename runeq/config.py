@@ -23,6 +23,12 @@ Auth method to use a user access token for authentication.
 
 """
 
+DEFAULT_CONFIG_YAML = '~/.rune/config'
+"""
+Default path for the config file (yaml formatted)
+
+"""
+
 
 class Config:
     """
@@ -78,7 +84,7 @@ class Config:
         else:
             self.set_values(**kwargs)
 
-    def load_yaml(self, filename='~/.rune/config'):
+    def load_yaml(self, filename=DEFAULT_CONFIG_YAML):
         """
         Set values from a YAML file. Keys from the file are passed directly to
         set_values(), as kwargs.

@@ -10,7 +10,7 @@ with open('requirements/common.txt', 'r') as r:
 
 setup(
     name=package_name,
-    version='0.4.0',
+    version='0.5.0',
     author='Rune Labs',
     maintainer_email='support@runelabs.io',
     description='Query data from Rune Labs APIs',
@@ -29,4 +29,9 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
+    entry_points={
+        'console_scripts': [
+            'runeq=cli:cli',
+        ],
+    },
 )
