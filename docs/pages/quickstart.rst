@@ -3,37 +3,58 @@
 Quickstart
 ==========
 
+Prerequisites
+-------------
+
+To access Rune's APIs, you will need to obtain API credentials.
+For multi-patient analyses, we recommended using **access tokens**,
+which provide access to all the patients in your organization.
+
+For details about creating API credentials, refer to the
+`Stream API documentation <https://docs.runelabs.io/stream/#section/Overview/Authentication>`_.
+
+
 Configuration
 -------------
 
-To start, create a :class:`~runeq.config.Config`, which holds credentials
-and settings for accessing the API:
+``runeq`` uses `YAML <https://yaml.org/>`_-formatted files to manage configuration
+settings (e.g. API credentials). The easiest way to set up this configuration is via
+the ``runeq`` command line tool, which is installed along with the Python library.
 
-.. code-block:: python
+To get started, open a terminal and run the following command in a Python environment
+where ``runeq`` is installed. This command will prompt you to enter an access token ID
+and secret, and it will create a configuration file in the default location.
 
-    from runeq import Config
+.. code-block:: bash
 
-    cfg = Config('~/.rune/config.yaml')
+    runeq configure setup
 
 
-In the example above, configuration was loaded from a `YAML <https://yaml.org/>`_-formatted
-file. See the `example config <https://github.com/rune-labs/runeq-python/blob/master/example_config.yaml>`_
-for the expected contents of this file.
+This command also provides options to get and set specific values in your config file. To
+see help documentation:
 
-For multi-patient analyses, it is recommended to use an **access token** to
-authenticate, as it will provide access to all the patients in your organization.
+.. code-block:: bash
+
+    runeq configure --help
+
+
+If you want to create or manage a configuration file manually, refer to the
+`example config <https://github.com/rune-labs/runeq-python/blob/master/example_config.yaml>`_
+for the expected contents.
 
 
 Stream API
 ----------
 
 To access the `Stream API <https://docs.runelabs.io/stream/index.html>`_, create a
-:class:`~runeq.stream.V1Client`, using a :class:`~runeq.config.Config`:
+:class:`~runeq.stream.V1Client`, using a :class:`~runeq.config.Config`. As shown below,
+the configuration class uses the file that was created via the command line tool (see above).
 
 .. code-block:: python
 
-    from runeq import stream
+    from runeq import Config, stream
 
+    cfg = Config()
     v1client = stream.V1Client(cfg)
 
 Methods on the :class:`~runeq.stream.V1Client` are used to create **accessors** for each type of data
@@ -87,7 +108,7 @@ containing the complete result set.
 
     df = pd.DataFrame()
     for text in accel.iter_csv_text():
-        page_df = pd.read_csv(io.StringIO(body))
+        page_df = pd.read_csv(io.StringIO(text))
         df.append(page_df)
 
 
