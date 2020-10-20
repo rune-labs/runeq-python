@@ -346,7 +346,6 @@ class StreamV1CSVBase(StreamV1Base):
 # V1 API Resources #
 ####################
 
-
 class Accel(StreamV1CSVBase):
     """
     Query accelerometry data streams.
@@ -362,6 +361,15 @@ class Event(StreamV1Base):
 
     """
     _resource = 'event'
+
+
+class HeartRate(StreamV1CSVBase):
+    """
+    Query heart rate data streams.
+
+    """
+    _resource = 'heartrate'
+    _availability = 'availability(bpm)'
 
 
 class LFP(StreamV1CSVBase):
@@ -445,6 +453,16 @@ class V1Client:
 
         """
         return Event(self.config, **defaults)
+
+    def HeartRate(self, **defaults) -> HeartRate:
+        """
+        Initialize a HeartRate accessor.
+
+        Args:
+            **defaults: Default query parameters
+
+        """
+        return HeartRate(self.config, **defaults)
 
     def LFP(self, **defaults) -> LFP:
         """
