@@ -33,7 +33,7 @@ Event
    :inherited-members:
 
 HeartRate
-*****
+*********
 .. autoclass:: HeartRate
    :members:
    :inherited-members:
