@@ -32,6 +32,12 @@ Event
    :members:
    :inherited-members:
 
+HeartRate
+*****
+.. autoclass:: HeartRate
+   :members:
+   :inherited-members:
+
 LFP
 ***
 
