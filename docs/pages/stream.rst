@@ -59,6 +59,13 @@ Rotation
    :members:
    :inherited-members:
 
+Span
+****
+
+.. autoclass:: Span
+   :members:
+   :inherited-members:
+
 State
 *****
 

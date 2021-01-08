@@ -118,8 +118,9 @@ class TestStreamV1Client(TestCase):
                         '/v1/probability_symptom.json'
                 ),
                 (self.client.Rotation, '/v1/rotation.json'),
-                (self.client.State, '/v1/state.json'))
-        ):
+                (self.client.Span, '/v1/span.json'),
+                (self.client.State, '/v1/state.json'),
+        )):
             resource_creator, endpoint = case
             resource = resource_creator(leslie='knope')
             resource.get_json_response(ron='swanson', test_num=test_num)
@@ -170,15 +171,18 @@ class TestStreamV1Client(TestCase):
 
     def test_iter_json_data_with_token(self):
         """
-        Test the iterator over JSON responses, with new pagination.
+        Test the iterator over JSON responses, paginating with the next page
+        token header.
 
         """
         for test_num, resource_creator in enumerate((
                 self.client.Accel,
+                self.client.Event,
                 self.client.HeartRate,
                 self.client.LFP,
                 self.client.ProbabilitySymptom,
                 self.client.Rotation,
+                self.client.Span,
                 self.client.State,
         )):
             resource = resource_creator()
@@ -203,7 +207,7 @@ class TestStreamV1Client(TestCase):
             self.assertEqual(len(list(iterator)), 2)
 
             # Check that all parameters were kept the same across calls,
-            # except for "page" (which must be incremented)
+            # except for "next_page_token"
             self.assertEqual(calls, [
                 ((), {'test_num': test_num}),
                 (
@@ -217,7 +221,8 @@ class TestStreamV1Client(TestCase):
 
     def test_iter_json_data(self):
         """
-        Test the iterator over JSON responses, which follows pagination.
+        Test the iterator over JSON responses, following pagination with
+        the page number.
 
         """
         results = [
@@ -419,7 +424,8 @@ class TestStreamV1Client(TestCase):
 
     def test_iter_points(self):
         """
-        Test iterating over data as points.
+        Test iterating over data as points. Uses the CSV endpoint.
+
         """
         mock_responses = [
             'lower,higher,label\n1,2,ints\n3.5,6.7,floats\n',

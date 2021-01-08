@@ -121,7 +121,7 @@ class StreamV1Base:
 
     def iter_json_data(self, **params) -> Generator[dict, None, None]:
         """
-        Iterate over JSON results, the resource’s JSON endpoint.
+        Iterate over results from the resource’s JSON endpoint.
 
         Follows pagination to get a complete set of results, starting
         with the page specified in the `page` kwarg (or the first
@@ -137,20 +137,21 @@ class StreamV1Base:
         Raises:
             APIError: when a request fails
         """
-        next_page = 1  # init with something truthy
-        while next_page:
+        has_next = True
+        while has_next:
             r = self.get_json_response(**params)
             _check_response(r)
             data = r.json()
 
             next_page = data.get('next_page')
-            params['page'] = next_page
             next_page_token = r.headers.get('X-Rune-Next-Page-Token')
+            has_next = (next_page or next_page_token)
 
             if next_page_token is not None:
                 params['next_page_token'] = next_page_token
                 params.pop('page', None)
             else:
+                params['page'] = next_page
                 params.pop('next_page_token', None)
 
             yield data['result']
@@ -399,6 +400,44 @@ class Rotation(StreamV1CSVBase):
     _availability = 'availability(rotation)'
 
 
+class Span(StreamV1Base):
+    """
+    Query spans.
+
+    """
+
+    _resource = 'span'
+
+    def iter_json_data(self, **params) -> Generator[dict, None, None]:
+        """
+        Iterate over results from the resource’s JSON endpoint.
+
+        Follows pagination to get a complete set of results.
+
+        Args:
+            **params: Query parameters for the request. These override
+                self.defaults, on a key-by-key basis.
+
+        Yields:
+             dict with the "result" from the JSON body of each response.
+
+        Raises:
+            APIError: when a request fails
+        """
+        # Span endpoint only supports the next page token pagination
+        next_page_token = 1  # init with something truthy
+        while next_page_token:
+            r = self.get_json_response(**params)
+            _check_response(r)
+            data = r.json()
+
+            next_page_token = r.headers.get('X-Rune-Next-Page-Token')
+            if next_page_token is not None:
+                params['next_page_token'] = next_page_token
+
+            yield data['result']
+
+
 class State(StreamV1CSVBase):
     """
     Query device state.
@@ -493,6 +532,16 @@ class V1Client:
 
         """
         return Rotation(self.config, **defaults)
+
+    def Span(self, **defaults) -> Span:
+        """
+        Initialize a Span accessor.
+
+        Args:
+            **defaults: Default query parameters
+
+        """
+        return Span(self.config, **defaults)
 
     def State(self, **defaults) -> State:
         """
