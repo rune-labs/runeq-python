@@ -444,6 +444,7 @@ class State(StreamV1CSVBase):
 
     """
     _resource = 'state'
+    _availability = 'availability(state)'
 
 
 ####################
