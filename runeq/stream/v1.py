@@ -4,7 +4,7 @@ Query data from the Rune Labs Stream API (V1).
 """
 import csv
 from logging import getLogger
-from typing import Generator, Union
+from typing import Iterator, Union
 from urllib.parse import urljoin, urlencode
 
 import requests
@@ -119,7 +119,7 @@ class StreamV1Base:
             params=params,
         )
 
-    def iter_json_data(self, **params) -> Generator[dict, None, None]:
+    def iter_json_data(self, **params) -> Iterator[dict]:
         """
         Iterate over results from the resource’s JSON endpoint.
 
@@ -172,7 +172,7 @@ class StreamV1Base:
 
         return self._availability
 
-    def iter_json_availability(self, **params) -> Generator[dict, None, None]:
+    def iter_json_availability(self, **params) -> Iterator[dict]:
         """
         Convenience method to query the JSON endpoint, using the availability
         expression. This may not be supported for all endpoints.
@@ -225,7 +225,7 @@ class StreamV1CSVBase(StreamV1Base):
             stream=True,
         )
 
-    def iter_csv_text(self, **params) -> Generator[str, None, None]:
+    def iter_csv_text(self, **params) -> Iterator[str]:
         """
         Iterate over CSV text results, from the resource's CSV endpoint.
 
@@ -272,7 +272,7 @@ class StreamV1CSVBase(StreamV1Base):
                 params['page'] = page
                 params.pop('next_page_token', None)
 
-    def iter_csv_availability(self, **params) -> Generator[dict, None, None]:
+    def iter_csv_availability(self, **params) -> Iterator[dict]:
         """
         Convenience method to query the CSV endpoint, using the availability
         expression. May not be supported for all resources.
@@ -291,7 +291,7 @@ class StreamV1CSVBase(StreamV1Base):
         params['expression'] = self.expr_availability
         yield from self.iter_csv_text(**params)
 
-    def points(self, **params) -> Generator[dict, None, None]:
+    def points(self, **params) -> Iterator[dict]:
         """
         Iterate over points from CSV response, yielding dictionaries.
 
@@ -331,7 +331,7 @@ class StreamV1CSVBase(StreamV1Base):
 
                 yield point
 
-    def __iter__(self) -> Generator[dict, None, None]:
+    def __iter__(self) -> Iterator[dict]:
         """
         Iterate over points from the CSV response, using self.points().
 
@@ -408,7 +408,7 @@ class Span(StreamV1Base):
 
     _resource = 'span'
 
-    def iter_json_data(self, **params) -> Generator[dict, None, None]:
+    def iter_json_data(self, **params) -> Iterator[dict]:
         """
         Iterate over results from the resource’s JSON endpoint.
 
