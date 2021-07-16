@@ -5,6 +5,7 @@ Configuration for API access
 import os
 import yaml
 
+
 AUTH_METHOD_CLIENT_KEYS = 'client_keys'
 """
 Auth method to use a Client Key pair for authentication.
@@ -36,6 +37,7 @@ class Config:
 
     """
 
+
     def __init__(self, *args, **kwargs):
         """
         Initialize configuration options.
@@ -59,6 +61,7 @@ class Config:
             # Set values using keyword arguments
 
         """
+        self.graph_url = 'https://graph.runelabs.io'
         self.stream_url = 'https://stream.runelabs.io'
         self.auth_method = None
         self._access_token_id = None
@@ -84,6 +87,7 @@ class Config:
         else:
             self.set_values(**kwargs)
 
+
     def load_yaml(self, filename=DEFAULT_CONFIG_YAML):
         """
         Set values from a YAML file. Keys from the file are passed directly to
@@ -96,6 +100,7 @@ class Config:
         with open(os.path.expanduser(filename)) as f:
             params = yaml.safe_load(f)
         return self.set_values(**params)
+
 
     def set_values(self,
                    auth_method=None,
@@ -169,6 +174,7 @@ class Config:
         # access auth headers to ensure they're valid
         _ = self.auth_headers
 
+
     @property
     def client_auth_headers(self):
         """
@@ -185,6 +191,7 @@ class Config:
             'X-Rune-Client-Access-Key': self._client_access_key,
         }
 
+
     @property
     def jwt_auth_headers(self):
         """
@@ -197,6 +204,7 @@ class Config:
         return {
             'X-Rune-User-Access-Token': self._jwt,
         }
+
 
     @property
     def access_token_auth_headers(self):
@@ -214,6 +222,7 @@ class Config:
             'X-Rune-User-Access-Token-Id': self._access_token_id,
             'X-Rune-User-Access-Token-Secret': self._access_token_secret
         }
+
 
     @property
     def auth_headers(self):
