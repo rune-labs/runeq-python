@@ -110,6 +110,7 @@ class TestStreamV1Client(TestCase):
         """
         for test_num, case in enumerate((
                 (self.client.Accel, '/v1/accel.json'),
+                (self.client.BandPower, '/v1/band_power.json'),
                 (self.client.Event, '/v1/event.json'),
                 (self.client.HeartRate, '/v1/heartrate.json'),
                 (self.client.LFP, '/v1/lfp.json'),
@@ -144,6 +145,7 @@ class TestStreamV1Client(TestCase):
         """
         for test_num, case in enumerate((
                 (self.client.Accel, '/v1/accel.csv'),
+                (self.client.BandPower, '/v1/band_power.csv'),
                 (self.client.HeartRate, '/v1/heartrate.csv'),
                 (self.client.LFP, '/v1/lfp.csv'),
                 (
@@ -177,6 +179,7 @@ class TestStreamV1Client(TestCase):
         """
         for test_num, resource_creator in enumerate((
                 self.client.Accel,
+                self.client.BandPower,
                 self.client.Event,
                 self.client.HeartRate,
                 self.client.LFP,
@@ -236,6 +239,7 @@ class TestStreamV1Client(TestCase):
 
         for test_num, resource_creator in enumerate((
                 self.client.Accel,
+                self.client.BandPower,
                 self.client.Event,
                 self.client.HeartRate,
                 self.client.LFP,
@@ -304,6 +308,7 @@ class TestStreamV1Client(TestCase):
 
         for test_num, resource_creator in enumerate((
                 self.client.Accel,
+                self.client.BandPower,
                 self.client.HeartRate,
                 self.client.LFP,
                 self.client.ProbabilitySymptom,
@@ -364,6 +369,7 @@ class TestStreamV1Client(TestCase):
 
         for test_num, resource_creator in enumerate((
                 self.client.Accel,
+                self.client.BandPower,
                 self.client.HeartRate,
                 self.client.LFP,
                 self.client.ProbabilitySymptom,
@@ -440,6 +446,7 @@ class TestStreamV1Client(TestCase):
 
         for test_num, resource_creator in enumerate((
                 self.client.Accel,
+                self.client.BandPower,
                 self.client.HeartRate,
                 self.client.LFP,
                 self.client.ProbabilitySymptom,
@@ -488,6 +495,7 @@ class TestStreamV1Client(TestCase):
 
         for test_num, resource_creator in enumerate((
                 self.client.Accel,
+                self.client.BandPower,
                 self.client.HeartRate,
                 self.client.LFP,
                 self.client.ProbabilitySymptom,

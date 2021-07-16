@@ -26,6 +26,13 @@ Accel
    :members:
    :inherited-members:
 
+BandPower
+*****
+
+.. autoclass:: BandPower
+   :members:
+   :inherited-members:
+
 Event
 *****
 .. autoclass:: Event
