@@ -356,6 +356,15 @@ class Accel(StreamV1CSVBase):
     _availability = 'availability(accel)'
 
 
+class BandPower(StreamV1CSVBase):
+    """
+    Query band power data streams.
+
+    """
+    _resource = 'band_power'
+    _availability = 'availability(power)'
+
+
 class Event(StreamV1Base):
     """
     Query patient events.
@@ -483,6 +492,16 @@ class V1Client:
 
         """
         return Accel(self.config, **defaults)
+
+    def BandPower(self, **defaults) -> BandPower:
+        """
+        Initialize a BandPower accessor.
+
+        Args:
+            **defaults: Default query parameters
+
+        """
+        return BandPower(self.config, **defaults)
 
     def Event(self, **defaults) -> Event:
         """
