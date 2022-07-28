@@ -3,95 +3,51 @@ Tests for the v2 client.
 
 """
 from unittest import TestCase
-from unittest.mock import patch
 
-import runeq
-from runeq.config import AUTH_METHOD_ACCESS_TOKEN, AUTH_METHOD_CLIENT_KEYS
-from runeq.v2sdk.patients import Patient
-from runeq.v2sdk.users import User
+from runeq import errors
+from runeq.v2sdk import initialize
+from runeq.v2sdk.client import get_stream, NOT_INITIALIZED_ERROR
 
 
-class TestClientSession(TestCase):
+class TestInitialize(TestCase):
     """
-    Unit tests for the client session.
+    Unit tests for the initialization of the user's credentials.
 
     """
 
-
-    @patch('runeq.v2sdk.client.GraphAPIClient')
-    def test_i_patient(self, graphclient):
+    def test_init_invalid(self):
         """
-        Test the "who am I?" functionality as a patient.
+        Test that access is restricted with no initialization.
 
         """
-        config = runeq.Config(
-            auth_method=AUTH_METHOD_CLIENT_KEYS,
-            graph_url='http://graph.example.io',
-            client_key_id='llama',
-            client_access_key='llama',
+        with self.assertRaises(errors.RuneError) as err:
+            get_stream("stream_id")
+
+        self.assertEqual(NOT_INITIALIZED_ERROR, str(err.exception))
+
+    def test_init_with_access_keys(self):
+        """
+        Test that the user is initialized but with invalid access keys.
+
+        """
+        initialize(
+            stream_url="https://stream-staging.runelabs.io",
+            access_token_id="foo",
+            access_token_secret="bar",
         )
 
-        graphclient().whoami.return_value = {
-            'patient': {
-                'id': 'patient-llama,patient',
-                'codeName': 'llama code name',
-                'createdAt': 1234567890.0,
-            }
-        }
+        with self.assertRaisesRegex(errors.APIError, "404 NotFound"):
+            get_stream("stream_id").__next__()
 
-        rune = runeq.session(config)
-        me = rune.me
-
-        self.assertIsInstance(me, Patient)
-        self.assertEqual('llama', me.id)
-        self.assertEqual('llama code name', me.code_name)
-        graphclient().whoami.assert_called_once()
-
-        # Assert caching works
-        me = rune.me
-        graphclient().whoami.assert_called_once()
-
-
-    @patch('runeq.v2sdk.client.GraphAPIClient')
-    def test_i_user(self, graphclient):
+    def test_init_with_client_keys(self):
         """
-        Test the "who am I" functionality as a user.
+        Test that the user is initialized but with invalid client keys.
 
         """
-        config = runeq.Config(
-            auth_method=AUTH_METHOD_ACCESS_TOKEN,
-            graph_url='http://graph.example.io',
-            access_token_id='llama',
-            access_token_secret='llama'
+        initialize(
+            client_key_id="foo",
+            client_access_key="bar",
         )
 
-        graphclient().whoami.return_value = {
-            'user': {
-                'id': 'llama',
-                'created': 1234567890.0,
-                'defaultMembership': {
-                    'id': 'rune$llama',
-                    'created': 1234567890.0,
-                    'org': {
-                        'id': 'llama',
-                        'created': 1234567890.0,
-                        'displayName': 'Llama Org'
-                    }
-                },
-                'displayName': 'Llama User',
-                'email': 'llama@runelabs.io',
-                'username': 'llamauser',
-            }
-        }
-
-        rune = runeq.session(config)
-        me = rune.me
-
-        self.assertIsInstance(me, User)
-        self.assertEqual('llama', me.id)
-        self.assertEqual('llama@runelabs.io', me.email)
-        graphclient().whoami.assert_called_once()
-
-        # Assert caching works
-        me = rune.me
-        graphclient().whoami.assert_called_once()
+        with self.assertRaisesRegex(errors.APIError, "401 InvalidAuthentication"):
+            get_stream("stream_id").__next__()

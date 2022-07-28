@@ -5,11 +5,9 @@ APIs.
 """
 from . import stream
 from .config import Config
-from .v2sdk import session
 
 
 __all__ = [
-    'Config',
-    'session',
-    'stream',
+    "Config",
+    "stream",
 ]

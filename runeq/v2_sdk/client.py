@@ -1,8 +1,3 @@
-"""
-V2 SDK Client to support graph and stream clients.
-
-"""
-
 import requests
 
 from gql import Client as GQLClient
@@ -10,6 +5,14 @@ from gql.transport.requests import RequestsHTTPTransport
 
 from runeq import Config, errors
 
+
+NOT_INITIALIZED_ERROR = (
+    "User not initialized. Call runeq.v2sdk.initialize() to get started."
+)
+"""
+Error raised when a user has not initialized their API credentials with initialize().
+
+"""
 
 _gql_client = None
 """
@@ -20,14 +23,6 @@ Rune GraphQL Client to query stream metadata.
 _stream_client = None
 """
 Rune Stream API Client to query stream data.
-
-"""
-
-NOT_INITIALIZED_ERROR = (
-    "User not initialized. Call runeq.v2sdk.initialize() to get started."
-)
-"""
-Error raised when a user has not initialized their API credentials with initialize().
 
 """
 
