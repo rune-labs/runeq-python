@@ -6,9 +6,11 @@ from runeq import errors
 from runeq.v2sdk import client
 
 
-NOT_INITIALIZED_ERROR = "User not initialized. Call runeq.v2sdk.initialize() to get started."
+NOT_INITIALIZED_ERROR = (
+    "User not initialized. Call runeq.v2sdk.initialize() to get started."
+)
 """
-Error raised when a user has not initialized their API credentials with initialize().
+Error raised when a user has not initialized their API credentials.
 
 """
 
@@ -45,7 +47,8 @@ def get_availability(stream_id, **params):
     if not client._stream_client:
         raise errors.RuneError(NOT_INITIALIZED_ERROR)
 
-    url = f"{client._stream_client._config.stream_url}/v2/streams/{stream_id}/availability"
+    stream_url = client._stream_client._config.stream_url
+    url = f"{stream_url}/v2/streams/{stream_id}/availability"
 
     # TODO: Currently it seems that only JSON availability is supported, but
     # CSV availability will be incorporated very soon!

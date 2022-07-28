@@ -46,7 +46,10 @@ class GraphClient:
             retries=10,
             url=f"{config.graph_url}/graphql",
             use_json=True,
-            headers={"Content-Type": "application/json", **config.auth_headers},
+            headers={
+                "Content-Type": "application/json",
+                **config.auth_headers
+            },
         )
         self._gql_client = GQLClient(
             transport=transport,
