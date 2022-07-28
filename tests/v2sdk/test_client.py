@@ -6,7 +6,7 @@ from unittest import TestCase
 
 from runeq import errors
 from runeq.v2sdk import initialize
-from runeq.v2sdk.client import get_stream, NOT_INITIALIZED_ERROR
+from runeq.v2sdk.stream import get_stream, NOT_INITIALIZED_ERROR
 
 
 class TestInitialize(TestCase):
@@ -31,7 +31,6 @@ class TestInitialize(TestCase):
 
         """
         initialize(
-            stream_url="https://stream-staging.runelabs.io",
             access_token_id="foo",
             access_token_secret="bar",
         )
@@ -49,5 +48,8 @@ class TestInitialize(TestCase):
             client_access_key="bar",
         )
 
-        with self.assertRaisesRegex(errors.APIError, "401 InvalidAuthentication"):
+        with self.assertRaisesRegex(
+            errors.APIError,
+            "401 InvalidAuthentication"
+        ):
             get_stream("stream_id").__next__()

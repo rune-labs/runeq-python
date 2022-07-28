@@ -35,8 +35,8 @@ def beta_warning():
 
 def initialize(*args, **kwargs):
     """
-    Initialize configuration options. Authenticate the user and globally initialize
-    internal graph and stream clients.
+    Initialize configuration options. Authenticate the user and globally
+    initialize internal graph and stream clients.
 
     Args:
         *args: Accepts at most 1; a filename. If provided, values will be
