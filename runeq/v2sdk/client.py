@@ -33,7 +33,7 @@ class GraphClient:
     config: Config = None
     """
     Configuration details for the graph client.
-    
+
     """
 
     _gql_client: GQLClient
@@ -77,7 +77,7 @@ class StreamClient:
     config: Config = None
     """
     Configuration details for the stream client.
-    
+
     """
 
     def __init__(self, config: Config):
