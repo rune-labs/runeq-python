@@ -30,6 +30,12 @@ class GraphClient:
 
     """
 
+    config: Config = None
+    """
+    Configuration details for the graph client.
+    
+    """
+
     _gql_client: GQLClient
     """
     The GraphQL client.
@@ -41,7 +47,7 @@ class GraphClient:
         Initialize the Graph API Client.
 
         """
-        self._config = config
+        self.config = config
         transport = RequestsHTTPTransport(
             retries=10,
             url=f"{config.graph_url}/graphql",
@@ -68,14 +74,20 @@ class StreamClient:
 
     """
 
+    config: Config = None
+    """
+    Configuration details for the stream client.
+    
+    """
+
     def __init__(self, config: Config):
         """
         Initialize the Stream API Client.
 
         """
-        self._config = config
+        self.config = config
 
-    def _get(self, url, **params):
+    def get_data(self, url: str, **params):
         """
         Fetch stream data from the specified url and params.
 
@@ -83,7 +95,7 @@ class StreamClient:
         while True:
             r = requests.get(
                 url,
-                headers=self._config.auth_headers,
+                headers=self.config.auth_headers,
                 params=params
             )
 

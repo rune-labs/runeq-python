@@ -20,8 +20,8 @@ def get_stream(stream_id, **params):
     if not client._stream_client:
         raise errors.InitializationError("Failed to initialize stream client.")
 
-    url = f"{client._stream_client._config.stream_url}/v2/streams/{stream_id}"
-    return client._stream_client._get(url, **params)
+    url = f"{client._stream_client.config.stream_url}/v2/streams/{stream_id}"
+    return client._stream_client.get_data(url, **params)
 
 
 def get_availability(stream_id, **params):
@@ -38,10 +38,10 @@ def get_availability(stream_id, **params):
     if not client._stream_client:
         raise errors.InitializationError("Failed to initialize stream client.")
 
-    stream_url = client._stream_client._config.stream_url
+    stream_url = client._stream_client.config.stream_url
     url = f"{stream_url}/v2/streams/{stream_id}/availability"
 
     # TODO: Currently it seems that only JSON availability is supported, but
     # CSV availability will be incorporated very soon!
     # https://runelabs.atlassian.net/browse/DATA-247?atlOrigin=eyJpIjoiYjhjYmE1ODM1ZWE4NGYwYmE1ZWVlOGQ1ZWM3MjUyZTUiLCJwIjoiaiJ9
-    return client._stream_client._get(url, **params)
+    return client._stream_client.get_data(url, **params)
