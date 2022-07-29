@@ -1,12 +1,12 @@
 """
-Tests for the v2 client.
+Tests for the V2 SDK Client.
 
 """
 from unittest import TestCase
 
 from runeq import errors
 from runeq.v2sdk import initialize
-from runeq.v2sdk.stream import get_stream, NOT_INITIALIZED_ERROR
+from runeq.v2sdk.stream import get_stream
 
 
 class TestInitialize(TestCase):
@@ -20,10 +20,8 @@ class TestInitialize(TestCase):
         Test that access is restricted with no initialization.
 
         """
-        with self.assertRaises(errors.RuneError) as err:
+        with self.assertRaises(errors.InitializationError):
             get_stream("stream_id")
-
-        self.assertEqual(NOT_INITIALIZED_ERROR, str(err.exception))
 
     def test_init_with_access_keys(self):
         """

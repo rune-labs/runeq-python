@@ -1,4 +1,4 @@
 """
-Test suite for the v2 SDK.
+Tests for the V2 SDK.
 
 """
