@@ -43,8 +43,8 @@ def initialize(*args, **kwargs):
         **and** keyword arguments.
     **kwargs
         Initialize client with keyword arguments.
-        If using client keys, specify the client_key_id and client_access_key.
-        If using access token auth, specify access_token_id and access_token_secret.
+        If using client keys, specify the client_key_id & client_access_key.
+        If using access tokens, specify access_token_id & access_token_secret.
 
     Examples
     --------

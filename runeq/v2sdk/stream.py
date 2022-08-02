@@ -47,7 +47,8 @@ def get_availability(stream_id: str, **params):
 
     Returns
     -------
-    Generator over stream availability data in the specified format, defaulting to csv.
+    Generator over stream availability data in the specified format,
+    defaulting to csv.
 
     """
     if not client._stream_client:
