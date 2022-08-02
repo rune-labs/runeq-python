@@ -61,6 +61,7 @@ def initialize(*args, **kwargs):
 
     >>> initialize(access_token_id='foo', access_token_secret='bar')
     # Set values using keyword arguments
+
     """
     beta_warning()
 

@@ -23,17 +23,11 @@ class GraphClient:
 
     """
 
+    # Configuration details for the graph client.
     config: Config = None
-    """
-    Configuration details for the graph client.
 
-    """
-
+    # The GraphQL client.
     _gql_client: GQLClient
-    """
-    The GraphQL client.
-
-    """
 
     def __init__(self, config: Config):
         """
@@ -61,17 +55,17 @@ class StreamClient:
 
     """
 
+    # Default response size per data fetch
+    DEFAULT_RESPONSE_SIZE = 100
+
+    # Max response size per data fetch
+    MAX_RESPONSE_SIZE = 10000
+
+    # Pagination token to get the next page of results.
     HEADER_NEXT_PAGE = "X-Rune-Next-Page-Token"
-    """
-    Pagination token to get the next page of results.
 
-    """
-
+    # Configuration details for the stream client.
     config: Config = None
-    """
-    Configuration details for the stream client.
-
-    """
 
     def __init__(self, config: Config):
         """
@@ -85,6 +79,11 @@ class StreamClient:
         Fetch stream data from the specified url and params.
 
         """
+        if params.get('limit'):
+            params['limit'] = min(params['limit'], self.MAX_RESPONSE_SIZE)
+        else:
+            params['limit'] = self.DEFAULT_RESPONSE_SIZE
+
         while True:
             r = requests.get(
                 url,
