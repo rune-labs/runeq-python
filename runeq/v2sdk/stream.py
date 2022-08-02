@@ -6,34 +6,49 @@ from runeq import errors
 from . import client
 
 
-def get_stream(stream_id, **params):
+def get_stream(stream_id: str, **params):
     """
     Fetch stream data from the Stream API.
 
-    Args:
-        stream_id: Unique string identifier for a stream.
+    Parameters
+    ----------
+    stream_id : str
+        Unique string identifier for a stream.
 
-        **params:
-            limit: Limits the number of points returned for the stream.
-            format: 'csv' or 'json'. Defaults to csv.
+    **params
+        limit: Limits the number of points returned for the stream.
+        format: 'csv' or 'json'. Defaults to csv.
+
+    Returns
+    -------
+    Generator over stream data in the specified format, defaulting to csv.
+
     """
     if not client._stream_client:
         raise errors.InitializationError("Failed to initialize stream client.")
 
     url = f"{client._stream_client.config.stream_url}/v2/streams/{stream_id}"
+
     return client._stream_client.get_data(url, **params)
 
 
-def get_availability(stream_id, **params):
+def get_availability(stream_id: str, **params):
     """
     Fetch stream data availability from the Stream API.
 
-    Args:
-        stream_id: Unique string identifier for a stream.
+    Parameters
+    ----------
+    stream_id : str
+        Unique string identifier for a stream.
 
-        **params:
-            limit: Limits the number of points returned for the stream.
-            format: 'csv' or 'json'. Defaults to csv.
+    **params
+        limit: Limits the number of points returned for the stream.
+        format: 'csv' or 'json'. Defaults to csv.
+
+    Returns
+    -------
+    Generator over stream availability data in the specified format, defaulting to csv.
+
     """
     if not client._stream_client:
         raise errors.InitializationError("Failed to initialize stream client.")
@@ -41,7 +56,4 @@ def get_availability(stream_id, **params):
     stream_url = client._stream_client.config.stream_url
     url = f"{stream_url}/v2/streams/{stream_id}/availability"
 
-    # TODO: Currently it seems that only JSON availability is supported, but
-    # CSV availability will be incorporated very soon!
-    # https://runelabs.atlassian.net/browse/DATA-247?atlOrigin=eyJpIjoiYjhjYmE1ODM1ZWE4NGYwYmE1ZWVlOGQ1ZWM3MjUyZTUiLCJwIjoiaiJ9
     return client._stream_client.get_data(url, **params)

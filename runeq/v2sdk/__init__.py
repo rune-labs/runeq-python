@@ -8,11 +8,8 @@ from runeq import Config
 from runeq.v2sdk import client
 
 
+# Whether the warning about beta usage has been printed.
 _beta_warned = False
-"""
-Whether the warning about beta usage has been printed.
-
-"""
 
 
 def beta_warning():
@@ -38,30 +35,32 @@ def initialize(*args, **kwargs):
     Initialize configuration options. Authenticate the user and globally
     initialize internal graph and stream clients.
 
-    Args:
-        *args: Accepts at most 1; a filename. If provided, values will be
-            loaded from the file. It is invalid to provide both a filename
-            **and** keyword arguments.
-        **kwargs: Initialize client with keyword arguments.
-            If using client keys, specify:
-                client_key_id and client_access_key
-            If using access token auth, specify:
-                access_token_id and access_token_secret
+    Parameters
+    ----------
+    *args
+        Accepts at most 1; a filename. If provided, values will be
+        loaded from the file. It is invalid to provide both a filename
+        **and** keyword arguments.
+    **kwargs
+        Initialize client with keyword arguments.
+        If using client keys, specify the client_key_id and client_access_key.
+        If using access token auth, specify access_token_id and access_token_secret.
 
-    Examples:
-        There are four valid ways to initialize the Rune V2 Client:
+    Examples
+    --------
+    There are four valid ways to initialize the Rune V2 Client:
 
-        >>> initialize()
-        # Load from default file location (~/.rune/config)
+    >>> initialize()
+    # Load from default file location (~/.rune/config)
 
-        >>> initialize('./example_config.yaml')
-        # Load from a specified YAML file
+    >>> initialize('./example_config.yaml')
+    # Load from a specified YAML file
 
-        >>> initialize(client_key_id='foo', client_access_key='bar')
-        # Set values using keyword arguments
+    >>> initialize(client_key_id='foo', client_access_key='bar')
+    # Set values using keyword arguments
 
-        >>> initialize(access_token_id='foo', access_token_secret='bar')
-        # Set values using keyword arguments
+    >>> initialize(access_token_id='foo', access_token_secret='bar')
+    # Set values using keyword arguments
     """
     beta_warning()
 

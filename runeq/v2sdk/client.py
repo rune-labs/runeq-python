@@ -10,18 +10,11 @@ from gql.transport.requests import RequestsHTTPTransport
 
 from runeq import Config, errors
 
-
+# Rune GraphQL Client to query stream metadata.
 _gql_client = None
-"""
-Rune GraphQL Client to query stream metadata.
 
-"""
-
+# Rune Stream API Client to query stream data.
 _stream_client = None
-"""
-Rune Stream API Client to query stream data.
-
-"""
 
 
 class GraphClient:
