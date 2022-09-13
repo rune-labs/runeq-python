@@ -2,5 +2,4 @@
 # used only for development and CI
 coverage==5.1
 flake8==3.7.9
-numpy>=1.11.3
 unittest-xml-reporting==3.0.2
