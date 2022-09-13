@@ -37,7 +37,6 @@ class Config:
 
     """
 
-
     def __init__(self, *args, **kwargs):
         """
         Initialize configuration options.
@@ -87,7 +86,6 @@ class Config:
         else:
             self.set_values(**kwargs)
 
-
     def load_yaml(self, filename=DEFAULT_CONFIG_YAML):
         """
         Set values from a YAML file. Keys from the file are passed directly to
@@ -101,33 +99,41 @@ class Config:
             params = yaml.safe_load(f)
         return self.set_values(**params)
 
-
-    def set_values(self,
-                   auth_method=None,
-                   access_token_id=None,
-                   access_token_secret=None,
-                   client_key_id=None,
-                   client_access_key=None,
-                   jwt=None,
-                   stream_url=None,
-                   **kwargs):
+    def set_values(
+        self,
+        auth_method=None,
+        access_token_id=None,
+        access_token_secret=None,
+        client_key_id=None,
+        client_access_key=None,
+        jwt=None,
+        stream_url=None,
+        graph_url=None,
+        **kwargs,
+    ):
         """
         Set configuration values.
 
         Args:
-            auth_method: One of 'access_token' or 'client_keys' or 'jwt'.
-            If falsy, the auth
-            method is inferred based on which kwargs are specified.
+            auth_method: What type of authentication credentials to use. Must
+                be one of 'access_token', 'client_keys', or 'jwt'. If not set,
+                the auth method is inferred based on which credentials are
+                specified (as long as it's unambiguous).
             access_token_id: User access token ID
             access_token_secret: User access token secret
             client_key_id: Client key ID
             client_access_key: Client access key
             jwt: JWT
             stream_url: base URL to use for the stream API
+            graph_url: base URL to use for the graph API
+            **kwargs: Arbitrary values may be provided, but they are ignored.
 
         """
         if stream_url is not None:
             self.stream_url = stream_url
+
+        if graph_url is not None:
+            self.graph_url = graph_url
 
         if auth_method is None:
             num_auth_methods_set = sum([
@@ -147,7 +153,6 @@ class Config:
                 auth_method = AUTH_METHOD_CLIENT_KEYS
             elif jwt:
                 auth_method = AUTH_METHOD_JWT
-
             else:
                 raise ValueError(
                     'Cannot infer auth method: a complete set of credentials '
@@ -174,7 +179,6 @@ class Config:
         # access auth headers to ensure they're valid
         _ = self.auth_headers
 
-
     @property
     def client_auth_headers(self):
         """
@@ -191,7 +195,6 @@ class Config:
             'X-Rune-Client-Access-Key': self._client_access_key,
         }
 
-
     @property
     def jwt_auth_headers(self):
         """
@@ -204,7 +207,6 @@ class Config:
         return {
             'X-Rune-User-Access-Token': self._jwt,
         }
-
 
     @property
     def access_token_auth_headers(self):
@@ -222,7 +224,6 @@ class Config:
             'X-Rune-User-Access-Token-Id': self._access_token_id,
             'X-Rune-User-Access-Token-Secret': self._access_token_secret
         }
-
 
     @property
     def auth_headers(self):

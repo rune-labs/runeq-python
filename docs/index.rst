@@ -48,6 +48,7 @@ Documentation
    pages/quickstart
    pages/config
    pages/stream
+   pages/graph
    pages/errors
 
 Source

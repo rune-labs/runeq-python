@@ -1,4 +1,4 @@
 -r common.txt
 # used for building documentation
-Sphinx==3.5.4 
+Sphinx==5.1.1
 Jinja2<3.1

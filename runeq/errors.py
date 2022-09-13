@@ -11,6 +11,14 @@ class RuneError(Exception):
     """
 
 
+class InitializationError(RuneError):
+    """
+    Rune Initialization Error. Raised when a user has not initialized
+    their API credentials.
+
+    """
+
+
 class APIError(RuneError):
     """
     Rune API Error. Includes details about error type.
