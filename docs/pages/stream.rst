@@ -27,7 +27,7 @@ Accel
    :inherited-members:
 
 BandPower
-*****
+*********
 
 .. autoclass:: BandPower
    :members:
