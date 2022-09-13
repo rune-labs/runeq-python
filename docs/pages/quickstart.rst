@@ -6,18 +6,45 @@ Quickstart
 Prerequisites
 -------------
 
+API Credentials
+***************
+
 To access Rune's APIs, you will need to obtain API credentials.
-For multi-patient analyses, we recommended using **access tokens**,
-which provide access to all the patients in your organization.
+For multi-patient analyses, we recommended using **user access tokens**.
+These provide access to all the user's allowed resources.
 
-For details about creating API credentials, refer to the
-`Stream API documentation <https://docs.runelabs.io/stream/#section/Overview/Authentication>`_.
+To create a new access token:
 
+    1. Log in to the `Rune web portal <https://app.runelabs.io>`_
+    2. Click on the profile icon, in the top right corner.
+    3. Click on **User Settings**.
+    4. On the left sidebar, click on **Access Tokens**.
+    5. Click **CREATE ACCESS TOKEN**.
+    6. Copy the token ID and secret *before closing the page*. The secret will never be shown again.
 
-Configuration
--------------
+See :ref:`quickstart_config` for details about how to use these credentials
+with this library.
 
-``runeq`` uses `YAML <https://yaml.org/>`_-formatted files to manage configuration
+It is highly recommended that you rotate your access tokens every 3-6 months,
+by creating a new token and deactivating the old one. Store your access tokens
+securely, and do not share them.
+
+Multiple Organizations
+**********************
+
+For users who are members of multiple organizations, note that
+user access tokens only operate within the context of the organization that
+is **currently active**. To switch your active organization, log in to
+the `Rune web portal <https://app.runelabs.io>`_ and click on the profile icon
+in the top right corner. If you are a member of multiple organizations, the
+profile icon's dropdown menu will have an option to switch your organization.
+
+.. _quickstart_config:
+
+Configuration Setup
+-------------------
+
+``runeq`` uses a `YAML <https://yaml.org/>`_-formatted file to manage configuration
 settings (e.g. API credentials). The easiest way to set up this configuration is via
 the ``runeq`` command line tool, which is installed along with the Python library.
 
@@ -42,99 +69,87 @@ If you want to create or manage a configuration file manually, refer to the
 `example config <https://github.com/rune-labs/runeq-python/blob/master/example_config.yaml>`_
 for the expected contents.
 
+Once a configuration file exists, you won't need to repeat this step (unless
+you're rotating your access token, getting set up on a different computer, etc).
 
-Stream API
-----------
+.. _quickstart_init:
 
-To access the `Stream API <https://docs.runelabs.io/stream/index.html>`_, create a
-:class:`~runeq.stream.V1Client`, using a :class:`~runeq.config.Config`. As shown below,
-the configuration class uses the file that was created via the command line tool (see above).
+Initialization
+--------------
 
-.. code-block:: python
-
-    from runeq import Config, stream
-
-    cfg = Config()
-    v1client = stream.V1Client(cfg)
-
-Methods on the :class:`~runeq.stream.V1Client` are used to create **accessors** for each type of data
-that can be queried using the Stream API (e.g. accelerometry, events, local field potentials, etc).
-
-The example below initializes an :class:`~runeq.stream.v1.Accel` class, which will allow us to
-fetch accelerometry data:
+To get started with the library, use :class:`~runeq.initialize`:
 
 .. code-block:: python
 
-    accel = v1client.Accel(
-        patient_id='992967a09cad48378f7b628aff5bdf6c',
-        device_id='ABCDEF',
-        start_time=1562482800,
-        end_time=1563692400,
-    )
+    from runeq import initialize
 
-Accessors can be initialized with default query parameters, which will be used for all API requests.
+    initialize()
 
-JSON Endpoints
-**************
+This loads credentials from your configuration file (see :ref:`quickstart_config`).
 
-An accessor can be used to iterate over paginated data from the respective JSON endpoint:
+Usage
+-----
 
-.. code-block:: python
+Explore Metadata
+****************
 
-    for result in accel.iter_json_data():
-         print(result.keys())
+After initializing the library, you can fetch metadata about various resources.
 
-
-To override the default query parameters, use keyword arguments:
+For example, you can get information about your user, based on the authentication
+credentials:
 
 .. code-block:: python
 
-    for text in accel.iter_json_data(device_id='patient-ABC,device-456'):
-        pass  # do something
+    from runeq.resources.user import get_current_user
+
+    my_user = get_current_user()
+    print(my_user)
 
 
-CSV Endpoints
-*************
-
-An accessor can also iterate over paginated data from the respective CSV endpoint.
-
-Here, we use the accessor to build up a `pandas <https://pandas.pydata.org/>`_ DataFrame,
-containing the complete result set.
+You can also fetch metadata about all the patients you have access to:
 
 .. code-block:: python
 
-    import io
+    from runeq.resources.user import get_all_patients
+
+    patients = get_all_patients()
+
+    for patient in patients:
+        print('Code Name:\t', patient.code_name)
+        print('Patient ID:\t', patient.id)
+        print('Devices:')
+        for device in patient.devices:
+            print(' - Type: ', device.device_type_id)
+            print('   Alias:', device.alias)
+            print('   ID:   ', device.id)
+
+        print('')
+
+
+:class:`~runeq.v2sdk.patient.get_all_patients` returns a :class:`~runeq.v2sdk.patient.PatientSet`,
+which can be serialized as a list of dictionaries, e.g. to save the metadata to a file:
+
+.. code-block:: python
+
+    import json
+
+    with open('patients.json', 'w') as f:
+        json.dump(patients.to_list(), f, indent=4)
+
+
+You can also convert a :class:`~runeq.v2sdk.patient.PatientSet` to a collection of
+devices (a :class:`~runeq.v2sdk.patient.DeviceSet`). This may be more convenient for
+a columnar data format, like a `pandas <https://pandas.pydata.org/>`_ DataFrame.
+
+.. code-block:: python
+
     import pandas as pd
 
-    df = pd.DataFrame()
-    for text in accel.iter_csv_text():
-        page_df = pd.read_csv(io.StringIO(text))
-        df.append(page_df)
+    devices = patients.devices()
+    devices_df = pd.DataFrame(devices.to_list())
 
 
-We can also iterate over each point from the CSV response. Each line from the CSV
-is returned as a dict:
+Fetch Timeseries Data
+*********************
 
-.. code-block:: python
-
-    for point in accel.points():
-        print(point)
-
-    # the accessor itself is also an iterator
-    for point in accel:
-        print(point)
-
-To override the default query parameters, use keyword arguments:
-
-.. code-block:: python
-
-    for point in accel.points(end_time=1563692400):
-        pass  # do something
-
-    for text in accel.iter_csv_text(device_id='patient-ABC,device-456'):
-        pass  # do something
-
-    # etc
-
-Note that CSV-formatted data is not supported for all resources: refer to the
-`API documentation <https://docs.runelabs.io/stream/index.html>`_ for details.
+Coming soon!

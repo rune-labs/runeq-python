@@ -3,7 +3,7 @@
 Configuration
 =============
 
-.. autofunction:: runeq.config.initialize
+.. autofunction:: runeq.v2sdk.initialize
 
 .. automodule:: runeq.config
 .. autoclass:: runeq.config.Config
