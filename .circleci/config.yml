@@ -23,14 +23,16 @@ executors:
 
 jobs:
     lint:
+        parameters:
+            executor:
+                type: executor
+        executor: << parameters.executor >>
         working_directory: ~/runeq-python/
-        docker:
-            - image: cimg/python:3.10
         steps:
             - checkout:
                 path: ~/runeq-python
             - restore_cache:
-                  key: runeq-python-{{ checksum "requirements/common.txt" }}-{{ checksum "requirements/dev.txt" }}-{{ checksum "requirements/docs.txt" }}
+                key: runeq-python-<< parameters.executor >>-{{ checksum "requirements/common.txt" }}-{{ checksum "requirements/dev.txt" }}-{{ checksum "requirements/docs.txt" }}
             - run:
                 name: Install flake8
                 command: |
@@ -54,7 +56,7 @@ jobs:
             - checkout:
                   path: ~/runeq-python
             - restore_cache:
-                  key: runeq-python-{{ checksum "requirements/common.txt" }}-{{ checksum "requirements/dev.txt" }}-{{ checksum "requirements/docs.txt" }}
+                  key: runeq-python-<<parameters.executor>>-{{ checksum "requirements/common.txt" }}-{{ checksum "requirements/dev.txt" }}-{{ checksum "requirements/docs.txt" }}
             - run:
                   name: Install Dependencies
                   command: |
@@ -63,7 +65,7 @@ jobs:
                       pip install --upgrade pip
                       pip install -r requirements/dev.txt
             - save_cache:
-                  key: runeq-python-{{ checksum "requirements/common.txt" }}-{{ checksum "requirements/dev.txt" }}-{{ checksum "requirements/docs.txt" }}
+                  key: runeq-python-<<parameters.executor>>-{{ checksum "requirements/common.txt" }}-{{ checksum "requirements/dev.txt" }}-{{ checksum "requirements/docs.txt" }}
                   paths:
                       - venv
             - run:
@@ -82,14 +84,16 @@ jobs:
                   path: htmlcov
 
     docs:
+        parameters:
+            executor:
+                type: executor
+        executor: << parameters.executor >>
         working_directory: ~/runeq-python/
-        docker:
-            - image: cimg/python:3.10
         steps:
             - checkout:
                 path: ~/runeq-python
             - restore_cache:
-                key: runeq-python-{{ checksum "requirements/common.txt" }}-{{ checksum "requirements/docs.txt" }}
+                key: runeq-python-<< parameters.executor >>-{{ checksum "requirements/common.txt" }}-{{ checksum "requirements/docs.txt" }}
             - run:
                 name: Install docs requirements
                 command: |
@@ -111,9 +115,15 @@ workflows:
     version: 2
     runeq:
         jobs:
-            - lint
+            - lint:
+                matrix:
+                    parameters:
+                        executor: ["python3_10"]
             - test:
                 matrix:
                     parameters:
                         executor: ["python3_6", "python3_7", "python3_8", "python3_9", "python3_10"]
-            - docs
+            - docs:
+                matrix:
+                    parameters:
+                        executor: ["python3_10"]
