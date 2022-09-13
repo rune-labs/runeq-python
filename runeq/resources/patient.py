@@ -23,7 +23,7 @@ class Device(ItemBase):
         self,
         id: str,
         patient_id: str,
-        alias: str,
+        name: str,
         created_at: float,
         device_type_id: str,
         **attributes
@@ -34,20 +34,20 @@ class Device(ItemBase):
         Args:
             id: ID of the device
             patient_id: ID of the patient
-            alias: Human-readable name for the device
+            name: Human-readable name for the device
             created_at: When the device was created (unix timestamp)
             **attributes: Other attributes associated with the device
 
         """
         self.patient_id = patient_id
-        self.alias = alias
+        self.name = name
         self.created_at = created_at
         self.device_type_id = device_type_id
 
         super().__init__(
             id=id,
             patient_id=patient_id,
-            alias=alias,
+            name=name,
             created_at=created_at,
             device_type_id=device_type_id,
             **attributes,
@@ -86,6 +86,16 @@ class Device(ItemBase):
 
         return f'patient-{norm_patient_id},device-{norm_device_id}'
 
+    def __repr__(self):
+        """
+        Override repr, to include the patient ID
+
+        """
+        return (
+            f'{self.__class__.__name__}('
+            f'id={self.id}, name={self.name}, patient_id={self.patient_id})'
+        )
+
 
 class DeviceSet(ItemSet):
     """
@@ -122,7 +132,7 @@ class Patient(ItemBase):
     def __init__(
         self,
         id: str,
-        code_name: str,
+        name: str,
         created_at: float,
         devices: DeviceSet,
         **attributes
@@ -132,18 +142,18 @@ class Patient(ItemBase):
 
         Args:
             id: ID of the patient
-            code_name: Human-readable display name for the patient
+            name: Human-readable display name for the patient
             created_at: When the patient's record was created (unix timestamp)
             devices: Devices that belong to the patient
             **attributes: Other attributes associated with the patient
         """
-        self.code_name = code_name
+        self.name = name
         self.created_at = created_at
         self.devices = devices
 
         super().__init__(
             id=id,
-            code_name=code_name,
+            name=name,
             created_at=created_at,
             devices=devices,
             **attributes,
@@ -230,6 +240,7 @@ class PatientSet(ItemSet):
         """
         return Patient
 
+    @property
     def devices(self) -> DeviceSet:
         """
         Set of all devices that belong to the patients in this collection.
@@ -261,7 +272,7 @@ def get_patient(
         query getPatient($patient_id: ID!, $cursor: Cursor) {
             patient(id: $patient_id) {
                 id
-                code_name: codeName
+                name: codeName
                 created_at: createdAt
                 deviceList(cursor: $cursor) {
                     pageInfo {
@@ -269,8 +280,7 @@ def get_patient(
                     }
                     devices {
                         id: deviceShortId
-                        denormalized_id: id
-                        alias
+                        name: alias
                         created_at: createdAt
                         device_type: deviceType {
                             id
@@ -342,7 +352,7 @@ def get_all_patients(client: Optional[GraphClient] = None) -> PatientSet:
                     patientAccess {
                         patient {
                             id
-                            code_name: codeName
+                            name: codeName
                             created_at: createdAt
                             deviceList(cursor: $device_cursor) {
                                 pageInfo {
@@ -350,8 +360,7 @@ def get_all_patients(client: Optional[GraphClient] = None) -> PatientSet:
                                 }
                                 devices {
                                     id: deviceShortId
-                                    denormalized_id: id
-                                    alias
+                                    name: alias
                                     created_at: createdAt
                                     device_type: deviceType {
                                         id
@@ -453,7 +462,7 @@ def get_patient_devices(
     Get all devices for a patient.
 
     Note that if a Patient object is provided, this function serves
-    as a wrapper around Patient.devices(). If a patient ID is provided,
+    as a wrapper around Patient.devices. If a patient ID is provided,
     metadata is fetched from the API.
 
     Args:
@@ -496,4 +505,4 @@ def get_all_devices(
 
         return all_devices
 
-    return patients.devices()
+    return patients.devices

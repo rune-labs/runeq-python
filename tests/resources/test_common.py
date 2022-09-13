@@ -5,7 +5,7 @@ Tests for the V2 SDK Common Classes.
 from typing import List, Type
 from unittest import TestCase
 
-from runeq.resources.common import ItemBase, ItemSet
+from runeq.v2sdk.common import ItemBase, ItemSet
 
 
 class StreamItem(ItemBase):
@@ -122,20 +122,15 @@ class TestItemBase(TestCase):
         Test __repr__
 
         """
-        patient1 = PatientItem(id="patient_id")
+        patient1 = PatientItem(id="patient_id1")
         self.assertEqual(
-            'PatientItem(\n\tid=patient_id,\n\tattributes='
-            '{\'id\': \'patient_id\'}\n)',
+            'PatientItem(id=patient_id1)',
             repr(patient1)
         )
 
-
-        patient2 = PatientItem(id="patient_id", key1="val1")
+        patient2 = PatientItem(id="patient_id2", key1="val1")
         self.assertEqual(
-            (
-                "PatientItem(\n\tid=patient_id,\n\t"
-                "attributes={'key1': 'val1', 'id': 'patient_id'}\n)"
-            ),
+            "PatientItem(id=patient_id2)",
             repr(patient2)
         )
 
@@ -320,9 +315,9 @@ class TestItemSet(TestCase):
         self.assertEqual(
             (
                 'PatientItemSet {\n'
-                '	patient1_id\n'
-                '	patient2_id\n'
-                '	patient3_id\n'
+                '	PatientItem(id=patient1_id)\n'
+                '	PatientItem(id=patient2_id)\n'
+                '	PatientItem(id=patient3_id)\n'
                 '	... (and 2 others)\n'
                 '}'
             ),

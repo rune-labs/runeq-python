@@ -5,8 +5,8 @@ Tests for the V2 SDK Patient.
 from unittest import TestCase, mock
 
 from runeq.config import Config
-from runeq.resources.client import GraphClient
-from runeq.resources.patient import (
+from runeq.v2sdk.client import GraphClient
+from runeq.v2sdk.patient import (
     Device, DeviceSet, Patient, PatientSet, get_all_devices, get_all_patients,
     get_device, get_patient, get_patient_devices
 )
@@ -38,20 +38,20 @@ class TestPatient(TestCase):
         test_patient = Patient(
             id="p1",
             created_at=1629300943.9179766,
-            code_name="patient1",
+            name="patient1",
             devices=DeviceSet(
                 [
                     Device(
                         id="d1",
                         patient_id="p1",
-                        alias="Percept",
+                        name="Percept",
                         created_at=1629300943.9179766,
                         device_type_id="dt1",
                     ),
                     Device(
                         id="d2",
                         patient_id="p1",
-                        alias="Apple Watch",
+                        name="Apple Watch",
                         created_at=1629300943.9179766,
                         device_type_id="dt2",
                     )
@@ -61,7 +61,7 @@ class TestPatient(TestCase):
 
         self.assertEqual("p1", test_patient.id)
         self.assertEqual(1629300943.9179766, test_patient.created_at)
-        self.assertEqual("patient1", test_patient.code_name)
+        self.assertEqual("patient1", test_patient.name)
 
         actual_devices = test_patient.devices.to_list()
         self.assertEqual(2, len(actual_devices))
@@ -70,7 +70,7 @@ class TestPatient(TestCase):
             {
                 "id": "d1",
                 "patient_id": "p1",
-                "alias": "Percept",
+                "name": "Percept",
                 "created_at": 1629300943.9179766,
                 "device_type_id": "dt1",
             },
@@ -81,7 +81,7 @@ class TestPatient(TestCase):
             {
                 "id": "d2",
                 "patient_id": "p1",
-                "alias": "Apple Watch",
+                "name": "Apple Watch",
                 "created_at": 1629300943.9179766,
                 "device_type_id": "dt2",
             },
@@ -92,11 +92,27 @@ class TestPatient(TestCase):
             Device(
                 id="d1",
                 patient_id="p1",
-                alias="Percept",
+                name="Percept",
                 created_at=1629300943.9179766,
                 device_type_id="dt1",
             ),
             test_patient.device("d1")
+        )
+
+    def test_repr(self):
+        """
+        Test __repr__
+
+        """
+        test_patient = Patient(
+            id="p1",
+            created_at=1629300943.9179766,
+            name="patient1",
+            devices=DeviceSet()
+        )
+        self.assertEqual(
+            "Patient(id=p1, name=patient1)",
+            repr(test_patient)
         )
 
     def test_normalize_id(self):
@@ -140,7 +156,7 @@ class TestPatient(TestCase):
                 "patient": {
                     "id": "p1",
                     "created_at": 1630515986.9949625,
-                    "code_name": "patient1",
+                    "name": "patient1",
                     "deviceList": {
                         "pageInfo": {
                             "endCursor": None
@@ -148,8 +164,7 @@ class TestPatient(TestCase):
                         "devices": [
                             {
                                 "id": "d1",
-                                "denormalized_id": "patient-p1,device-d1",
-                                "alias": "Percept",
+                                "name": "Percept",
                                 "created_at": 1646685476.1367705,
                                 "device_type": {
                                     "id": "dt1",
@@ -161,8 +176,7 @@ class TestPatient(TestCase):
                             },
                             {
                                 "id": "d2",
-                                "denormalized_id": "patient-p1,device-d2",
-                                "alias": "Strive PD",
+                                "name": "Strive PD",
                                 "created_at": 1646684177.194158,
                                 "device_type": {
                                     "id": "dt2",
@@ -174,8 +188,7 @@ class TestPatient(TestCase):
                             },
                             {
                                 "id": "d3",
-                                "denormalized_id": "patient-p1,device-d3",
-                                "alias": "Apple Watch",
+                                "name": "Apple Watch",
                                 "created_at": 1646684177.1942198,
                                 "device_type": {
                                     "id": "dt3",
@@ -197,12 +210,11 @@ class TestPatient(TestCase):
             {
                 "id": "p1",
                 "created_at": 1630515986.9949625,
-                "code_name": "patient1",
+                "name": "patient1",
                 "devices": [
                     {
-                        "denormalized_id": "patient-p1,device-d1",
                         "patient_id": "p1",
-                        "alias": "Percept",
+                        "name": "Percept",
                         "created_at": 1646685476.1367705,
                         "device_type_id": "dt1",
                         "disabled": False,
@@ -211,9 +223,8 @@ class TestPatient(TestCase):
                         "id": "d1"
                     },
                     {
-                        "denormalized_id": "patient-p1,device-d2",
                         "patient_id": "p1",
-                        "alias": "Strive PD",
+                        "name": "Strive PD",
                         "created_at": 1646684177.194158,
                         "device_type_id": "dt2",
                         "disabled": False,
@@ -222,9 +233,8 @@ class TestPatient(TestCase):
                         "id": "d2"
                     },
                     {
-                        "denormalized_id": "patient-p1,device-d3",
                         "patient_id": "p1",
-                        "alias": "Apple Watch",
+                        "name": "Apple Watch",
                         "created_at": 1646684177.1942198,
                         "device_type_id": "dt3",
                         "disabled": True,
@@ -250,7 +260,7 @@ class TestPatient(TestCase):
                 "patient": {
                     "id": "p1",
                     "created_at": 1630515986.9949625,
-                    "code_name": "patient1",
+                    "name": "patient1",
                     "deviceList": {
                         "pageInfo": {
                             "endCursor": "test_check_next"
@@ -258,8 +268,7 @@ class TestPatient(TestCase):
                         "devices": [
                             {
                                 "id": "d1",
-                                "denormalized_id": "patient-p1,device-d1",
-                                "alias": "Percept",
+                                "name": "Percept",
                                 "created_at": 1646685476.1367705,
                                 "device_type": {
                                     "id": "dt1",
@@ -276,7 +285,7 @@ class TestPatient(TestCase):
                 "patient": {
                     "id": "p1",
                     "created_at": 1630515986.9949625,
-                    "code_name": "patient1",
+                    "name": "patient1",
                     "deviceList": {
                         "pageInfo": {
                             "endCursor": None
@@ -284,8 +293,7 @@ class TestPatient(TestCase):
                         "devices": [
                             {
                                 "id": "d2",
-                                "denormalized_id": "patient-p1,device-d2",
-                                "alias": "Strive PD",
+                                "name": "Strive PD",
                                 "created_at": 1646684177.194158,
                                 "device_type": {
                                     "id": "dt2",
@@ -306,12 +314,11 @@ class TestPatient(TestCase):
             {
                 "id": "p1",
                 "created_at": 1630515986.9949625,
-                "code_name": "patient1",
+                "name": "patient1",
                 "devices": [
                     {
-                        "denormalized_id": "patient-p1,device-d1",
                         "patient_id": "p1",
-                        "alias": "Percept",
+                        "name": "Percept",
                         "created_at": 1646685476.1367705,
                         "device_type_id": "dt1",
                         "disabled": False,
@@ -320,9 +327,8 @@ class TestPatient(TestCase):
                         "id": "d1"
                     },
                     {
-                        "denormalized_id": "patient-p1,device-d2",
                         "patient_id": "p1",
-                        "alias": "Strive PD",
+                        "name": "Strive PD",
                         "created_at": 1646684177.194158,
                         "device_type_id": "dt2",
                         "disabled": False,
@@ -344,7 +350,7 @@ class TestPatient(TestCase):
             "patient": {
                 "id": "p1",
                 "created_at": 1630515986.9949625,
-                "code_name": "patient1",
+                "name": "patient1",
                 "deviceList": {
                     "pageInfo": {
                         "endCursor": None
@@ -352,8 +358,7 @@ class TestPatient(TestCase):
                     "devices": [
                         {
                             "id": "d1",
-                            "denormalized_id": "patient-p1,device-d1",
-                            "alias": "Percept",
+                            "name": "Percept",
                             "created_at": 1646685476.1367705,
                             "device_type": {
                                 "id": "dt1",
@@ -371,7 +376,7 @@ class TestPatient(TestCase):
             "patient": {
                 "id": "p2",
                 "created_at": 1630515986.9949625,
-                "code_name": "patient2",
+                "name": "patient2",
                 "deviceList": {
                     "pageInfo": {
                         "endCursor": None
@@ -379,8 +384,7 @@ class TestPatient(TestCase):
                     "devices": [
                         {
                             "id": "d1",
-                            "denormalized_id": "patient-p2,device-d1",
-                            "alias": "Percept",
+                            "name": "Percept",
                             "created_at": 1646685476.1367705,
                             "device_type": {
                                 "id": "dt1",
@@ -419,12 +423,11 @@ class TestPatient(TestCase):
                 {
                     "id": "p1",
                     "created_at": 1630515986.9949625,
-                    "code_name": "patient1",
+                    "name": "patient1",
                     "devices": [
                         {
-                            "denormalized_id": "patient-p1,device-d1",
                             "patient_id": "p1",
-                            "alias": "Percept",
+                            "name": "Percept",
                             "created_at": 1646685476.1367705,
                             "device_type_id": "dt1",
                             "disabled": False,
@@ -437,12 +440,11 @@ class TestPatient(TestCase):
                 {
                     "id": "p2",
                     "created_at": 1630515986.9949625,
-                    "code_name": "patient2",
+                    "name": "patient2",
                     "devices": [
                         {
-                            "denormalized_id": "patient-p2,device-d1",
                             "patient_id": "p2",
-                            "alias": "Percept",
+                            "name": "Percept",
                             "created_at": 1646685476.1367705,
                             "device_type_id": "dt1",
                             "disabled": False,
@@ -467,7 +469,7 @@ class TestPatient(TestCase):
             "patient": {
                 "id": "p1",
                 "created_at": 1630515986.9949625,
-                "code_name": "patient1",
+                "name": "patient1",
                 "deviceList": {
                     "pageInfo": {
                         "endCursor": None
@@ -475,8 +477,7 @@ class TestPatient(TestCase):
                     "devices": [
                         {
                             "id": "d1",
-                            "denormalized_id": "patient-p1,device-d1",
-                            "alias": "Percept",
+                            "name": "Percept",
                             "created_at": 1646685476.1367705,
                             "device_type": {
                                 "id": "dt1",
@@ -494,7 +495,7 @@ class TestPatient(TestCase):
             "patient": {
                 "id": "p2",
                 "created_at": 1630515986.9949625,
-                "code_name": "patient2",
+                "name": "patient2",
                 "deviceList": {
                     "pageInfo": {
                         "endCursor": None
@@ -502,8 +503,7 @@ class TestPatient(TestCase):
                     "devices": [
                         {
                             "id": "d1",
-                            "denormalized_id": "patient-p2,device-d1",
-                            "alias": "Percept",
+                            "name": "Percept",
                             "created_at": 1646685476.1367705,
                             "device_type": {
                                 "id": "dt1",
@@ -553,12 +553,11 @@ class TestPatient(TestCase):
                 {
                     "id": "p1",
                     "created_at": 1630515986.9949625,
-                    "code_name": "patient1",
+                    "name": "patient1",
                     "devices": [
                         {
-                            "denormalized_id": "patient-p1,device-d1",
                             "patient_id": "p1",
-                            "alias": "Percept",
+                            "name": "Percept",
                             "created_at": 1646685476.1367705,
                             "device_type_id": "dt1",
                             "disabled": False,
@@ -571,12 +570,11 @@ class TestPatient(TestCase):
                 {
                     "id": "p2",
                     "created_at": 1630515986.9949625,
-                    "code_name": "patient2",
+                    "name": "patient2",
                     "devices": [
                         {
-                            "denormalized_id": "patient-p2,device-d1",
                             "patient_id": "p2",
-                            "alias": "Percept",
+                            "name": "Percept",
                             "created_at": 1646685476.1367705,
                             "device_type_id": "dt1",
                             "disabled": False,
@@ -618,17 +616,33 @@ class TestDevice(TestCase):
         test_device = Device(
             id="device-1",
             patient_id="patient-1",
-            alias="Percept",
+            name="Percept",
             created_at=1629300943.9179766,
             device_type_id="dt1",
         )
 
         self.assertEqual("device-1", test_device.id)
         self.assertEqual("patient-1", test_device.patient_id)
-        self.assertEqual("Percept", test_device.alias)
+        self.assertEqual("Percept", test_device.name)
         self.assertEqual(1629300943.9179766, test_device.created_at)
         self.assertEqual("dt1", test_device.device_type_id)
 
+    def test_repr(self):
+        """
+        Test __repr__
+
+        """
+        test_device = Device(
+            id="1",
+            patient_id="p1",
+            name="Percept",
+            created_at=1629300943.9179766,
+            device_type_id="dt1",
+        )
+        self.assertEqual(
+            "Device(id=1, name=Percept, patient_id=p1)",
+            repr(test_device)
+        )
 
     def test_normalize_id(self):
         """
@@ -691,7 +705,7 @@ class TestDevice(TestCase):
         test_device = Device(
             id="1",
             patient_id="p1",
-            alias="Percept",
+            name="Percept",
             created_at=1629300943.9179766,
             device_type_id="dt1",
         )
@@ -699,7 +713,7 @@ class TestDevice(TestCase):
         test_patient = Patient(
             id="p1",
             created_at=1629300943.9179766,
-            code_name="patient1",
+            name="patient1",
             devices=DeviceSet(
                 [
                     test_device
@@ -721,7 +735,7 @@ class TestDevice(TestCase):
         test_device_1 = Device(
             id="d1",
             patient_id="p1",
-            alias="Percept",
+            name="Percept",
             created_at=1629300943.9179766,
             device_type_id="dt1",
         )
@@ -729,7 +743,7 @@ class TestDevice(TestCase):
         test_device_2 = Device(
             id="d2",
             patient_id="p1",
-            alias="Apple Watch",
+            name="Apple Watch",
             created_at=1629300943.9179766,
             device_type_id="dt2",
         )
@@ -737,7 +751,7 @@ class TestDevice(TestCase):
         test_patient = Patient(
             id="p1",
             created_at=1629300943.9179766,
-            code_name="patient1",
+            name="patient1",
             devices=DeviceSet(
                 [
                     test_device_1,
@@ -765,7 +779,7 @@ class TestDevice(TestCase):
         test_device_1 = Device(
             id="d1",
             patient_id="p1",
-            alias="Percept",
+            name="Percept",
             created_at=1629300943.9179766,
             device_type_id="dt1",
         )
@@ -773,14 +787,14 @@ class TestDevice(TestCase):
         test_patient_1 = Patient(
             id="p1",
             created_at=1629300943.9179766,
-            code_name="patient1",
+            name="patient1",
             devices=DeviceSet([test_device_1])
         )
 
         test_device_2 = Device(
             id="d2",
             patient_id="p1",
-            alias="Apple Watch",
+            name="Apple Watch",
             created_at=1629300943.9179766,
             device_type_id="dt2",
         )
@@ -788,7 +802,7 @@ class TestDevice(TestCase):
         test_patient_2 = Patient(
             id="p2",
             created_at=1629300943.9179766,
-            code_name="patient2",
+            name="patient2",
             devices=DeviceSet([test_device_2])
         )
 

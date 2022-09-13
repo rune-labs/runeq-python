@@ -5,8 +5,8 @@ Tests for the V2 SDK User.
 from unittest import TestCase, mock
 
 from runeq.config import Config
-from runeq.resources.client import GraphClient
-from runeq.resources.user import User, get_current_user
+from runeq.v2sdk.client import GraphClient
+from runeq.v2sdk.user import User, get_current_user
 
 
 class TestUser(TestCase):
@@ -35,16 +35,34 @@ class TestUser(TestCase):
         test_user = User(
             id="user1-id",
             created_at=1629300943.9179766,
-            display_name="user1",
+            name="user1",
             active_org_id="org1-id",
-            active_org_display_name="org1",
+            active_org_name="org1",
         )
 
         self.assertEqual("user1-id", test_user.id)
         self.assertEqual(1629300943.9179766, test_user.created_at)
-        self.assertEqual("user1", test_user.display_name)
+        self.assertEqual("user1", test_user.name)
         self.assertEqual("org1-id", test_user.active_org_id)
-        self.assertEqual("org1", test_user.active_org_display_name)
+        self.assertEqual("org1", test_user.active_org_name)
+
+    def test_repr(self):
+        """
+        Test __repr__
+
+        """
+        test_user = User(
+            id="user1-id",
+            created_at=1629300943.9179766,
+            name="user1",
+            active_org_id="org1-id",
+            active_org_name="org1",
+        )
+
+        self.assertEqual(
+            "User(id=user1-id, name=user1)",
+            repr(test_user)
+        )
 
     def test_normalize_id(self):
         """
@@ -82,11 +100,11 @@ class TestUser(TestCase):
                 "user": {
                     "id": "user1-id",
                     "created_at": 1629300943.9179766,
-                    "display_name": "user1",
+                    "name": "user1",
                     "defaultMembership": {
                         "org": {
                             "id": "org1-id",
-                            "display_name": "org1"
+                            "name": "org1"
                         }
                     },
                     "email": "user1@email.com",
@@ -100,9 +118,9 @@ class TestUser(TestCase):
             {
                 "id": "user1-id",
                 "created_at": 1629300943.9179766,
-                "display_name": "user1",
+                "name": "user1",
                 "active_org_id": "org1-id",
-                "active_org_display_name": "org1",
+                "active_org_name": "org1",
                 "email": "user1@email.com",
             },
             user.to_dict(),

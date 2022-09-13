@@ -61,11 +61,13 @@ class ItemBase:
         """
         Format the item representation.
 
+        TODO: should this be __str__ instead?
+
         """
-        return (
-            f'{self.__class__.__name__}(\n\tid={self._id},\n\t'
-            f'attributes={self._attributes}\n)'
-        )
+        if hasattr(self, "name"):
+            return f'{self.__class__.__name__}(id={self.id}, name={self.name})'
+        else:
+            return f'{self.__class__.__name__}(id={self.id})'
 
     def to_dict(self) -> dict:
         """
@@ -154,6 +156,17 @@ class ItemSet(ABC):
 
             self._items[item.id] = item
 
+    def __add__(self, other):
+        """
+        Add two ItemSets of the same type together. Items are deduplicated.
+
+        """
+        if type(other) != self.__class__:
+            raise TypeError(f'cannot add {self.__class__} and {type(other)}')
+
+        items = [i for i in other]
+        self.add(*items)
+
     def remove(self, *items: Union[str, ItemBase]):
         """
         Remove item(s) from this set.
@@ -178,14 +191,20 @@ class ItemSet(ABC):
         """
         String representation of the set of items. Returns information on
         the number of items in the set, the type of the set, and up to 3
-        item ids.
+        items.
 
         """
-        items_ids = self._items.keys()
-        items_str = ''.join([f'\t{str(id)}\n' for id in list(items_ids)[:3]])
-        if len(items_ids) > 3:
-            items_str += f'\t... (and {len(self._items.keys()) - 3} others)\n'
+        item_strs = []
+        for i, item in enumerate(self):
+            if i > 2:
+                item_strs.append(
+                    f'\t... (and {len(self._items.keys()) - 3} others)\n'
+                )
+                break
 
+            item_strs.append(f'\t{str(item)}\n')
+
+        items_str = ''.join(item_strs)
         return f'{type(self).__name__} {{\n{items_str}}}'
 
     def to_list(self) -> List[dict]:
