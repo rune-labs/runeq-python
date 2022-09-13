@@ -5,16 +5,16 @@ GraphQL API
 
 Classes and functions to work with metadata for resources stored in the
 Rune platform. Metadata is fetched from Rune's GraphQL API (https://graph.runelabs.io/graphql),
-using a :class:`~runeq.v2sdk.client.GraphClient`.
+using a :class:`~runeq.resources.client.GraphClient`.
 
-By default, the global :class:`~runeq.v2sdk.client.GraphClient` is used for all
-API requests (see :class:`~runeq.v2sdk.initialize`). Functions that make
+By default, the global :class:`~runeq.resources.client.GraphClient` is used for all
+API requests (see :class:`~runeq.config.initialize`). Functions that make
 API requests also accept an optional client, to be used instead.
 
 Patient Metadata
 ----------------
 
-.. automodule:: runeq.v2sdk.patient
+.. automodule:: runeq.resources.patient
 
 Patients
 ********
@@ -50,7 +50,7 @@ Devices
 Organization Metadata
 ---------------------
 
-.. automodule:: runeq.v2sdk.org
+.. automodule:: runeq.resources.org
 
 .. autofunction:: get_org
 .. autofunction:: get_orgs
@@ -67,7 +67,7 @@ Organization Metadata
 User Metadata
 -------------
 
-.. automodule:: runeq.v2sdk.user
+.. automodule:: runeq.resources.user
 
 .. autofunction:: get_current_user
 

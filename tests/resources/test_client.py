@@ -5,7 +5,7 @@ Tests for the V2 SDK Client.
 from unittest import TestCase
 
 from runeq import errors
-from runeq.resources import initialize
+from runeq.resources.client import initialize
 from runeq.resources.stream import get_stream_data
 
 
