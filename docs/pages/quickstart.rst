@@ -201,7 +201,7 @@ you can fetch the **availability** of all or any of the streams:
 
 .. code-block:: python
 
-    availability_df = neural_device_streams.get_stream_availability_dataframe(
+    availability_df = neural_device_streams.get_batch_availability_dataframe(
         start_time=166000000,
         end_time=1663123000,
         resolution=3600,
