@@ -3,14 +3,14 @@
 Resources
 =========
 
-.. automodule:: runeq.v2sdk
+.. automodule:: runeq.resources
 
 For example usage patterns, see :ref:`quickstart`.
 
 Patient Metadata
 ----------------
 
-.. automodule:: runeq.v2sdk.patient
+.. automodule:: runeq.resources.patient
 
 Patients
 ********
@@ -46,7 +46,7 @@ Devices
 Organization Metadata
 ---------------------
 
-.. automodule:: runeq.v2sdk.org
+.. automodule:: runeq.resources.org
 
 .. autofunction:: get_org
 .. autofunction:: get_orgs
@@ -63,7 +63,7 @@ Organization Metadata
 User Metadata
 -------------
 
-.. automodule:: runeq.v2sdk.user
+.. automodule:: runeq.resources.user
 
 .. autofunction:: get_current_user
 

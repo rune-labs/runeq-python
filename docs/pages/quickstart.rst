@@ -126,7 +126,7 @@ You can also fetch metadata about all the patients you have access to:
         print('')
 
 
-:class:`~runeq.v2sdk.patient.get_all_patients` returns a :class:`~runeq.v2sdk.patient.PatientSet`,
+:class:`~runeq.resources.patient.get_all_patients` returns a :class:`~runeq.resources.patient.PatientSet`,
 which can be serialized as a list of dictionaries, e.g. to save the metadata to a file:
 
 .. code-block:: python
@@ -137,8 +137,8 @@ which can be serialized as a list of dictionaries, e.g. to save the metadata to 
         json.dump(patients.to_list(), f, indent=4)
 
 
-You can also convert a :class:`~runeq.v2sdk.patient.PatientSet` to a collection of
-devices (a :class:`~runeq.v2sdk.patient.DeviceSet`). This may be more convenient for
+You can also convert a :class:`~runeq.resources.patient.PatientSet` to a collection of
+devices (a :class:`~runeq.resources.patient.DeviceSet`). This may be more convenient for
 a columnar data format, like a `pandas <https://pandas.pydata.org/>`_ DataFrame.
 
 .. code-block:: python

@@ -6,7 +6,7 @@ V1 Stream API
 The :class:`~runeq.stream` module contains classes that fetch timeseries data using
 `V1 Stream API <https://docs.runelabs.io/stream/index.html>`_.
 The V1 API is supported, but is not longer under active development. We recommend
-using the :class:`~runeq.v2sdk` module instead, which provides access to the
+using the :class:`~runeq.resources` module instead, which provides access to the
 `V2 Stream API <https://docs.runelabs.io/stream/v2/index.html>`_.
 
 Usage
@@ -16,7 +16,7 @@ Initialization
 **************
 
 The global initialization method, as described in the Quickstart (:ref:`quickstart_init`),
-does NOT apply to requests made by the :class:`~runeq.v2sdk` module.
+does NOT apply to requests made by the :class:`~runeq.stream` module.
 
 Start by creating a :class:`~runeq.stream.V1Client`, using a :class:`~runeq.config.Config`.
 The configuration class uses the file that was created via the command line tool (see
