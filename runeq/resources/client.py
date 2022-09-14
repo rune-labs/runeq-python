@@ -1,10 +1,11 @@
 """
-V2 SDK Client to support graph and stream clients.
+Clients for Rune's GraphQL API and V2 Stream API.
 
 """
 from functools import wraps
 import time
-from typing import Dict
+from typing import Dict, Iterator, Union
+import urllib.parse
 
 from gql import Client as GQLClient
 from gql import gql
@@ -24,28 +25,6 @@ _graph_client = None
 
 # Rune Stream API Client to query stream data.
 _stream_client = None
-
-
-def global_graph_client():
-    """
-    Validates global gql client.
-
-    """
-    if not _graph_client:
-        raise INITIALIZATION_ERROR
-
-    return _graph_client
-
-
-def global_stream_client():
-    """
-    Validates global stream client.
-
-    """
-    if not _stream_client:
-        raise INITIALIZATION_ERROR
-
-    return _stream_client
 
 
 def _retry(exceptions, max_attempts=3, max_sleep_secs=0):
@@ -126,7 +105,7 @@ class GraphClient:
 
 class StreamClient:
     """
-    V2 Rune Stream API Client to query stream data.
+    Client to query the V2 Stream API.
 
     """
 
@@ -143,11 +122,28 @@ class StreamClient:
         """
         self.config = config
 
-    def get_data(self, url: str, **params):
+    def get_data(self, path: str, **params) -> Iterator[Union[str, dict]]:
         """
-        Fetch stream data from the specified url and params.
+        Makes request(s) to an endpoint of the V2 Stream API. Iterates over
+        responses, following pagination headers until all data has been
+        fetched.
+
+        Args:
+            path: Path for an endpoint of the V2 Stream API.
+            **params: Query parameters. If the format parameter is "json",
+                responses are parsed as JSON. Otherwise, the response is
+                returned as text.
+
+        Raises:
+            errors.APIError
 
         """
+        if not path.startswith("/v2"):
+            raise ValueError("path must begin with /v2")
+
+        url = urllib.parse.urljoin(self.config.stream_url, path)
+        return_json = params.get("format", "json") == "json"
+
         while True:
             r = requests.get(
                 url,
@@ -158,7 +154,7 @@ class StreamClient:
             self._check_response(r)
             r.raise_for_status()
 
-            if params.get("json"):
+            if return_json:
                 yield r.json()
             else:
                 yield r.text
@@ -191,10 +187,8 @@ class StreamClient:
 
 def initialize(*args, **kwargs):
     """
-    Initialize the library with specified configuration options. Sets global
-    clients for the Stream and GraphQL APIs.
-
-    Note that the global Stream API client is only used for V2 endpoints.
+    Initializes the library with specified configuration options. Sets global
+    clients for requests to the GraphQL API and the V2 Stream API.
 
     Parameters
     ----------
@@ -229,3 +223,34 @@ def initialize(*args, **kwargs):
     global _graph_client, _stream_client
     _graph_client = GraphClient(config)
     _stream_client = StreamClient(config)
+
+
+def global_graph_client() -> GraphClient:
+    """
+    Returns the globally configured GraphQL client. Use
+    :class:`~runeq.resources.client.initialize` to configure the client.
+
+    Raises:
+        errors.InitializationError: if the library was not initialized.
+
+    """
+    if not _graph_client:
+        raise INITIALIZATION_ERROR
+
+    return _graph_client
+
+
+def global_stream_client() -> StreamClient:
+    """
+    Returns the globally configured Stream API client. Use
+    :class:`~runeq.resources.client.initialize` to configure the client.
+
+    Raises:
+        errors.InitializationError: if the library was not initialized.
+
+
+    """
+    if not _stream_client:
+        raise INITIALIZATION_ERROR
+
+    return _stream_client
