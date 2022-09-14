@@ -138,7 +138,7 @@ class TestStreamData(TestCase):
         stream = get_stream_data(
             'test_stream_id',
             format="json",
-            client=self.stream_client,,
+            client=self.stream_client,
         )
 
         expected = [expected_data, expected_data]
