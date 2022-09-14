@@ -20,7 +20,7 @@ class TestStreamData(TestCase):
         Set up mock graph client for testing.
 
         """
-        self.stream_client, = StreamClient(
+        self.stream_client = StreamClient(
             Config(
                 client_key_id='test',
                 client_access_key='config'
