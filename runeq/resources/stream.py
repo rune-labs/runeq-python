@@ -79,8 +79,10 @@ def get_stream_data(
         end_time = time.mktime(end_time.timetuple())
 
     client = client or global_stream_client()
+    path = f"/v2/streams/{stream_id}"
+
     yield from client.get_data(
-        stream_id,
+        path,
         start_time=start_time,
         start_time_ns=start_time_ns,
         end_time=end_time,
@@ -108,7 +110,9 @@ def get_stream_availability(
     client: Optional[StreamClient] = None
 ) -> Iterator[Union[str, dict]]:
     """
-    Fetch the availability of 1 or multiple streams.
+    Fetch the availability of 1 or multiple streams. When multiple stream
+    IDs are specified, this fetches the availability of **all** or **any**
+    of the streams (depending on the **batch_operation**).
 
     Args:
         stream_ids: 1 or multiple stream IDs. If multiple stream IDs are

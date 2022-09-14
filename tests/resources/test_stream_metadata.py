@@ -347,7 +347,7 @@ class TestStreamMetadata(TestCase):
         ]
 
         streams = get_stream_metadata(
-            stream_id=["s1", "s2"],
+            stream_ids=["s1", "s2"],
             client=self.mock_graph_client
         )
 
@@ -922,7 +922,7 @@ class TestStreamMetadata(TestCase):
         ]
 
         stream_df = get_stream_dataframe(
-            stream_id="s1",
+            stream_ids="s1",
             stream_client=self.mock_stream_client,
             graph_client=self.mock_graph_client
         )
@@ -1145,7 +1145,7 @@ class TestStreamMetadata(TestCase):
         ]
 
         stream_df = get_stream_dataframe(
-            stream_id=["s1", "s2"],
+            stream_ids=["s1", "s2"],
             stream_client=self.mock_stream_client,
             graph_client=self.mock_graph_client
         )
@@ -1368,7 +1368,7 @@ class TestStreamMetadata(TestCase):
         ]
 
         stream_df = get_stream_availability_dataframe(
-            stream_id="s1",
+            stream_ids="s1",
             start_time=123,
             end_time=345,
             resolution=300,
@@ -1476,7 +1476,7 @@ class TestStreamMetadata(TestCase):
         )
 
         stream_df = get_stream_availability_dataframe(
-            stream_id=["s1", "s2"],
+            stream_ids=["s1", "s2"],
             start_time=123,
             end_time=345,
             resolution=300,

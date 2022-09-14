@@ -3,6 +3,7 @@ Fetch metadata about streams, including stream types.
 
 """
 import datetime
+from io import StringIO
 from typing import Callable, Iterable, Iterator, List, Optional, Type, Union
 
 import pandas as pd
@@ -406,7 +407,7 @@ class StreamMetadata(ItemBase):
 
         all_stream_dfs = []
         for resp in get_stream_data(client=stream_client, **params):
-            all_stream_dfs.append(pd.read_csv(resp, sep=","))
+            all_stream_dfs.append(pd.read_csv(StringIO(resp), sep=","))
 
         stream_df = pd.concat(all_stream_dfs, axis=0, ignore_index=True)
 
@@ -460,21 +461,22 @@ class StreamMetadata(ItemBase):
         del metadata['max_time']
         del metadata['parameters']
 
-        params = {
-            'stream_id': metadata['stream_id'],
-            'start_time': start_time,
-            'end_time': end_time,
-            'resolution': resolution,
-            'format': 'csv',
-            'limit': limit,
-            'page_token': page_token,
-            'timestamp': timestamp,
-            'timezone': timezone,
-        }
+        responses = get_stream_availability(
+            stream_ids=metadata['stream_id'],
+            start_time=start_time,
+            end_time=end_time,
+            resolution=resolution,
+            format='csv',
+            limit=limit,
+            page_token=page_token,
+            timestamp=timestamp,
+            timezone=timezone,
+            client=stream_client,
+        )
 
         all_stream_dfs = []
-        for resp in get_stream_availability(client=stream_client, **params):
-            all_stream_dfs.append(pd.read_csv(resp, sep=","))
+        for resp in responses:
+            all_stream_dfs.append(pd.read_csv(StringIO(resp), sep=","))
 
         stream_df = pd.concat(all_stream_dfs, axis=0, ignore_index=True)
 
@@ -626,8 +628,7 @@ class StreamMetadataSet(ItemSet):
 
         return pd.concat(all_stream_dfs, axis=0, ignore_index=True)
 
-    # TODO: get_batch_availability_dataframe?
-    def get_stream_availability_dataframe(
+    def get_batch_availability_dataframe(
         self,
         start_time: Union[float, datetime.date],
         end_time: Union[float, datetime.date],
@@ -644,8 +645,8 @@ class StreamMetadataSet(ItemSet):
         specified **batch_operation**, this fetches the availability of **all**
         or **any** of the streams in the collection.
 
-        If you want to fetch the availability of each stream individually,
-        see the
+        If you want to gather the availability of each *individual* stream in a
+        dataframe, see get_stream_availability_dataframe()
 
         Args:
             start_time: Start time for the query, provided as a unix timestamp
@@ -674,23 +675,24 @@ class StreamMetadataSet(ItemSet):
                 from the API. Otherwise, the global StreamClient is used.
 
         """
-        params = {
-            'stream_id': self.ids(),
-            'start_time': start_time,
-            'end_time': end_time,
-            'resolution': resolution,
-            'batch_operation': batch_operation,
-            'format': 'csv',
-            'limit': limit,
-            'page_token': page_token,
-            'timestamp': timestamp,
-            'timezone': timezone,
-            'client': stream_client,
-        }
+        responses = get_stream_availability(
+            stream_ids=list(self.ids()),
+            start_time=start_time,
+            end_time=end_time,
+            resolution=resolution,
+            batch_operation=batch_operation,
+            format='csv',
+            limit=limit,
+            page_token=page_token,
+            timestamp=timestamp,
+            timezone=timezone,
+            client=stream_client,
+        )
 
         all_stream_dfs = []
-        for resp in get_stream_availability(**params):
-            all_stream_dfs.append(pd.read_csv(resp, sep=","))
+        for resp in responses:
+            all_stream_dfs.append(pd.read_csv(StringIO(resp), sep=","))
+
         stream_df = pd.concat(all_stream_dfs, axis=0, ignore_index=True)
 
         return stream_df
@@ -1083,7 +1085,7 @@ def get_stream_availability_dataframe(
 
         all_stream_dfs = []
         for resp in responses:
-            all_stream_dfs.append(pd.read_csv(resp, sep=","))
+            all_stream_dfs.append(pd.read_csv(StringIO(resp), sep=","))
 
         stream_df = pd.concat(all_stream_dfs, axis=0, ignore_index=True)
 
