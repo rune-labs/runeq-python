@@ -4,7 +4,7 @@ Query data directly from the V2 Stream API.
 """
 from datetime import datetime
 import time
-from typing import Iterator, List, Optional, Union
+from typing import Iterable, Iterator, Optional, Union
 
 from .client import StreamClient, global_stream_client
 
@@ -97,7 +97,7 @@ def get_stream_data(
 
 
 def get_stream_availability(
-    stream_ids: Union[str, List[str]],
+    stream_ids: Union[str, Iterable[str]],
     start_time: Union[float, datetime.date],
     end_time: Union[float, datetime.date],
     resolution: int,
@@ -175,9 +175,13 @@ def get_stream_availability(
 
     client = client or global_stream_client()
 
+    # If stream_ids is not a string, convert it to a list so that we can
+    if type(stream_ids) is not str:
+        stream_ids = list(stream_ids)
+
     if type(stream_ids) is str:
         path = f"/v2/streams/{stream_ids}/availability"
-    elif type(stream_ids) is list and len(stream_ids) == 1:
+    elif len(stream_ids) == 1:
         path = f"/v2/streams/{stream_ids[0]}/availability"
     else:
         # If querying for batch availability, need batch_operation

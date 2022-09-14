@@ -677,7 +677,7 @@ class StreamMetadataSet(ItemSet):
 
         """
         responses = get_stream_availability(
-            stream_ids=list(self.ids()),
+            stream_ids=self.ids(),
             start_time=start_time,
             end_time=end_time,
             resolution=resolution,
@@ -700,7 +700,7 @@ class StreamMetadataSet(ItemSet):
 
 
 def get_stream_metadata(
-    stream_ids: Union[str, List[str]],
+    stream_ids: Union[str, Iterable[str]],
     client: Optional[GraphClient] = None
 ) -> Union[StreamMetadata, StreamMetadataSet]:
     """
@@ -761,6 +761,8 @@ def get_stream_metadata(
 
     if type(stream_ids) is str:
         stream_ids = [stream_ids]
+    else:
+        stream_ids = list(stream_ids)
 
     result = client.execute(
         statement=query,
@@ -946,7 +948,7 @@ def get_patient_stream_metadata(
 
 
 def get_stream_dataframe(
-    stream_ids: Union[str, List[str]],
+    stream_ids: Union[str, Iterable[str]],
     start_time: Optional[Union[float, datetime.date]] = None,
     start_time_ns: Optional[int] = None,
     end_time: Optional[Union[float, datetime.date]] = None,
@@ -1016,7 +1018,7 @@ def get_stream_dataframe(
 
 
 def get_stream_availability_dataframe(
-    stream_ids: Union[str, List[str]],
+    stream_ids: Union[str, Iterable[str]],
     start_time: Union[float, datetime.date],
     end_time: Union[float, datetime.date],
     resolution: int,
@@ -1067,6 +1069,10 @@ def get_stream_availability_dataframe(
             the API. Otherwise, the global GraphClient is used.
 
     """
+    # Standardize iterable stream_ids to a list (so that we can use len)
+    if type(stream_ids) is not str:
+        stream_ids = list(stream_ids)
+
     # If there are multiple stream ids, there is no need to get metadata
     # since the dataframe response will be simplified
     if type(stream_ids) is list and len(stream_ids) > 1:

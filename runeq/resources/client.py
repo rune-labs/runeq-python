@@ -147,7 +147,9 @@ class StreamClient:
             raise ValueError("path must begin with /v2")
 
         url = urllib.parse.urljoin(self.config.stream_url, path)
-        return_json = params.get("format", "json") == "json"
+
+        # V2 endpoints return CSV-formatted responses by default
+        return_json = params.get("format") == "json"
 
         while True:
             r = requests.get(
