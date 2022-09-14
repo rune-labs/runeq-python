@@ -1,5 +1,5 @@
 """
-Configuration for API access
+Configuration for accessing Rune APIs.
 
 """
 import os
@@ -33,7 +33,7 @@ Default path for the config file (yaml formatted)
 
 class Config:
     """
-    Config holds configuration (e.g. auth credentials, URLs, etc)
+    Holds configuration (e.g. auth credentials, URLs, etc)
 
     """
 
@@ -228,7 +228,7 @@ class Config:
     @property
     def auth_headers(self):
         """
-        Authentication headers for HTTP requests.
+        Authentication headers for HTTP requests to Rune APIs.
 
         """
         if self.auth_method == AUTH_METHOD_ACCESS_TOKEN:
