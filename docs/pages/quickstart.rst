@@ -110,7 +110,7 @@ You can also fetch metadata about all the patients you have access to:
 
 .. code-block:: python
 
-    from runeq.resources.user import get_all_patients
+    from runeq.resources.patient import get_all_patients
 
     patients = get_all_patients()
 
@@ -152,4 +152,66 @@ a columnar data format, like a `pandas <https://pandas.pydata.org/>`_ DataFrame.
 Fetch Timeseries Data
 *********************
 
-Coming soon!
+To start, fetch a :class:`~runeq.resources.stream_metadata.StreamMetadataSet`
+representing a particular patient's stream data:
+
+.. code-block:: python
+
+    from runeq.resources.stream_metadata import get_patient_stream_metadata
+
+    patient_id = "abc123"
+    patient_streams = get_patient_stream_metadata(patient_id)
+
+Explore and refine the :class:`~runeq.resources.stream_metadata.StreamMetadataSet`,
+using the filter method:
+
+.. code-block:: python
+
+    # Filter stream metadata by category...
+    neural_streams = patient_streams.filter(category="neural")
+
+    # Or by the ID of the device that collected the data...
+    device_id = "exc31z#"
+    device_streams = patient_streams.filter(device_id=device_id)
+
+    # You can discover the intersection of multiple filters:
+    neural_device_streams = patient_streams.filter(
+        category="neural",
+        device_id=device_id,
+    )
+
+    # You can also define your own filter function:
+    def is_percept_or_mdkit(stream) -> bool:
+        return (
+            stream.algorithm="ingest-medtronic-percept.0" or
+            stream.algorithm="ingest-strive-applewatch-md.0"
+        )
+
+    percept_mdkit_streams = patient_streams.filter(
+        filter_function=is_percept_or_mdkit
+    )
+
+You can use the :class:`~runeq.resources.stream_metadata.StreamMetadataSet` to
+fetch the **availability** of all or any of the streams:
+
+.. code-block:: python
+
+    availability_df = neural_device_streams.get_stream_availability_dataframe(
+        start_time=166000000,
+        end_time=1663123000,
+        resolution=3600,
+        batch_operation="any",
+    )
+
+When you're ready to fetch data, you can gather all the raw stream data into a
+pandas dataframe:
+
+.. code-block:: python
+
+    stream_df = percept_mdkit_streams.get_stream_dataframe(
+        start_time=1662499000,
+        end_time=1663123000,
+    )
+
+See :class:`~runeq.resources.stream_metadata.StreamMetadata` for details
+about working directly with API responses.

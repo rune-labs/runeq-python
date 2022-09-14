@@ -43,7 +43,7 @@ def get_stream_data(
             of the response. A limit of 0 (default) will fetch all
             available data.
         page_token: Token to fetch the subsequent page of results.
-            The value is obtained from the 'X-Rune-Next-Page-Token'
+            The value is obtained from the "X-Rune-Next-Page-Token"
             response header field.
         timestamp: One of "unix", "unixns", or "iso", which determines
             how timestamps are formatted in the response
@@ -54,7 +54,8 @@ def get_stream_data(
         translate_enums: If True, enum values are returned as their string
             representation. Otherwise, enums are returned as integer values.
         client: If specified, this client is used to fetch data from the
-            API. Otherwise, the global StreamClient is used.
+            API. Otherwise, the global :class:`~runeq.resources.client.StreamClient`
+            is used.
 
     Returns:
         An iterator over paginated API responses. If format is "json", each
@@ -127,7 +128,7 @@ def get_stream_csv(
             of the response. A limit of 0 (default) will fetch all
             available data.
         page_token: Token to fetch the subsequent page of results.
-            The value is obtained from the 'X-Rune-Next-Page-Token'
+            The value is obtained from the "X-Rune-Next-Page-Token"
             response header field.
         timestamp: One of "unix", "unixns", or "iso", which determines
             how timestamps are formatted in the response
@@ -138,7 +139,8 @@ def get_stream_csv(
         translate_enums: If True, enum values are returned as their string
             representation. Otherwise, enums are returned as integer values.
         client: If specified, this client is used to fetch data from the
-            API. Otherwise, the global StreamClient is used.
+            API. Otherwise, the global :class:`~runeq.resources.client.StreamClient`
+            is used.
 
     Returns:
         An iterator over paginated API responses.
@@ -193,7 +195,7 @@ def get_stream_json(
             of the response. A limit of 0 (default) will fetch all
             available data.
         page_token: Token to fetch the subsequent page of results.
-            The value is obtained from the 'X-Rune-Next-Page-Token'
+            The value is obtained from the "X-Rune-Next-Page-Token"
             response header field.
         timestamp: One of "unix", "unixns", or "iso", which determines
             how timestamps are formatted in the response
@@ -204,7 +206,8 @@ def get_stream_json(
         translate_enums: If True, enum values are returned as their string
             representation. Otherwise, enums are returned as integer values.
         client: If specified, this client is used to fetch data from the
-            API. Otherwise, the global StreamClient is used.
+            API. Otherwise, the global :class:`~runeq.resources.client.StreamClient`
+            is used.
 
     Returns:
         An iterator over paginated API responses.
@@ -263,7 +266,7 @@ def get_stream_availability(
             of the response. A limit of 0 (default) will fetch all
             available data.
         page_token: Token to fetch the subsequent page of results.
-            The value is obtained from the 'X-Rune-Next-Page-Token'
+            The value is obtained from the "X-Rune-Next-Page-Token"
             response header field.
         timestamp: One of "unix", "unixns", or "iso", which determines
             how timestamps are formatted in the response
@@ -272,7 +275,8 @@ def get_stream_availability(
             For example, PST (UTC-0800) is represented as -28800.
             If omitted, the timezone is UTC.
         client: If specified, this client is used to fetch data from the
-            API. Otherwise, the global StreamClient is used.
+            API. Otherwise, the global :class:`~runeq.resources.client.StreamClient`
+            is used.
 
     Returns:
         An iterator over paginated API responses. If format is "json", each
@@ -353,7 +357,7 @@ def get_stream_availability_csv(
             of the response. A limit of 0 (default) will fetch all
             available data.
         page_token: Token to fetch the subsequent page of results.
-            The value is obtained from the 'X-Rune-Next-Page-Token'
+            The value is obtained from the "X-Rune-Next-Page-Token"
             response header field.
         timestamp: One of "unix", "unixns", or "iso", which determines
             how timestamps are formatted in the response
@@ -362,7 +366,8 @@ def get_stream_availability_csv(
             For example, PST (UTC-0800) is represented as -28800.
             If omitted, the timezone is UTC.
         client: If specified, this client is used to fetch data from the
-            API. Otherwise, the global StreamClient is used.
+            API. Otherwise, the global :class:`~runeq.resources.client.StreamClient`
+            is used.
 
     Returns:
         An iterator over paginated API responses.
@@ -419,7 +424,7 @@ def get_stream_availability_json(
             of the response. A limit of 0 (default) will fetch all
             available data.
         page_token: Token to fetch the subsequent page of results.
-            The value is obtained from the 'X-Rune-Next-Page-Token'
+            The value is obtained from the "X-Rune-Next-Page-Token"
             response header field.
         timestamp: One of "unix", "unixns", or "iso", which determines
             how timestamps are formatted in the response
@@ -428,7 +433,8 @@ def get_stream_availability_json(
             For example, PST (UTC-0800) is represented as -28800.
             If omitted, the timezone is UTC.
         client: If specified, this client is used to fetch data from the
-            API. Otherwise, the global StreamClient is used.
+            API. Otherwise, the global :class:`~runeq.resources.client.StreamClient`
+            is used.
 
     Returns:
         An iterator over paginated API responses.
