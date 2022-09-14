@@ -134,6 +134,11 @@ class StreamClient:
                 responses are parsed as JSON. Otherwise, the response is
                 returned as text.
 
+        Returns:
+            Iterator over the API responses. If the format parameter is "json",
+            each value is a dictionary. Otherwise, each value is a
+            CSV-formatted string (the default for the V2 API).
+
         Raises:
             errors.APIError
 

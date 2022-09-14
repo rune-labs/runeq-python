@@ -20,7 +20,7 @@ class TestStreamData(TestCase):
         Set up mock graph client for testing.
 
         """
-        self.mock_client = StreamClient(
+        self.stream_client = StreamClient(
             Config(
                 client_key_id='test',
                 client_access_key='config'
@@ -28,7 +28,8 @@ class TestStreamData(TestCase):
         )
         self.maxDiff = None
 
-    def test_get_stream_data_csv(self):
+    @mock.patch("runeq.resources.client.requests")
+    def test_get_stream_data_csv(self, mock_requests):
         """
         Test get a stream as csv with specific stream_id and optional
         parameters.
@@ -43,22 +44,32 @@ class TestStreamData(TestCase):
 2022-07-28T14:26:45.362149Z,0.024860087782144547,20000000
 2022-07-28T14:26:45.36221Z,0.026072751730680466,20000000"""
 
-        # TODO: make sure client.get_data does response format...!
-        self.mock_client.get_data = mock.Mock()
-        self.mock_client.get_data.return_value = iter(
-            [
-                expected_data,
-                expected_data
-            ]
-        )
+        # Mock a paginated response
+        mock_response1 = mock.Mock()
+        mock_response1.ok = True
+        mock_response1.headers = {
+            "X-Rune-Next-Page-Token": "foobar"
+        }
+        mock_response1.text = expected_data
 
-        stream = get_stream_data('test_stream_id', client=self.mock_client)
+        mock_response2 = mock.Mock()
+        mock_response2.ok = True
+        mock_response2.headers = {}
+        mock_response2.text = expected_data
+
+        mock_requests.get.side_effect = [
+            mock_response1,
+            mock_response2
+        ]
+
+        stream = get_stream_data('test_stream_id', client=self.stream_client,)
 
         expected = [expected_data, expected_data]
         actual = list(stream)
         self.assertEqual(expected, actual)
 
-    def test_get_stream_data_json(self):
+    @mock.patch("runeq.resources.client.requests")
+    def test_get_stream_data_json(self, mock_requests):
         """
         Test get a stream as json with specific stream_id and optional
         parameters.
@@ -106,25 +117,36 @@ class TestStreamData(TestCase):
             }
         }
 
-        self.mock_client.get_data = mock.Mock()
-        self.mock_client.get_data.return_value = iter(
-            [
-                expected_data,
-                expected_data
-            ]
-        )
+        # Mock a paginated response
+        mock_response1 = mock.Mock()
+        mock_response1.ok = True
+        mock_response1.headers = {
+            "X-Rune-Next-Page-Token": "foobar"
+        }
+        mock_response1.json.return_value = expected_data
+
+        mock_response2 = mock.Mock()
+        mock_response2.ok = True
+        mock_response2.headers = {}
+        mock_response2.json.return_value = expected_data
+
+        mock_requests.get.side_effect = [
+            mock_response1,
+            mock_response2
+        ]
 
         stream = get_stream_data(
             'test_stream_id',
             format="json",
-            client=self.mock_client,
+            client=self.stream_client,
         )
 
         expected = [expected_data, expected_data]
         actual = list(stream)
         self.assertEqual(expected, actual)
 
-    def test_get_stream_availability_csv(self):
+    @mock.patch("runeq.resources.client.requests")
+    def test_get_stream_availability_csv(self, mock_requests):
         """
         Test get a stream availability as csv for a specific stream_id.
 
@@ -139,13 +161,23 @@ class TestStreamData(TestCase):
 2022-07-28T14:26:45.36221Z,1
 """
 
-        self.mock_client.get_data = mock.Mock()
-        self.mock_client.get_data.return_value = iter(
-            [
-                expected_data,
-                expected_data
-            ]
-        )
+        # Mock a paginated response
+        mock_response1 = mock.Mock()
+        mock_response1.ok = True
+        mock_response1.headers = {
+            "X-Rune-Next-Page-Token": "foobar"
+        }
+        mock_response1.text = expected_data
+
+        mock_response2 = mock.Mock()
+        mock_response2.ok = True
+        mock_response2.headers = {}
+        mock_response2.text = expected_data
+
+        mock_requests.get.side_effect = [
+            mock_response1,
+            mock_response2
+        ]
 
         availability = get_stream_availability(
             stream_ids='test_stream_id',
@@ -153,14 +185,15 @@ class TestStreamData(TestCase):
             end_time=345,
             resolution=300,
             format="csv",
-            client=self.mock_client
+            client=self.stream_client,
         )
 
         expected = [expected_data, expected_data]
         actual = list(availability)
         self.assertEqual(expected, actual)
 
-    def test_get_stream_availability_json(self):
+    @mock.patch("runeq.resources.client.requests")
+    def test_get_stream_availability_json(self, mock_requests):
         """
         Test get a stream availability as json for a specific stream_id.
 
@@ -196,13 +229,23 @@ class TestStreamData(TestCase):
             "cardinality": 10
         }
 
-        self.mock_client.get_data = mock.Mock()
-        self.mock_client.get_data.return_value = iter(
-            [
-                expected_data,
-                expected_data
-            ]
-        )
+        # Mock a paginated response
+        mock_response1 = mock.Mock()
+        mock_response1.ok = True
+        mock_response1.headers = {
+            "X-Rune-Next-Page-Token": "foobar"
+        }
+        mock_response1.json.return_value = expected_data
+
+        mock_response2 = mock.Mock()
+        mock_response2.ok = True
+        mock_response2.headers = {}
+        mock_response2.json.return_value = expected_data
+
+        mock_requests.get.side_effect = [
+            mock_response1,
+            mock_response2
+        ]
 
         availability = get_stream_availability(
             stream_ids='test_stream_id',
@@ -210,14 +253,15 @@ class TestStreamData(TestCase):
             end_time=345,
             resolution=300,
             format="json",
-            client=self.mock_client
+            client=self.stream_client,
         )
 
         expected = [expected_data, expected_data]
         actual = list(availability)
         self.assertEqual(expected, actual)
 
-    def test_get_batch_stream_availability(self):
+    @mock.patch("runeq.resources.client.requests")
+    def test_get_batch_stream_availability(self, mock_requests):
         """
         Test get batch stream availability for multiple stream_ids.
 
@@ -232,13 +276,23 @@ class TestStreamData(TestCase):
 2022-07-28T14:26:45.36221Z,1
 """
 
-        self.mock_client.get_data = mock.Mock()
-        self.mock_client.get_data.return_value = iter(
-            [
-                expected_data,
-                expected_data
-            ]
-        )
+        # Mock a paginated response
+        mock_response1 = mock.Mock()
+        mock_response1.ok = True
+        mock_response1.headers = {
+            "X-Rune-Next-Page-Token": "foobar"
+        }
+        mock_response1.text = expected_data
+
+        mock_response2 = mock.Mock()
+        mock_response2.ok = True
+        mock_response2.headers = {}
+        mock_response2.text = expected_data
+
+        mock_requests.get.side_effect = [
+            mock_response1,
+            mock_response2
+        ]
 
         # Must include batch_operation when querying >1 stream
         with self.assertRaisesRegex(
@@ -251,7 +305,7 @@ class TestStreamData(TestCase):
                 end_time=345,
                 resolution=300,
                 format="csv",
-                client=self.mock_client
+                client=self.stream_client,
             ).__next__()
 
         availability = get_stream_availability(
@@ -260,7 +314,7 @@ class TestStreamData(TestCase):
             end_time=345,
             resolution=300,
             batch_operation="all",
-            client=self.mock_client
+            client=self.stream_client,
         )
 
         expected = [expected_data, expected_data]

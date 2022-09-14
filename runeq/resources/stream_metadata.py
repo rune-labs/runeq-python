@@ -307,7 +307,8 @@ class StreamMetadata(ItemBase):
                 For example, PST (UTC-0800) is represented as -28800.
                 If omitted, the timezone is UTC.
             translate_enums: If True, enum values are returned as their string
-                representation. Otherwise, enums are returned as integer values.
+                representation. Otherwise, enums are returned as integer
+                values.
             client: If specified, this client is used to fetch data from the
                 API. Otherwise, the global
                 :class:`~runeq.resources.client.StreamClient` is used.

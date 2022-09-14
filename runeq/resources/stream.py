@@ -53,8 +53,8 @@ def get_stream_data(
         translate_enums: If True, enum values are returned as their string
             representation. Otherwise, enums are returned as integer values.
         client: If specified, this client is used to fetch data from the
-            API. Otherwise, the global :class:`~runeq.resources.client.StreamClient`
-            is used.
+            API. Otherwise, the global
+            :class:`~runeq.resources.client.StreamClient` is used.
 
     Returns:
         An iterator over paginated API responses. If format is "json", each
@@ -126,8 +126,8 @@ def get_stream_availability(
             what type of batch calculation will determine availability for
             multiple streams. Availability values will equal 1 when
             data is available for "all" or "any" of the requested streams in
-            the given interval.
-            This argument is required when multiple **stream_ids** are specified.
+            the given interval. This argument is required when multiple
+            **stream_ids** are specified.
         format: Either "csv" (default) or "json". Determines the content type
             of the API response.
         limit: Maximum number of timestamps to return, across *all pages*
@@ -143,8 +143,8 @@ def get_stream_availability(
             For example, PST (UTC-0800) is represented as -28800.
             If omitted, the timezone is UTC.
         client: If specified, this client is used to fetch data from the
-            API. Otherwise, the global :class:`~runeq.resources.client.StreamClient`
-            is used.
+            API. Otherwise, the global
+            :class:`~runeq.resources.client.StreamClient` is used.
 
     Returns:
         An iterator over paginated API responses. If format is "json", each
