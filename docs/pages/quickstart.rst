@@ -163,6 +163,7 @@ the function accepts additional filters.
 
     patient_id = "abc123"
     patient_streams = get_patient_stream_metadata(patient_id)
+    print(f'Found {len(patient_streams)} streams')
 
 Once you have a :class:`~runeq.resources.stream_metadata.StreamMetadataSet`,
 you can use the **filter** operation to get a more specific subset of streams:
