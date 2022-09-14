@@ -20,7 +20,8 @@ from .stream import (
 
 class Dimension(ItemBase):
     """
-    A dimension of a stream of data.
+    A dimension of a stream type. This is akin to a column in a table,
+    where each value in the timeseries is a row.
 
     """
     def __init__(
@@ -130,7 +131,7 @@ def get_all_stream_types(
     client: Optional[GraphClient] = None
 ) -> StreamTypeSet:
     """
-    Get a set of all stream types.
+    Get all stream types.
 
     Args:
         client: If specified, this client is used to fetch metadata from the
@@ -199,7 +200,9 @@ def _parse_stream_type(stream_type_attrs: dict) -> StreamType:
 
 class StreamMetadata(ItemBase):
     """
-    Stream metadata for a stream of timeseries data.
+    Metadata for a stream (i.e. timeseries data).
+
+    TODO: say more about this class...allows fetching the data itself, too.
 
     """
 
@@ -220,18 +223,19 @@ class StreamMetadata(ItemBase):
         Initialize with metadata.
 
         Args:
-            id: StreamMetadata ID
-            created_at: When the stream metadata was created (unix timestamp)
-            algorithm: Name of the ingestion process which converted the raw
-                dataset into various time series streams.
+            id: Stream ID
+            created_at: When the stream was created, as a Unix timestamp, as
+                a Unix timestamp (in seconds).
+            algorithm: A versioned label that describes the process that was
+                used to derive this timeseries.
             device_id: Device ID
             patient_id: Patient ID
-            stream_type: Stream type to categorize streams.
-            min_time: Unix float in seconds representing the start time of data
-                in the stream.
-            max_time: Unix float in seconds representing the end time of data
-                in the stream.
-            parameters: Key/Value pairs that label the stream.
+            stream_type: Stream type, which categorizes the stream data.
+            min_time: The earliest timestamp in the stream, as a Unix timestamp
+                (in seconds).
+            max_time: The latest timestamp in the stream, as a Unix timestamp
+                (in seconds).
+            parameters: Key/value pairs that label the stream.
 
         """
         self.created_at = created_at
@@ -265,6 +269,7 @@ class StreamMetadata(ItemBase):
         attrs["stream_type"] = self.stream_type.to_dict()
         return attrs
 
+    # TODO: rename iter_csv_data?
     def iter_csv_responses(
         self,
         start_time: Optional[Union[float, datetime.date]] = None,
@@ -336,7 +341,7 @@ class StreamMetadata(ItemBase):
         timezone: Optional[int] = None,
         translate_enums: Optional[bool] = True,
         client: Optional[StreamClient] = None
-    ) -> Iterator[str]:
+    ) -> Iterator[dict]:
         """
         Iterate over JSON-formatted API responses for this stream
 
@@ -398,7 +403,10 @@ class StreamMetadata(ItemBase):
         stream_client: Optional[StreamClient] = None
     ) -> pd.DataFrame:
         """
-        Get stream as enriched dataframe with stream data and metadata.
+        Get stream data as an enriched Pandas dataframe. In addition to the raw
+        stream data, the dataframe also includes columns with stream metadata.
+        This allows for the concatenation of dataframes with data from
+        multiple streams.
 
         Args:
             start_time: Start time for the query, provided as a unix timestamp
@@ -455,11 +463,11 @@ class StreamMetadata(ItemBase):
 
         all_stream_dfs = []
         for resp in get_stream_data(client=stream_client, **params):
-            all_stream_dfs.append(pd.read_csv(StringIO(resp), sep=","))
+            all_stream_dfs.append(pd.read_csv(resp, sep=","))
+
         stream_df = pd.concat(all_stream_dfs, axis=0, ignore_index=True)
 
         return stream_df.assign(**metadata)
-
 
     def get_stream_availability_dataframe(
         self,
@@ -473,8 +481,9 @@ class StreamMetadata(ItemBase):
         stream_client: Optional[StreamClient] = None
     ) -> pd.DataFrame:
         """
-        Get stream availability as enriched dataframe with stream data
-        and metadata.
+        Get stream availability as an enriched Pandas dataframe. The dataframe
+        includes columns with metadata for this stream. This allows for the
+        concatenation of dataframes with availability for multiple streams.
 
         Args:
             start_time: Start time for the query, provided as a unix timestamp
@@ -522,7 +531,8 @@ class StreamMetadata(ItemBase):
 
         all_stream_dfs = []
         for resp in get_stream_availability(client=stream_client, **params):
-            all_stream_dfs.append(pd.read_csv(StringIO(resp), sep=","))
+            all_stream_dfs.append(pd.read_csv(resp, sep=","))
+
         stream_df = pd.concat(all_stream_dfs, axis=0, ignore_index=True)
 
         return stream_df.assign(**metadata)
@@ -563,19 +573,20 @@ class StreamMetadataSet(ItemSet):
     ) -> 'StreamMetadataSet':
         """
         Filters streams for those that match ALL optional filter parameters.
+        Returns a new StreamMetadataSet.
 
         Args:
-            stream_id: ID of the stream
+            stream_id: Stream ID
             patient_id: Patient ID
             device_id: Device ID
-            stream_type_id: StreamType ID
-            algorithm: Name of the ingestion process which converted the raw
-                dataset into various time series streams.
+            stream_type_id: Stream type ID
+            algorithm: A versioned label that describes the process that was
+                used to derive this timeseries.
             category: A broad categorization of the data type (e.g. neural,
                 vitals, etc)
             measurement: A specific label for what is being measured
                 (e.g. heart_rate, step_count, etc).
-            filter_function: User defined filter function which accepts a
+            filter_function: User-defined filter function which accepts a
                 Stream as a single argument and returns a boolean indicating
                 whether to keep that stream.
 
@@ -735,14 +746,14 @@ class StreamMetadataSet(ItemSet):
 
 
 def get_stream_metadata(
-    stream_id: Union[str, List[str]],
+    stream_ids: Union[str, List[str]],
     client: Optional[GraphClient] = None
 ) -> Union[StreamMetadata, StreamMetadataSet]:
     """
     Get stream metadata for the specified stream_id(s).
 
     Args:
-        stream_id: ID of the stream or list of IDs
+        stream_ids: ID of the stream or list of IDs
         client: If specified, this client is used to fetch metadata from the
             API. Otherwise, the global GraphClient is used.
 
@@ -787,7 +798,8 @@ def get_stream_metadata(
     '''
     stream_set = StreamMetadataSet()
 
-    stream_ids = stream_id if type(stream_id) is list else [stream_id]
+    if type(stream_ids) is str:
+        stream_ids = [stream_ids]
 
     result = client.execute(
         statement=query,
@@ -834,15 +846,15 @@ def get_patient_stream_metadata(
     **parameters
 ) -> StreamMetadataSet:
     """
-    Get stream metadata for streams that match ALL optional filter parameters
-    for the specific patient_id.
+    Get stream metadata for streams that match ALL filter parameters. Only the
+    patient ID is required.
 
     Args:
         patient_id: Patient ID
         device_id: Device ID
-        stream_type_id: StreamType ID
-        algorithm: Name of the ingestion process which converted the raw
-            dataset into various time series streams.
+        stream_type_id: Stream type ID
+        algorithm: A versioned label that describes the process that was
+            used to derive this timeseries.
         category: A broad categorization of the data type (e.g. neural,
             vitals, etc)
         measurement: A specific label for what is being measured
@@ -851,6 +863,7 @@ def get_patient_stream_metadata(
             API. Otherwise, the global GraphClient is used.
 
     Raises:
+        TODO: is this true...?
         ValueError: if the set does not contain an item with the ID.
 
     """
@@ -897,7 +910,7 @@ def get_patient_stream_metadata(
     if device_id:
         device_id = Device.denormalize_id(patient_id, device_id)
 
-    # Add cateogory to params and format params list for filter query
+    # Add category to params and format params list for filter query
     if category:
         parameters["category"] = category
 
@@ -964,7 +977,9 @@ def get_patient_stream_metadata(
     return stream_set
 
 
+# TODO: maybe remove?
 def get_stream_dataframe(
+    # TODO: be consistent about stream_id vs stream_ids
     stream_id: Union[str, List[str]],
     start_time: Optional[Union[float, datetime.date]] = None,
     start_time_ns: Optional[int] = None,
@@ -1012,6 +1027,7 @@ def get_stream_dataframe(
             the API. Otherwise, the global GraphClient is used.
 
     Raises:
+        TODO: is this true?
         RuneError: if recieved more than 1 metadata for specified stream_id.
 
     """
@@ -1082,6 +1098,7 @@ def get_stream_availability_dataframe(
             the API. Otherwise, the global GraphClient is used.
 
     Raises:
+        TODO: is this true?
         RuneError: if recieved more than 1 metadata for specified stream_id.
 
     """

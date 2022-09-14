@@ -35,10 +35,9 @@ def get_stream_data(
         end_time: End time for the query, provided as a unix timestamp
             (in seconds) or a datetime.date.
         end_time_ns: End time for the query, provided as a unix timestamp
-            (in nanoseconds).format: Optional enum "json" or "csv", which
-            determines the content type of the response
-        format: Either "csv" (default) or "json", which determines the content
-            type of the API response.
+            (in nanoseconds).
+        format: Either "csv" (default) or "json". Determines the content type
+            of the API response.
         limit: Maximum number of timestamps to return, across *all pages*
             of the response. A limit of 0 (default) will fetch all
             available data.
@@ -67,6 +66,7 @@ def get_stream_data(
         raise ValueError(
             "only start_time or start_time_ns can be defined, not both."
         )
+
     if end_time and end_time_ns:
         raise ValueError(
             "only end_time or end_time_ns can be defined, not both."
@@ -92,10 +92,10 @@ def get_stream_data(
     }
 
     client = client or global_stream_client()
-    path = f"/v2/streams/{stream_id}"
-    yield from client.get_data(path, **params)
+    yield from client.get_data(stream_id, **params)
 
 
+# TODO: this should match the base function
 def get_stream_csv(
     stream_id: str,
     start_time: Optional[Union[float, datetime.date]] = None,
@@ -122,8 +122,7 @@ def get_stream_csv(
         end_time: End time for the query, provided as a unix timestamp
             (in seconds) or a datetime.date.
         end_time_ns: End time for the query, provided as a unix timestamp
-            (in nanoseconds).format: Optional enum "json" or "csv", which
-            determines the content type of the response
+            (in nanoseconds).
         limit: Maximum number of timestamps to return, across *all pages*
             of the response. A limit of 0 (default) will fetch all
             available data.
@@ -163,6 +162,7 @@ def get_stream_csv(
     return get_stream_data(**params)
 
 
+# TODO: potentially remove this??
 def get_stream_json(
     stream_id: str,
     start_time: Optional[Union[float, datetime.date]] = None,
@@ -189,8 +189,7 @@ def get_stream_json(
         end_time: End time for the query, provided as a unix timestamp
             (in seconds) or a datetime.date.
         end_time_ns: End time for the query, provided as a unix timestamp
-            (in nanoseconds).format: Optional enum "json" or "csv", which
-            determines the content type of the response
+            (in nanoseconds).
         limit: Maximum number of timestamps to return, across *all pages*
             of the response. A limit of 0 (default) will fetch all
             available data.
@@ -231,7 +230,7 @@ def get_stream_json(
 
 
 def get_stream_availability(
-    stream_id: Union[str, List[str]],
+    stream_ids: Union[str, List[str]],
     start_time: Union[float, datetime.date],
     end_time: Union[float, datetime.date],
     resolution: int,
@@ -247,7 +246,7 @@ def get_stream_availability(
     Fetch the availability of 1 or multiple streams.
 
     Args:
-        stream_id: 1 or multiple stream IDs. If multiple stream IDs are
+        stream_ids: 1 or multiple stream IDs. If multiple stream IDs are
             specified, must also specify batch_operation.
         start_time: Start time for the query, provided as a unix timestamp
             (in seconds) or a datetime.date.
@@ -260,8 +259,8 @@ def get_stream_availability(
             data is available for "all" or "any" of the requested streams in
             the given interval.
             This argument is required when multiple stream IDs are specified.
-        format: Either "csv" (default) or "json", which determines the content
-            type of the API response.
+        format: Either "csv" (default) or "json". Determines the content type
+            of the API response.
         limit: Maximum number of timestamps to return, across *all pages*
             of the response. A limit of 0 (default) will fetch all
             available data.
@@ -289,7 +288,6 @@ def get_stream_availability(
 
     """
     params = {
-        'stream_id': stream_id,
         'start_time': start_time,
         'end_time': end_time,
         'resolution': resolution,
@@ -308,16 +306,19 @@ def get_stream_availability(
 
     client = client or global_stream_client()
 
-    if type(stream_id) is list:
+    if type(stream_ids) is str:
+        path = f"/v2/streams/{stream_ids}/availability"
+    elif type(stream_ids) is list and len(stream_ids) == 1:
+        path = f"/v2/streams/{stream_ids[0]}/availability"
+    else:
         # If querying for batch availability, need batch_operation
         if not batch_operation:
             raise ValueError(
                 "batch_operation must be specified for multiple stream IDs"
             )
+
         path = "/v2/batch/availability"
-    else:
-        path = f"/v2/streams/{stream_id}/availability"
-        del params['stream_id']
+        params["stream_id"] = stream_ids
 
     yield from client.get_data(path, **params)
 
