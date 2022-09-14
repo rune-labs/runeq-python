@@ -116,11 +116,7 @@ Stream Data
 .. automodule:: runeq.resources.stream
 
 .. autofunction:: get_stream_availability
-.. autofunction:: get_stream_availability_csv
-.. autofunction:: get_stream_availability_json
 .. autofunction:: get_stream_data
-.. autofunction:: get_stream_csv
-.. autofunction:: get_stream_json
 
 User Metadata
 -------------

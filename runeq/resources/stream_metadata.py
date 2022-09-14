@@ -2,20 +2,16 @@
 Fetch metadata about streams, including stream types.
 
 """
-
 import datetime
-from io import StringIO
-
-import pandas as pd
 from typing import Callable, Iterable, Iterator, List, Optional, Type, Union
 
+import pandas as pd
 
 from .client import GraphClient, StreamClient, global_graph_client
 from .common import ItemBase, ItemSet
 from .patient import Device, Patient
-from .stream import (
-    get_stream_availability, get_stream_csv, get_stream_data, get_stream_json
-)
+from .stream import get_stream_availability, get_stream_data
+from runeq.errors import RuneError
 
 
 class Dimension(ItemBase):
@@ -200,9 +196,8 @@ def _parse_stream_type(stream_type_attrs: dict) -> StreamType:
 
 class StreamMetadata(ItemBase):
     """
-    Metadata for a stream (i.e. timeseries data).
-
-    TODO: say more about this class...allows fetching the data itself, too.
+    Metadata for a stream (i.e. timeseries data). This class also has methods
+    that fetch data for the stream.
 
     """
 
@@ -269,20 +264,20 @@ class StreamMetadata(ItemBase):
         attrs["stream_type"] = self.stream_type.to_dict()
         return attrs
 
-    # TODO: rename iter_csv_data?
-    def iter_csv_responses(
+    def iter_stream_data(
         self,
         start_time: Optional[Union[float, datetime.date]] = None,
         start_time_ns: Optional[int] = None,
         end_time: Optional[Union[float, datetime.date]] = None,
         end_time_ns: Optional[int] = None,
+        format: Optional[str] = "csv",
         limit: Optional[int] = None,
         page_token: Optional[str] = None,
         timestamp: Optional[str] = "iso",
         timezone: Optional[int] = None,
         translate_enums: Optional[bool] = True,
         client: Optional[StreamClient] = None
-    ) -> Iterator[str]:
+    ) -> Iterator[Union[str, dict]]:
         """
         Iterate over CSV-formatted data for this stream.
 
@@ -295,99 +290,47 @@ class StreamMetadata(ItemBase):
                 (in seconds) or a datetime.date.
             end_time_ns: End time for the query, provided as a unix timestamp
                 (in nanoseconds).
+            format: Either "csv" (default) or "json". Determines the content
+                type of the API response, as well as the type that
+                is returned from this function.
             limit: Maximum number of timestamps to return, across *all pages*
                 of the response. A limit of 0 (default) will fetch all
                 available data.
             page_token: Token to fetch the subsequent page of results.
-                The value is obtained from the 'X-Rune-Next-Page-Token'
+                The value is obtained from the "X-Rune-Next-Page-Token"
                 response header field.
-            timestamp: Optional enum "unix", "unixns", or "iso", which
-                determines how timestamps are formatted in the response
-            timezone: Optional timezone offset, in seconds, used to calculate
+            timestamp: One of "unix", "unixns", or "iso", which determines
+                how timestamps are formatted in the response
+            timezone: Timezone offset, in seconds, used to calculate
                 string-based timestamp formats such as datetime and iso.
                 For example, PST (UTC-0800) is represented as -28800.
                 If omitted, the timezone is UTC.
             translate_enums: If True, enum values are returned as their string
-                representation. Otherwise, enums are returned as integer
-                values.
-            client: If specified, this client is used to fetch metadata from
-                the API. Otherwise, the global StreamClient is used.
+                representation. Otherwise, enums are returned as integer values.
+            client: If specified, this client is used to fetch data from the
+                API. Otherwise, the global
+                :class:`~runeq.resources.client.StreamClient` is used.
+
+        Returns:
+            An iterator over paginated API responses. If format is "json", each
+            response is a dict. If format is "csv", each response is a
+            CSV-formatted string.
 
         """
-        params = {
-            'stream_id': self.id,
-            'start_time': start_time,
-            'start_time_ns': start_time_ns,
-            'end_time': end_time,
-            'end_time_ns': end_time_ns,
-            'limit': limit,
-            'page_token': page_token,
-            'timestamp': timestamp,
-            'timezone': timezone,
-            'translate_enums': translate_enums,
-            'client': client,
-        }
-        return get_stream_csv(**params)
-
-    def iter_json_responses(
-        self,
-        start_time: Optional[Union[float, datetime.date]] = None,
-        start_time_ns: Optional[int] = None,
-        end_time: Optional[Union[float, datetime.date]] = None,
-        end_time_ns: Optional[int] = None,
-        limit: Optional[int] = None,
-        page_token: Optional[str] = None,
-        timestamp: Optional[str] = "iso",
-        timezone: Optional[int] = None,
-        translate_enums: Optional[bool] = True,
-        client: Optional[StreamClient] = None
-    ) -> Iterator[dict]:
-        """
-        Iterate over JSON-formatted API responses for this stream
-
-        Args:
-            start_time: Start time for the query, provided as a unix timestamp
-                (in seconds) or a datetime.date.
-            start_time_ns: Start time for the query, provided as a unix
-                timestamp (in nanoseconds).
-            end_time: End time for the query, provided as a unix timestamp
-                (in seconds) or a datetime.date.
-            end_time_ns: End time for the query, provided as a unix timestamp
-                (in nanoseconds).format: Optional enum "json" or "csv", which
-                determines the content type of the response
-            limit: Maximum number of timestamps to return, across *all pages*
-                of the response. A limit of 0 (default) will fetch all
-                available data.
-            page_token: Token to fetch the subsequent page of results.
-                The value is obtained from the 'X-Rune-Next-Page-Token'
-                response header field.
-            timestamp: Optional enum "unix", "unixns", or "iso", which
-                determines how timestamps are formatted in the response
-            timezone: Optional timezone offset, in seconds, used to calculate
-                string-based timestamp formats such as datetime and iso.
-                For example, PST (UTC-0800) is represented as -28800.
-                If omitted, the timezone is UTC.
-            translate_enums: If True, enum values are returned as their string
-                representation. Otherwise, enums are returned as integer
-                values.
-            client: If specified, this client is used to fetch metadata from
-                the API. Otherwise, the global StreamClient is used.
-
-        """
-        params = {
-            'stream_id': self.id,
-            'start_time': start_time,
-            'start_time_ns': start_time_ns,
-            'end_time': end_time,
-            'end_time_ns': end_time_ns,
-            'limit': limit,
-            'page_token': page_token,
-            'timestamp': timestamp,
-            'timezone': timezone,
-            'translate_enums': translate_enums,
-            'client': client,
-        }
-        return get_stream_json(**params)
+        return get_stream_data(
+            stream_id=self.id,
+            start_time=start_time,
+            start_time_ns=start_time_ns,
+            end_time=end_time,
+            end_time_ns=end_time_ns,
+            format=format,
+            limit=limit,
+            page_token=page_token,
+            timestamp=timestamp,
+            timezone=timezone,
+            translate_enums=translate_enums,
+            client=client,
+        )
 
     def get_stream_dataframe(
         self,
@@ -632,7 +575,9 @@ class StreamMetadataSet(ItemSet):
         stream_client: Optional[StreamClient] = None
     ) -> pd.DataFrame:
         """
-        Get stream set as enriched dataframe with stream data and metadata.
+        Get raw data for all streams in the collection, as an enriched Pandas
+        dataframe. The dataframe includes columns with metadata for each
+        stream.
 
         Args:
             start_time: Start time for the query, provided as a unix timestamp
@@ -681,6 +626,7 @@ class StreamMetadataSet(ItemSet):
 
         return pd.concat(all_stream_dfs, axis=0, ignore_index=True)
 
+    # TODO: get_batch_availability_dataframe?
     def get_stream_availability_dataframe(
         self,
         start_time: Union[float, datetime.date],
@@ -694,7 +640,12 @@ class StreamMetadataSet(ItemSet):
         stream_client: Optional[StreamClient] = None
     ) -> pd.DataFrame:
         """
-        Get stream availability data as a dataframe.
+        Get stream availability data as a Pandas dataframe. Depending on the
+        specified **batch_operation**, this fetches the availability of **all**
+        or **any** of the streams in the collection.
+
+        If you want to fetch the availability of each stream individually,
+        see the
 
         Args:
             start_time: Start time for the query, provided as a unix timestamp
@@ -739,7 +690,7 @@ class StreamMetadataSet(ItemSet):
 
         all_stream_dfs = []
         for resp in get_stream_availability(**params):
-            all_stream_dfs.append(pd.read_csv(StringIO(resp), sep=","))
+            all_stream_dfs.append(pd.read_csv(resp, sep=","))
         stream_df = pd.concat(all_stream_dfs, axis=0, ignore_index=True)
 
         return stream_df
@@ -756,6 +707,13 @@ def get_stream_metadata(
         stream_ids: ID of the stream or list of IDs
         client: If specified, this client is used to fetch metadata from the
             API. Otherwise, the global GraphClient is used.
+
+    Returns:
+        StreamMetadata: if a single stream ID is specified
+        StreamMetadataSet: if multiple stream IDs are specified
+
+    Raises:
+        RuneError: if any of the stream IDs are not found
 
     """
     client = client or global_graph_client()
@@ -806,6 +764,7 @@ def get_stream_metadata(
         stream_ids=stream_ids,
     )
 
+    seen_stream_ids = set(stream_ids)
     stream_list = result.get("streamListByIds", {})
     for stream_attrs in stream_list.get("streams", []):
         stream_type = _parse_stream_type(stream_attrs["streamType"])
@@ -828,6 +787,16 @@ def get_stream_metadata(
             **stream_attrs
         )
         stream_set.add(stream)
+
+        try:
+            seen_stream_ids.remove(stream.id)
+        except KeyError:
+            pass
+
+    if len(seen_stream_ids) > 0:
+        raise RuneError(
+            f"1+ stream ID(s) not found: {','.join(seen_stream_ids)}"
+        )
 
     if len(stream_set) == 1:
         return list(stream_set)[0]
@@ -861,10 +830,6 @@ def get_patient_stream_metadata(
             (e.g. heart_rate, step_count, etc).
         client: If specified, this client is used to fetch metadata from the
             API. Otherwise, the global GraphClient is used.
-
-    Raises:
-        TODO: is this true...?
-        ValueError: if the set does not contain an item with the ID.
 
     """
     client = client or global_graph_client()
@@ -977,10 +942,8 @@ def get_patient_stream_metadata(
     return stream_set
 
 
-# TODO: maybe remove?
 def get_stream_dataframe(
-    # TODO: be consistent about stream_id vs stream_ids
-    stream_id: Union[str, List[str]],
+    stream_ids: Union[str, List[str]],
     start_time: Optional[Union[float, datetime.date]] = None,
     start_time_ns: Optional[int] = None,
     end_time: Optional[Union[float, datetime.date]] = None,
@@ -997,7 +960,7 @@ def get_stream_dataframe(
     Get stream(s) as enriched dataframe with stream data and metadata.
 
     Args:
-        stream_id: ID of the stream or list of IDs
+        stream_ids: 1 or multiple stream IDs
         start_time: Start time for the query, provided as a unix timestamp
                 (in seconds) or a datetime.date.
         start_time_ns: Start time for the query, provided as a unix timestamp
@@ -1027,12 +990,11 @@ def get_stream_dataframe(
             the API. Otherwise, the global GraphClient is used.
 
     Raises:
-        TODO: is this true?
-        RuneError: if recieved more than 1 metadata for specified stream_id.
+        RuneError: if any of the stream IDs is not found.
 
     """
     stream_meta_set = get_stream_metadata(
-        stream_id=stream_id,
+        stream_ids=stream_ids,
         client=graph_client
     )
 
@@ -1051,7 +1013,7 @@ def get_stream_dataframe(
 
 
 def get_stream_availability_dataframe(
-    stream_id: Union[str, List[str]],
+    stream_ids: Union[str, List[str]],
     start_time: Union[float, datetime.date],
     end_time: Union[float, datetime.date],
     resolution: int,
@@ -1065,11 +1027,15 @@ def get_stream_availability_dataframe(
 ) -> pd.DataFrame:
     """
     Get stream availability data as a dataframe. If a single stream_id is
-    passed in, the dataframe will be enriched with the stream's metadata,
-    otherwise it will contain just the availability data.
+    passed in, the dataframe will be enriched with the stream's metadata.
+    Otherwise it will contain just the availability data.
+
+    Note that this is different from the get_stream_availability_dataframe
+    method on the :class:`~runeq.resources.stream_metadata.StreamMetadataSet`.
+    This dataframe contains the availability of each *individual* stream.
 
     Args:
-        stream_id: ID of the stream or list of IDs
+        stream_ids: 1 or multiple stream IDs
         start_time: Start time for the query, provided as a unix timestamp
                 (in seconds) or a datetime.date.
         end_time: End time for the query, provided as a unix timestamp
@@ -1097,31 +1063,28 @@ def get_stream_availability_dataframe(
         graph_client: If specified, this client is used to fetch metadata from
             the API. Otherwise, the global GraphClient is used.
 
-    Raises:
-        TODO: is this true?
-        RuneError: if recieved more than 1 metadata for specified stream_id.
-
     """
     # If there are multiple stream ids, there is no need to get metadata
     # since the dataframe response will be simplified
-    if type(stream_id) is list and len(stream_id) > 1:
-        params = {
-            'stream_id': stream_id,
-            'start_time': start_time,
-            'end_time': end_time,
-            'resolution': resolution,
-            'batch_operation': batch_operation,
-            'format': 'csv',
-            'limit': limit,
-            'page_token': page_token,
-            'timestamp': timestamp,
-            'timezone': timezone,
-            'client': stream_client,
-        }
+    if type(stream_ids) is list and len(stream_ids) > 1:
+        responses = get_stream_availability(
+            stream_ids=stream_ids,
+            start_time=start_time,
+            end_time=end_time,
+            resolution=resolution,
+            batch_operation=batch_operation,
+            format='csv',
+            limit=limit,
+            page_token=page_token,
+            timestamp=timestamp,
+            timezone=timezone,
+            client=stream_client,
+        )
 
         all_stream_dfs = []
-        for resp in get_stream_availability(**params):
-            all_stream_dfs.append(pd.read_csv(StringIO(resp), sep=","))
+        for resp in responses:
+            all_stream_dfs.append(pd.read_csv(resp, sep=","))
+
         stream_df = pd.concat(all_stream_dfs, axis=0, ignore_index=True)
 
         return stream_df
@@ -1129,19 +1092,17 @@ def get_stream_availability_dataframe(
     # Since there is only one stream id, we can enrich the dataframe with
     # metadata
     stream_meta = get_stream_metadata(
-        stream_id=stream_id,
+        stream_ids=stream_ids,
         client=graph_client
     )
 
-    params = {
-        'start_time': start_time,
-        'end_time': end_time,
-        'resolution': resolution,
-        'limit': limit,
-        'page_token': page_token,
-        'timestamp': timestamp,
-        'timezone': timezone,
-        'stream_client': stream_client,
-    }
-
-    return stream_meta.get_stream_availability_dataframe(**params)
+    return stream_meta.get_stream_availability_dataframe(
+        start_time=start_time,
+        end_time=end_time,
+        resolution=resolution,
+        limit=limit,
+        page_token=page_token,
+        timestamp=timestamp,
+        timezone=timezone,
+        stream_client=stream_client,
+    )
