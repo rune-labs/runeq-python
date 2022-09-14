@@ -7,6 +7,23 @@ Resources
 
 For example usage patterns, see :ref:`quickstart`.
 
+API Clients
+-----------
+
+.. automodule:: runeq.resources.client
+
+.. autofunction:: runeq.resources.client.initialize
+.. autofunction:: runeq.resources.client.global_graph_client
+.. autofunction:: runeq.resources.client.global_stream_client
+
+.. autoclass:: runeq.resources.client.GraphClient
+   :special-members: __init__
+   :members:
+
+.. autoclass:: runeq.resources.client.StreamClient
+   :special-members: __init__
+   :members:
+
 Patient Metadata
 ----------------
 
@@ -59,6 +76,51 @@ Organization Metadata
    :special-members: __init__
    :members:
    :inherited-members:
+
+
+Stream Metadata
+---------------
+
+.. automodule:: runeq.resources.stream_metadata
+
+.. autofunction:: get_all_stream_types
+.. autofunction:: get_patient_stream_metadata
+.. autofunction:: get_stream_availability_dataframe
+.. autofunction:: get_stream_dataframe
+.. autofunction:: get_stream_metadata
+
+.. autoclass:: Dimension
+   :special-members: __init__
+   :members:
+   :inherited-members:
+.. autoclass:: StreamMetadata
+   :special-members: __init__
+   :members:
+   :inherited-members:
+.. autoclass:: StreamMetadataSet
+   :special-members: __init__
+   :members:
+   :inherited-members:
+.. autoclass:: StreamType
+   :special-members: __init__
+   :members:
+   :inherited-members:
+.. autoclass:: StreamTypeSet
+   :special-members: __init__
+   :members:
+   :inherited-members:
+
+Stream Data
+-----------
+
+.. automodule:: runeq.resources.stream
+
+.. autofunction:: get_stream_availability
+.. autofunction:: get_stream_availability_csv
+.. autofunction:: get_stream_availability_json
+.. autofunction:: get_stream_data
+.. autofunction:: get_stream_data_csv
+.. autofunction:: get_stream_data_json
 
 User Metadata
 -------------

@@ -22,9 +22,9 @@ def get_stream_data(
     timezone: Optional[int] = None,
     translate_enums: Optional[bool] = True,
     client: Optional[StreamClient] = None
-) -> Iterator[str]:
+) -> Iterator[Union[str, dict]]:
     """
-    Gets an iterator over one page of stream data.
+    Fetch raw data for a stream.
 
     Args:
         stream_id: ID of the stream
@@ -37,15 +37,17 @@ def get_stream_data(
         end_time_ns: End time for the query, provided as a unix timestamp
             (in nanoseconds).format: Optional enum "json" or "csv", which
             determines the content type of the response
+        format: Either "csv" (default) or "json", which determines the content
+            type of the API response.
         limit: Maximum number of timestamps to return, across *all pages*
             of the response. A limit of 0 (default) will fetch all
             available data.
         page_token: Token to fetch the subsequent page of results.
             The value is obtained from the 'X-Rune-Next-Page-Token'
             response header field.
-        timestamp: Optional enum "unix", "unixns", or "iso", which determines
+        timestamp: One of "unix", "unixns", or "iso", which determines
             how timestamps are formatted in the response
-        timezone: Optional timezone offset, in seconds, used to calculate
+        timezone: Timezone offset, in seconds, used to calculate
             string-based timestamp formats such as datetime and iso.
             For example, PST (UTC-0800) is represented as -28800.
             If omitted, the timezone is UTC.
@@ -53,6 +55,11 @@ def get_stream_data(
             representation. Otherwise, enums are returned as integer values.
         client: If specified, this client is used to fetch data from the
             API. Otherwise, the global StreamClient is used.
+
+    Returns:
+        An iterator over paginated API responses. If format is "json", each
+        response is a dict. If response is "csv", each response is a
+        CSV-formatted string.
 
     """
     if start_time and start_time_ns:
@@ -84,9 +91,8 @@ def get_stream_data(
     }
 
     client = client or global_stream_client()
-    url = f"{client.config.stream_url}/v2/streams/{stream_id}"
-
-    yield from client.get_data(url, **params)
+    path = f"/v2/streams/{stream_id}"
+    yield from client.get_data(path, **params)
 
 
 def get_stream_csv(
@@ -103,7 +109,8 @@ def get_stream_csv(
     client: Optional[StreamClient] = None
 ) -> Iterator[str]:
     """
-    Iterate over CSV-formatted data for this stream.
+    Fetch raw data for a stream. Iterates over responses as CSV-formatted
+    strings.
 
     Args:
         stream_id: ID of the stream
@@ -122,9 +129,9 @@ def get_stream_csv(
         page_token: Token to fetch the subsequent page of results.
             The value is obtained from the 'X-Rune-Next-Page-Token'
             response header field.
-        timestamp: Optional enum "unix", "unixns", or "iso", which determines
+        timestamp: One of "unix", "unixns", or "iso", which determines
             how timestamps are formatted in the response
-        timezone: Optional timezone offset, in seconds, used to calculate
+        timezone: Timezone offset, in seconds, used to calculate
             string-based timestamp formats such as datetime and iso.
             For example, PST (UTC-0800) is represented as -28800.
             If omitted, the timezone is UTC.
@@ -132,6 +139,9 @@ def get_stream_csv(
             representation. Otherwise, enums are returned as integer values.
         client: If specified, this client is used to fetch data from the
             API. Otherwise, the global StreamClient is used.
+
+    Returns:
+        An iterator over paginated API responses.
 
     """
     params = {
@@ -163,9 +173,10 @@ def get_stream_json(
     timezone: Optional[int] = None,
     translate_enums: Optional[bool] = True,
     client: Optional[StreamClient] = None
-) -> Iterator[str]:
+) -> Iterator[dict]:
     """
-    Iterate over JSON-formatted API responses for this stream
+    Fetch raw data for a stream. Iterates over the
+    JSON-formatted results as dicts.
 
     Args:
         stream_id: ID of the stream
@@ -184,9 +195,9 @@ def get_stream_json(
         page_token: Token to fetch the subsequent page of results.
             The value is obtained from the 'X-Rune-Next-Page-Token'
             response header field.
-        timestamp: Optional enum "unix", "unixns", or "iso", which determines
+        timestamp: One of "unix", "unixns", or "iso", which determines
             how timestamps are formatted in the response
-        timezone: Optional timezone offset, in seconds, used to calculate
+        timezone: Timezone offset, in seconds, used to calculate
             string-based timestamp formats such as datetime and iso.
             For example, PST (UTC-0800) is represented as -28800.
             If omitted, the timezone is UTC.
@@ -194,6 +205,9 @@ def get_stream_json(
             representation. Otherwise, enums are returned as integer values.
         client: If specified, this client is used to fetch data from the
             API. Otherwise, the global StreamClient is used.
+
+    Returns:
+        An iterator over paginated API responses.
 
     """
     params = {
@@ -225,39 +239,45 @@ def get_stream_availability(
     timestamp: Optional[str] = 'iso',
     timezone: Optional[int] = None,
     client: Optional[StreamClient] = None
-) -> Iterator[str]:
+) -> Iterator[Union[str, dict]]:
     """
-    Get the stream availability with the specified ID.
-    batch_operation must be specified if len(stream_ids) > 1.
+    Fetch the availability of 1 or multiple streams.
 
     Args:
-        stream_id: ID of the stream
+        stream_id: 1 or multiple stream IDs. If multiple stream IDs are
+            specified, must also specify batch_operation.
         start_time: Start time for the query, provided as a unix timestamp
-                (in seconds) or a datetime.date.
+            (in seconds) or a datetime.date.
         end_time: End time for the query, provided as a unix timestamp
             (in seconds) or a datetime.date.
         resolution: Interval between returned timestamps, in seconds.
         batch_operation: Either "any" or "all", which determines
-            what type of batch calculation will determine availability for the
-            batch of streams. Availability values will equal 1 when
+            what type of batch calculation will determine availability for
+            multiple streams. Availability values will equal 1 when
             data is available for "all" or "any" of the requested streams in
             the given interval.
-        format: Optional enum "json" or "csv", which determines the content
-            type of the response
+            This argument is required when multiple stream IDs are specified.
+        format: Either "csv" (default) or "json", which determines the content
+            type of the API response.
         limit: Maximum number of timestamps to return, across *all pages*
             of the response. A limit of 0 (default) will fetch all
             available data.
         page_token: Token to fetch the subsequent page of results.
             The value is obtained from the 'X-Rune-Next-Page-Token'
             response header field.
-        timestamp: Optional enum "unix", "unixns", or "iso", which determines
+        timestamp: One of "unix", "unixns", or "iso", which determines
             how timestamps are formatted in the response
-        timezone: Optional timezone offset, in seconds, used to calculate
+        timezone: Timezone offset, in seconds, used to calculate
             string-based timestamp formats such as datetime and iso.
             For example, PST (UTC-0800) is represented as -28800.
             If omitted, the timezone is UTC.
         client: If specified, this client is used to fetch data from the
             API. Otherwise, the global StreamClient is used.
+
+    Returns:
+        An iterator over paginated API responses. If format is "json", each
+        response is a dict. If response is "csv", each response is a
+        CSV-formatted string.
 
     Raises:
         ValueError: if batch_operation is not specified and querying for
@@ -283,20 +303,19 @@ def get_stream_availability(
         params['end_time'] = time.mktime(end_time.timetuple())
 
     client = client or global_stream_client()
-    stream_url = client.config.stream_url
 
     if type(stream_id) is list:
         # If querying for batch availability, need batch_operation
         if not batch_operation:
             raise ValueError(
-                "batch_operation must be specified if len(stream_id) > 1"
+                "batch_operation must be specified for multiple stream IDs"
             )
-        url = f"{stream_url}/v2/batch/availability"
+        path = "/v2/batch/availability"
     else:
-        url = f"{stream_url}/v2/streams/{stream_id}/availability"
+        path = f"/v2/streams/{stream_id}/availability"
         del params['stream_id']
 
-    yield from client.get_data(url, **params)
+    yield from client.get_data(path, **params)
 
 
 def get_stream_availability_csv(
@@ -312,35 +331,41 @@ def get_stream_availability_csv(
     client: Optional[StreamClient] = None
 ) -> Iterator[str]:
     """
-    Get the stream availability as a csv with the specified ID.
-    batch_operation must be specified if len(stream_ids) > 1.
+    Fetch the availability of 1 or multiple streams. Iterates over the
+    results as CSV-formatted strings.
 
     Args:
-        stream_id: ID of the stream
+        Args:
+        stream_id: 1 or multiple stream IDs. If multiple stream IDs are
+            specified, must also specify batch_operation.
         start_time: Start time for the query, provided as a unix timestamp
-                (in seconds) or a datetime.date.
+            (in seconds) or a datetime.date.
         end_time: End time for the query, provided as a unix timestamp
             (in seconds) or a datetime.date.
         resolution: Interval between returned timestamps, in seconds.
         batch_operation: Either "any" or "all", which determines
-            what type of batch calculation will determine availability for the
-            batch of streams. Availability values will equal 1 when
+            what type of batch calculation will determine availability for
+            multiple streams. Availability values will equal 1 when
             data is available for "all" or "any" of the requested streams in
             the given interval.
+            This argument is required when multiple stream IDs are specified.
         limit: Maximum number of timestamps to return, across *all pages*
             of the response. A limit of 0 (default) will fetch all
             available data.
         page_token: Token to fetch the subsequent page of results.
             The value is obtained from the 'X-Rune-Next-Page-Token'
             response header field.
-        timestamp: Optional enum "unix", "unixns", or "iso", which determines
+        timestamp: One of "unix", "unixns", or "iso", which determines
             how timestamps are formatted in the response
-        timezone: Optional timezone offset, in seconds, used to calculate
+        timezone: Timezone offset, in seconds, used to calculate
             string-based timestamp formats such as datetime and iso.
             For example, PST (UTC-0800) is represented as -28800.
             If omitted, the timezone is UTC.
         client: If specified, this client is used to fetch data from the
             API. Otherwise, the global StreamClient is used.
+
+    Returns:
+        An iterator over paginated API responses.
 
     """
     params = {
@@ -370,38 +395,43 @@ def get_stream_availability_json(
     timestamp: Optional[str] = 'iso',
     timezone: Optional[int] = None,
     client: Optional[StreamClient] = None
-) -> Iterator[str]:
+) -> Iterator[dict]:
     """
-    Get the stream availability as a json with the specified ID.
-    batch_operation must be specified if len(stream_ids) > 1.
+    Fetch the availability of 1 or multiple streams. Iterates over the
+    JSON-formatted results as dicts.
 
     Args:
-        stream_id: ID of the stream
+        Args:
+        stream_id: 1 or multiple stream IDs. If multiple stream IDs are
+            specified, must also specify batch_operation.
         start_time: Start time for the query, provided as a unix timestamp
-                (in seconds) or a datetime.date.
+            (in seconds) or a datetime.date.
         end_time: End time for the query, provided as a unix timestamp
             (in seconds) or a datetime.date.
         resolution: Interval between returned timestamps, in seconds.
         batch_operation: Either "any" or "all", which determines
-            what type of batch calculation will determine availability for the
-            batch of streams. Availability values will equal 1 when
+            what type of batch calculation will determine availability for
+            multiple streams. Availability values will equal 1 when
             data is available for "all" or "any" of the requested streams in
             the given interval.
+            This argument is required when multiple stream IDs are specified.
         limit: Maximum number of timestamps to return, across *all pages*
             of the response. A limit of 0 (default) will fetch all
             available data.
         page_token: Token to fetch the subsequent page of results.
             The value is obtained from the 'X-Rune-Next-Page-Token'
             response header field.
-        timestamp: Optional enum "unix", "unixns", or "iso", which determines
+        timestamp: One of "unix", "unixns", or "iso", which determines
             how timestamps are formatted in the response
-        timezone: Optional timezone offset, in seconds, used to calculate
+        timezone: Timezone offset, in seconds, used to calculate
             string-based timestamp formats such as datetime and iso.
             For example, PST (UTC-0800) is represented as -28800.
             If omitted, the timezone is UTC.
         client: If specified, this client is used to fetch data from the
             API. Otherwise, the global StreamClient is used.
 
+    Returns:
+        An iterator over paginated API responses.
     """
     params = {
         'stream_id': stream_id,
