@@ -12,4 +12,3 @@ from the `V2 Stream API <https://docs.runelabs.io/stream/v2/index.html>`_, using
 a :class:`~runeq.resources.client.StreamClient`.
 
 """
-from runeq.resources import client
