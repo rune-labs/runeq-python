@@ -153,7 +153,9 @@ Fetch Timeseries Data
 *********************
 
 To start, fetch a :class:`~runeq.resources.stream_metadata.StreamMetadataSet`
-representing a particular patient's stream data:
+representing a particular patient's stream data. If you're interested in a
+more specific set of streams, :class:`~runeq.resources.stream_metadata.get_patient_stream_metadata`
+accepts additional filters.
 
 .. code-block:: python
 
@@ -162,37 +164,40 @@ representing a particular patient's stream data:
     patient_id = "abc123"
     patient_streams = get_patient_stream_metadata(patient_id)
 
-Explore and refine the :class:`~runeq.resources.stream_metadata.StreamMetadataSet`,
-using the filter method:
+Once you have a :class:`~runeq.resources.stream_metadata.StreamMetadataSet`,
+you can use the **filter** operation to get a more specific subset:
 
 .. code-block:: python
 
-    # Filter stream metadata by category...
+    # Filter stream metadata by category
     neural_streams = patient_streams.filter(category="neural")
 
-    # Or by the ID of the device that collected the data...
-    device_id = "exc31z#"
+    # Or by the ID of the device that collected the data
+    device_id = "eb#8c31"
     device_streams = patient_streams.filter(device_id=device_id)
 
-    # You can discover the intersection of multiple filters:
+    # Specify multiple arguments to find streams that match
+    # all criteria
     neural_device_streams = patient_streams.filter(
         category="neural",
         device_id=device_id,
     )
 
-    # You can also define your own filter function:
-    def is_percept_or_mdkit(stream) -> bool:
-        return (
-            stream.algorithm="ingest-medtronic-percept.0" or
-            stream.algorithm="ingest-strive-applewatch-md.0"
-        )
+    # You can also define a custom filter function
+    import time
 
-    percept_mdkit_streams = patient_streams.filter(
-        filter_function=is_percept_or_mdkit
+    def in_last_two_weeks(stream) -> bool:
+        """Return True if stream has data in the last two weeks"""
+        two_weeks_ago = time.time() - 14*24*60*60
+        return stream.max_time > two_weeks_ago
+
+    recent_vitals_streams = patient_streams.filter(
+        category="vitals",
+        filter_function=in_last_two_weeks
     )
 
-You can use the :class:`~runeq.resources.stream_metadata.StreamMetadataSet` to
-fetch the **availability** of all or any of the streams:
+Using a :class:`~runeq.resources.stream_metadata.StreamMetadataSet`,
+you can fetch the **availability** of all or any of the streams:
 
 .. code-block:: python
 
@@ -213,5 +218,6 @@ pandas dataframe:
         end_time=1663123000,
     )
 
-See :class:`~runeq.resources.stream_metadata.StreamMetadata` for details
-about working directly with API responses.
+You can also work directly with responses from the V2 Stream API. See
+:module:`~runeq.resources.stream` and
+:class:`~runeq.resources.stream_metadata.StreamMetadata` for details.
