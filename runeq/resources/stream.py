@@ -58,7 +58,7 @@ def get_stream_data(
 
     Returns:
         An iterator over paginated API responses. If format is "json", each
-        response is a dict. If response is "csv", each response is a
+        response is a dict. If format is "csv", each response is a
         CSV-formatted string.
 
     """
@@ -247,7 +247,7 @@ def get_stream_availability(
 
     Args:
         stream_ids: 1 or multiple stream IDs. If multiple stream IDs are
-            specified, must also specify batch_operation.
+            specified, **batch_operation** is also required.
         start_time: Start time for the query, provided as a unix timestamp
             (in seconds) or a datetime.date.
         end_time: End time for the query, provided as a unix timestamp
@@ -258,7 +258,7 @@ def get_stream_availability(
             multiple streams. Availability values will equal 1 when
             data is available for "all" or "any" of the requested streams in
             the given interval.
-            This argument is required when multiple stream IDs are specified.
+            This argument is required when multiple **stream_ids** are specified.
         format: Either "csv" (default) or "json". Determines the content type
             of the API response.
         limit: Maximum number of timestamps to return, across *all pages*
@@ -279,7 +279,7 @@ def get_stream_availability(
 
     Returns:
         An iterator over paginated API responses. If format is "json", each
-        response is a dict. If response is "csv", each response is a
+        response is a dict. If format is "csv", each response is a
         CSV-formatted string.
 
     Raises:
@@ -340,9 +340,8 @@ def get_stream_availability_csv(
     results as CSV-formatted strings.
 
     Args:
-        Args:
         stream_id: 1 or multiple stream IDs. If multiple stream IDs are
-            specified, must also specify batch_operation.
+            specified, **batch_operation** is also required.
         start_time: Start time for the query, provided as a unix timestamp
             (in seconds) or a datetime.date.
         end_time: End time for the query, provided as a unix timestamp
@@ -353,7 +352,7 @@ def get_stream_availability_csv(
             multiple streams. Availability values will equal 1 when
             data is available for "all" or "any" of the requested streams in
             the given interval.
-            This argument is required when multiple stream IDs are specified.
+            This argument is required when multiple **stream_ids** are specified.
         limit: Maximum number of timestamps to return, across *all pages*
             of the response. A limit of 0 (default) will fetch all
             available data.
@@ -407,9 +406,8 @@ def get_stream_availability_json(
     JSON-formatted results as dicts.
 
     Args:
-        Args:
         stream_id: 1 or multiple stream IDs. If multiple stream IDs are
-            specified, must also specify batch_operation.
+            specified, **batch_operation** is also required.
         start_time: Start time for the query, provided as a unix timestamp
             (in seconds) or a datetime.date.
         end_time: End time for the query, provided as a unix timestamp
@@ -420,7 +418,7 @@ def get_stream_availability_json(
             multiple streams. Availability values will equal 1 when
             data is available for "all" or "any" of the requested streams in
             the given interval.
-            This argument is required when multiple stream IDs are specified.
+            This argument is required when multiple **stream_ids** are specified.
         limit: Maximum number of timestamps to return, across *all pages*
             of the response. A limit of 0 (default) will fetch all
             available data.

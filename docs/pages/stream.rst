@@ -5,8 +5,10 @@ V1 Stream API
 
 The :class:`~runeq.stream` module contains classes that fetch timeseries data using
 `V1 Stream API <https://docs.runelabs.io/stream/index.html>`_.
+
+
 The V1 API is supported, but is not longer under active development. We recommend
-using the :class:`~runeq.resources` module instead, which provides access to the
+using the :class:`~runeq.resources` module instead, which provides access to data from the
 `V2 Stream API <https://docs.runelabs.io/stream/v2/index.html>`_.
 
 Usage

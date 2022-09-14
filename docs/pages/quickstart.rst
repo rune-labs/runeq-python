@@ -152,10 +152,10 @@ a columnar data format, like a `pandas <https://pandas.pydata.org/>`_ DataFrame.
 Fetch Timeseries Data
 *********************
 
-To start, fetch a :class:`~runeq.resources.stream_metadata.StreamMetadataSet`
-representing a particular patient's stream data. If you're interested in a
-more specific set of streams, :class:`~runeq.resources.stream_metadata.get_patient_stream_metadata`
-accepts additional filters.
+Use :class:`~runeq.resources.stream_metadata.get_patient_stream_metadata` to get
+a :class:`~runeq.resources.stream_metadata.StreamMetadataSet` with details about
+a particular patient's data. If you're interested in a more specific set of streams,
+the function accepts additional filters.
 
 .. code-block:: python
 
@@ -165,16 +165,16 @@ accepts additional filters.
     patient_streams = get_patient_stream_metadata(patient_id)
 
 Once you have a :class:`~runeq.resources.stream_metadata.StreamMetadataSet`,
-you can use the **filter** operation to get a more specific subset:
+you can use the **filter** operation to get a more specific subset of streams:
 
 .. code-block:: python
 
-    # Filter stream metadata by category
-    neural_streams = patient_streams.filter(category="neural")
-
-    # Or by the ID of the device that collected the data
+    # Filter for data collected from a particular device
     device_id = "eb#8c31"
     device_streams = patient_streams.filter(device_id=device_id)
+
+    # Filter by broad category
+    neural_streams = patient_streams.filter(category="neural")
 
     # Specify multiple arguments to find streams that match
     # all criteria
@@ -183,7 +183,7 @@ you can use the **filter** operation to get a more specific subset:
         device_id=device_id,
     )
 
-    # You can also define a custom filter function
+    # Use a custom filter function
     import time
 
     def in_last_two_weeks(stream) -> bool:
@@ -219,5 +219,5 @@ pandas dataframe:
     )
 
 You can also work directly with responses from the V2 Stream API. See
-:module:`~runeq.resources.stream` and
+:class:`~runeq.resources.stream` and
 :class:`~runeq.resources.stream_metadata.StreamMetadata` for details.

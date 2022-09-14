@@ -1,5 +1,5 @@
 """
-V2 SDK functionality to support Stream Metadata operations.
+Fetch metadata about streams, including stream types.
 
 """
 
