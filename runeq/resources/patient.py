@@ -88,12 +88,13 @@ class Device(ItemBase):
 
     def __repr__(self):
         """
-        Override repr, to include the patient ID
+        Override repr, to include the patient ID (as well as the device ID
+        and name)
 
         """
         return (
-            f'{self.__class__.__name__}('
-            f'id="{self.id}", name="{self.name}", patient_id="{self.patient_id}")'
+            f'{self.__class__.__name__}(id="{self.id}", '
+            f'name="{self.name}", patient_id="{self.patient_id}")'
         )
 
 

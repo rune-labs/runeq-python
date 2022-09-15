@@ -63,7 +63,10 @@ class ItemBase:
 
         """
         if hasattr(self, "name"):
-            return f'{self.__class__.__name__}(id="{self.id}", name="{self.name}")'
+            return (
+                f'{self.__class__.__name__}'
+                f'(id="{self.id}", name="{self.name}")'
+            )
         else:
             return f'{self.__class__.__name__}(id="{self.id}")'
 
@@ -174,7 +177,7 @@ class ItemSet(ABC):
         """
         return iter(self._items.keys())
 
-    def __str__(self):
+    def __repr__(self):
         """
         String representation of the set of items. Returns information on
         the number of items in the set, the type of the set, and up to 3

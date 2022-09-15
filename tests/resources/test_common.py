@@ -287,15 +287,15 @@ class TestItemSet(TestCase):
             list(self.test_patient_set.ids())
         )
 
-    def test_str(self):
+    def test_repr(self):
         """
-        Test __str__
+        Test __repr__
 
         """
         self.assertEqual(
             """PatientItemSet {
 }""",
-            str(PatientItemSet())
+            repr(PatientItemSet())
         )
 
         patient_set = PatientItemSet(
