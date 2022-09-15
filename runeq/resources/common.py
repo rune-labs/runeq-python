@@ -61,13 +61,11 @@ class ItemBase:
         """
         Format the item representation.
 
-        TODO: should this be __str__ instead?
-
         """
         if hasattr(self, "name"):
-            return f'{self.__class__.__name__}(id={self.id}, name={self.name})'
+            return f'{self.__class__.__name__}(id="{self.id}", name="{self.name}")'
         else:
-            return f'{self.__class__.__name__}(id={self.id})'
+            return f'{self.__class__.__name__}(id="{self.id}")'
 
     def to_dict(self) -> dict:
         """
@@ -155,17 +153,6 @@ class ItemSet(ABC):
                 )
 
             self._items[item.id] = item
-
-    def __add__(self, other):
-        """
-        Add two ItemSets of the same type together. Items are deduplicated.
-
-        """
-        if type(other) != self.__class__:
-            raise TypeError(f'cannot add {self.__class__} and {type(other)}')
-
-        items = [i for i in other]
-        self.add(*items)
 
     def remove(self, *items: Union[str, ItemBase]):
         """

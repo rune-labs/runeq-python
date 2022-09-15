@@ -93,7 +93,7 @@ class Device(ItemBase):
         """
         return (
             f'{self.__class__.__name__}('
-            f'id={self.id}, name={self.name}, patient_id={self.patient_id})'
+            f'id="{self.id}", name="{self.name}", patient_id="{self.patient_id}")'
         )
 
 

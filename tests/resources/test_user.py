@@ -1,12 +1,12 @@
 """
-Tests for the V2 SDK User.
+Tests for fetching user metadata.
 
 """
 from unittest import TestCase, mock
 
 from runeq.config import Config
-from runeq.v2sdk.client import GraphClient
-from runeq.v2sdk.user import User, get_current_user
+from runeq.resources.client import GraphClient
+from runeq.resources.user import User, get_current_user
 
 
 class TestUser(TestCase):
@@ -54,13 +54,13 @@ class TestUser(TestCase):
         test_user = User(
             id="user1-id",
             created_at=1629300943.9179766,
-            name="user1",
+            name="User 1",
             active_org_id="org1-id",
-            active_org_name="org1",
+            active_org_name="Org 1",
         )
 
         self.assertEqual(
-            "User(id=user1-id, name=user1)",
+            'User(id="user1-id", name="User 1")',
             repr(test_user)
         )
 

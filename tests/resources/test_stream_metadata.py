@@ -1,5 +1,7 @@
 """
-Tests for the V2 SDK Stream.
+Tests for fetching stream metadata.
+
+TODO: add repr test
 
 """
 import json

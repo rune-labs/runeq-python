@@ -1,12 +1,12 @@
 """
-Tests for the V2 SDK Org.
+Tests for fetching org metadata.
 
 """
 from unittest import TestCase, mock
 
 from runeq.config import Config
-from runeq.v2sdk.client import GraphClient
-from runeq.v2sdk.org import Org, get_org, get_orgs
+from runeq.resources.client import GraphClient
+from runeq.resources.org import Org, get_org, get_orgs
 
 
 class TestOrg(TestCase):
@@ -50,10 +50,10 @@ class TestOrg(TestCase):
         test_org = Org(
             id="org1-id",
             created_at=1629300943.9179766,
-            name="org1",
+            name="Org 1",
         )
         self.assertEqual(
-            "Org(id=org1-id, name=org1)",
+            'Org(id="org1-id", name="Org 1")',
             repr(test_org)
         )
 

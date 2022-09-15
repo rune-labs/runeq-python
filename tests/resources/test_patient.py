@@ -1,12 +1,12 @@
 """
-Tests for the V2 SDK Patient.
+Tests for fetching patient metadata
 
 """
 from unittest import TestCase, mock
 
 from runeq.config import Config
-from runeq.v2sdk.client import GraphClient
-from runeq.v2sdk.patient import (
+from runeq.resources.client import GraphClient
+from runeq.resources.patient import (
     Device, DeviceSet, Patient, PatientSet, get_all_devices, get_all_patients,
     get_device, get_patient, get_patient_devices
 )
@@ -107,11 +107,11 @@ class TestPatient(TestCase):
         test_patient = Patient(
             id="p1",
             created_at=1629300943.9179766,
-            name="patient1",
+            name="Patient 1",
             devices=DeviceSet()
         )
         self.assertEqual(
-            "Patient(id=p1, name=patient1)",
+            'Patient(id="p1", name="Patient 1")',
             repr(test_patient)
         )
 
@@ -640,7 +640,7 @@ class TestDevice(TestCase):
             device_type_id="dt1",
         )
         self.assertEqual(
-            "Device(id=1, name=Percept, patient_id=p1)",
+            'Device(id="1", name="Percept", patient_id="p1")',
             repr(test_device)
         )
 
