@@ -1,8 +1,6 @@
 """
 Tests for fetching stream metadata.
 
-TODO: add repr test
-
 """
 import json
 from unittest import TestCase, mock
@@ -80,6 +78,22 @@ class TestStreamType(TestCase):
             test_stream_type.description
         )
         self.assertEqual([], test_stream_type.dimensions)
+
+    def test_repr(self):
+        """
+        Test __repr__
+
+        """
+        test_stream_type = StreamType(
+            id="rotation",
+            name="Rotation",
+            description="Rotation rate (velocity) sampled in the time-domain.",
+            dimensions=[]
+        )
+        self.assertEqual(
+            'StreamType(id="rotation", name="Rotation")',
+            repr(test_stream_type)
+        )
 
     def test_get_all_stream_types(self):
         """
@@ -261,6 +275,27 @@ class TestStreamMetadata(TestCase):
         self.assertEqual(1648231560, test_stream.min_time)
         self.assertEqual(1648234860, test_stream.max_time)
         self.assertEqual({"category": "vitals"}, test_stream.parameters)
+
+    def test_repr(self):
+        """
+        Test __repr__
+
+        """
+        test_stream = StreamMetadata(
+            id="s1",
+            created_at=1629300943.9179766,
+            algorithm="a1",
+            device_id="d1",
+            patient_id="p1",
+            stream_type=None,
+            min_time=1648231560,
+            max_time=1648234860,
+            parameters={"category": "vitals"}
+        )
+        self.assertEqual(
+            'StreamMetadata(id="s1")',
+            repr(test_stream)
+        )
 
     def test_get_stream_metadata(self):
         """
