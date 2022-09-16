@@ -144,41 +144,34 @@ class ItemSet(ABC):
             f"{self._item_class.__name__} with ID {id}"
         )
 
-    def add(self, items: Union[ItemBase, Iterable[ItemBase]]):
+    def add(self, item: ItemBase):
         """
-        Add item(s) to this set. Accepts a single item OR an interable of
-        items that have the same type as the item class (including another
-        ItemSet of this type).
+        Add a single item to the set. Must be the same type as other members
+        of the collection
 
         """
-        if type(items) is self._item_class:
-            items = [items]
+        if type(item) is not self._item_class:
+            raise TypeError(
+                f'cannot add {str(item)}; must be type '
+                f'{self._item_class.__name__}'
+            )
 
+        self._items[item.id] = item
+
+    def update(self, items: Iterable[ItemBase]):
+        """
+        Add an iterable of item(s) to this set. All items must be the same
+        class as members of this collection.
+
+        """
         for item in items:
             if type(item) is not self._item_class:
                 raise TypeError(
-                    f'cannot add {str(item)}; must be type '
+                    f'cannot update with {str(item)}; all items must be type '
                     f'{self._item_class.__name__}'
                 )
 
             self._items[item.id] = item
-
-    def __add__(self, other: 'ItemSet'):
-        """
-        Add two ItemSets together, creating a new ItemSet of the same type.
-        Both ItemSets must have the same type.
-
-        """
-        if type(other) is not self.__class__:
-            raise TypeError(
-                f'cannot add {self.__class__.__name__} '
-                f'and {type(other).__name__}'
-            )
-
-        # Copy all the items from this set to a new one
-        new_set = self.__class__([item for item in self])
-        new_set.add(other)
-        return new_set
 
     def remove(self, *items: Union[str, ItemBase]):
         """

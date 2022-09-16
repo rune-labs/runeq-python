@@ -154,6 +154,10 @@ class TestItemSet(TestCase):
     """
 
     def setUp(self) -> None:
+        """
+        Test setup
+
+        """
         self.test_patient_set = PatientItemSet(
             items=[
                 PatientItem(id="patient1_id", name="Patient 1"),
@@ -208,70 +212,55 @@ class TestItemSet(TestCase):
         patient2 = PatientItem(id="patient2_id")
 
         # Test successfully adding a new patient to a set
-        patient_set = PatientItemSet()
-        self.assertEqual(0, len(patient_set))
-
-        patient_set.add(patient1)
-        self.assertEqual(1, len(patient_set))
-        self.assertEqual(patient1, patient_set.get("patient1_id"))
-
-        # Test adding multiple patients to a set
-        patient_set = PatientItemSet()
-        patient_set.add([patient1, patient1, patient2])
-        self.assertEqual(2, len(patient_set))
-        self.assertEqual(patient1, patient_set.get("patient1_id"))
-        self.assertEqual(patient2, patient_set.get("patient2_id"))
-
-        # Test adding two ItemSets
         patient_set = PatientItemSet([patient1])
-        patient_set.add(PatientItemSet([patient2]))
+        self.assertEqual(1, len(patient_set))
 
+        patient_set.add(patient2)
         self.assertEqual(2, len(patient_set))
-        self.assertEqual(patient1, patient_set.get("patient1_id"))
-        self.assertEqual(patient2, patient_set.get("patient2_id"))
+        self.assertEqual({"patient1_id", "patient2_id"},
+                         set(patient_set.ids()))
 
         # Test raises TypeError when adding item with a different
         # type to the set.
         patient_set = PatientItemSet()
         new_stream = StreamItem(id="stream1_id")
 
-        with self.assertRaisesRegex(
-            TypeError,
-            f"must be type PatientItem"
-        ):
-            patient_set.add([new_stream])
+        with self.assertRaisesRegex(TypeError, "must be type PatientItem"):
+            patient_set.add(new_stream)
 
-    def test__add__(self):
+    def test_update(self):
         """
-        Test __add__
+        Test update
 
         """
         patient1 = PatientItem(id="patient1_id")
         patient2 = PatientItem(id="patient2_id")
 
-        # Adding two ItemSets together should create a third
+        # Test update with a list
+        patient_set = PatientItemSet()
+        patient_set.update([patient1, patient1, patient2])
+        self.assertEqual(2, len(patient_set))
+        self.assertEqual(patient1, patient_set.get("patient1_id"))
+        self.assertEqual(patient2, patient_set.get("patient2_id"))
+
+        # Test update with a ItemSet of the same type
         patient_set1 = PatientItemSet([patient1])
         patient_set2 = PatientItemSet([patient2])
+        patient_set1.update(patient_set2)
 
-        patient_set3 = patient_set1 + patient_set2
+        self.assertEqual(2, len(patient_set1))
+        self.assertEqual(patient1, patient_set.get("patient1_id"))
+        self.assertEqual(patient2, patient_set.get("patient2_id"))
 
-        self.assertEqual(len(patient_set3), 2)
-        self.assertEqual(
-            set(patient_set3.ids()), {"patient1_id", "patient2_id"})
-
-        # Original ItemSets should be unaffected
-        self.assertEqual(len(patient_set1), 1)
-        self.assertEqual(set(patient_set1.ids()), {"patient1_id"})
-
-        self.assertEqual(len(patient_set2), 1)
-        self.assertEqual(set(patient_set2.ids()), {"patient2_id"})
+        # other patient set is unaffected
+        self.assertEqual(1, len(patient_set2))
 
         # Test raises TypeError when adding ItemSets with different types
         with self.assertRaisesRegex(
             TypeError,
-            "cannot add PatientItemSet and OrgSet"
+            "cannot update with PatientItem"
         ):
-            PatientItemSet() + OrgSet()
+            OrgSet().update(patient_set)
 
     def test_remove(self):
         """
