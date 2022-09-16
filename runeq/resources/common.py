@@ -157,7 +157,8 @@ class ItemSet(ABC):
         for item in items:
             if type(item) is not self._item_class:
                 raise TypeError(
-                    f'cannot add {str(item)}; must be type {self._item_class.__name__}'
+                    f'cannot add {str(item)}; must be type '
+                    f'{self._item_class.__name__}'
                 )
 
             self._items[item.id] = item
@@ -170,7 +171,8 @@ class ItemSet(ABC):
         """
         if type(other) is not self.__class__:
             raise TypeError(
-                f'cannot add {self.__class__.__name__} and {type(other).__name__}'
+                f'cannot add {self.__class__.__name__} '
+                f'and {type(other).__name__}'
             )
 
         # Copy all the items from this set to a new one
