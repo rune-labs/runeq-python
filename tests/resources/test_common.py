@@ -1,11 +1,12 @@
 """
-Tests for the V2 SDK Common Classes.
+Tests for common base classes.
 
 """
 from typing import List, Type
 from unittest import TestCase
 
 from runeq.resources.common import ItemBase, ItemSet
+from runeq.resources.org import OrgSet
 
 
 class StreamItem(ItemBase):
@@ -21,14 +22,6 @@ class StreamItem(ItemBase):
         """
         super().__init__(id=id, **attributes)
 
-    @property
-    def id(self) -> str:
-        """
-        ID of the Stream
-
-        """
-        return self._attributes.get("id")
-
 
 class PatientItem(ItemBase):
     """
@@ -36,20 +29,13 @@ class PatientItem(ItemBase):
 
     """
 
-    def __init__(self, id: str, **attributes):
+    def __init__(self, id: str, name: str = "", **attributes):
         """
         Initializes PatientItem
 
         """
-        super().__init__(id=id, **attributes)
-
-    @property
-    def id(self) -> str:
-        """
-        ID of the Patient
-
-        """
-        return self._attributes.get("id")
+        self.name = name
+        super().__init__(id=id, name=name, **attributes)
 
 
 class PatientItemSet(ItemSet):
@@ -122,21 +108,18 @@ class TestItemBase(TestCase):
         Test __repr__
 
         """
-        patient1 = PatientItem(id="patient_id")
+        # Class that has a name attribute
+        patient = PatientItem(id="patient_id1", name="Patient 1", key1="val1")
         self.assertEqual(
-            'PatientItem(\n\tid=patient_id,\n\tattributes='
-            '{\'id\': \'patient_id\'}\n)',
-            repr(patient1)
+            'PatientItem(id="patient_id1", name="Patient 1")',
+            repr(patient)
         )
 
-
-        patient2 = PatientItem(id="patient_id", key1="val1")
+        # Class that doesn't have a name attribute
+        stream = StreamItem(id="stream-123", )
         self.assertEqual(
-            (
-                "PatientItem(\n\tid=patient_id,\n\t"
-                "attributes={'key1': 'val1', 'id': 'patient_id'}\n)"
-            ),
-            repr(patient2)
+            'StreamItem(id="stream-123")',
+            repr(stream)
         )
 
     def test_to_dict(self):
@@ -145,15 +128,21 @@ class TestItemBase(TestCase):
 
         """
         patient1 = PatientItem(id="patient_id")
-        self.assertEqual({"id": "patient_id"}, patient1.to_dict())
+        self.assertEqual({"id": "patient_id", "name": ""}, patient1.to_dict())
 
         patient2 = PatientItem(
             id="patient_id",
+            name='Patient 2',
             key1="val1",
             key2=2
         )
         self.assertEqual(
-            {"id": "patient_id", "key1": "val1", "key2": 2},
+            {
+                "id": "patient_id",
+                "name": "Patient 2",
+                "key1": "val1",
+                "key2": 2
+            },
             patient2.to_dict()
         )
 
@@ -164,13 +153,18 @@ class TestItemSet(TestCase):
 
     """
 
-    test_patient_set = PatientItemSet(
-        items=[
-            PatientItem(id="patient1_id"),
-            PatientItem(id="patient2_id", key1="val1"),
-            PatientItem(id="patient3_id", key1=1, key2="val2"),
-        ]
-    )
+    def setUp(self) -> None:
+        """
+        Test setup
+
+        """
+        self.test_patient_set = PatientItemSet(
+            items=[
+                PatientItem(id="patient1_id", name="Patient 1"),
+                PatientItem(id="patient2_id", key1="val1"),
+                PatientItem(id="patient3_id", key1=1, key2="val2"),
+            ]
+        )
 
     def test_iter(self):
         """
@@ -191,7 +185,6 @@ class TestItemSet(TestCase):
         """
         self.assertEqual(0, len(PatientItemSet()))
         self.assertEqual(3, len(self.test_patient_set))
-
 
     def test_get(self):
         """
@@ -215,33 +208,59 @@ class TestItemSet(TestCase):
         Test add
 
         """
-        # Test successfully adding a new patient to a set
-        patient_set = PatientItemSet()
-        self.assertEqual(0, len(patient_set))
-
-        new_patient = PatientItem(id="patient1_id")
-        patient_set.add(new_patient)
-        self.assertEqual(1, len(patient_set))
-        self.assertEqual(new_patient, patient_set.get("patient1_id"))
-
-        # Test adding multiple patients to a set
-        patient_set = PatientItemSet()
+        patient1 = PatientItem(id="patient1_id")
         patient2 = PatientItem(id="patient2_id")
-        patient_set.add(new_patient, new_patient, patient2)
+
+        # Test successfully adding a new patient to a set
+        patient_set = PatientItemSet([patient1])
+        self.assertEqual(1, len(patient_set))
+
+        patient_set.add(patient2)
         self.assertEqual(2, len(patient_set))
-        self.assertEqual(new_patient, patient_set.get("patient1_id"))
-        self.assertEqual(patient2, patient_set.get("patient2_id"))
+        self.assertEqual({"patient1_id", "patient2_id"},
+                         set(patient_set.ids()))
 
         # Test raises TypeError when adding item with a different
         # type to the set.
         patient_set = PatientItemSet()
-        new_stream = StreamItem(id="strean1_id")
+        new_stream = StreamItem(id="stream1_id")
 
+        with self.assertRaisesRegex(TypeError, "must be type PatientItem"):
+            patient_set.add(new_stream)
+
+    def test_update(self):
+        """
+        Test update
+
+        """
+        patient1 = PatientItem(id="patient1_id")
+        patient2 = PatientItem(id="patient2_id")
+
+        # Test update with a list
+        patient_set = PatientItemSet()
+        patient_set.update([patient1, patient1, patient2])
+        self.assertEqual(2, len(patient_set))
+        self.assertEqual(patient1, patient_set.get("patient1_id"))
+        self.assertEqual(patient2, patient_set.get("patient2_id"))
+
+        # Test update with a ItemSet of the same type
+        patient_set1 = PatientItemSet([patient1])
+        patient_set2 = PatientItemSet([patient2])
+        patient_set1.update(patient_set2)
+
+        self.assertEqual(2, len(patient_set1))
+        self.assertEqual(patient1, patient_set.get("patient1_id"))
+        self.assertEqual(patient2, patient_set.get("patient2_id"))
+
+        # other patient set is unaffected
+        self.assertEqual(1, len(patient_set2))
+
+        # Test raises TypeError when adding ItemSets with different types
         with self.assertRaisesRegex(
             TypeError,
-            "cannot add"
+            "cannot update with PatientItem"
         ):
-            patient_set.add(new_stream)
+            OrgSet().update(patient_set)
 
     def test_remove(self):
         """
@@ -292,26 +311,22 @@ class TestItemSet(TestCase):
             list(self.test_patient_set.ids())
         )
 
-    def test_str(self):
+    def test_repr(self):
         """
-        Test __str__
+        Test __repr__
 
         """
         self.assertEqual(
             """PatientItemSet {
 }""",
-            str(PatientItemSet())
+            repr(PatientItemSet())
         )
 
         patient_set = PatientItemSet(
             items=[
-                PatientItem(id="patient1_id"),
-                PatientItem(id="patient2_id", key1="val1"),
-                PatientItem(
-                    id="patient3_id",
-                    key1=1,
-                    key2="val2"
-                ),
+                PatientItem(id="patient1_id", name=""),
+                PatientItem(id="patient2_id", name="Patient 2"),
+                PatientItem(id="patient3_id", name="Patient 3", key1="value1"),
                 PatientItem(id="patient4_id"),
                 PatientItem(id="patient5_id"),
             ]
@@ -320,9 +335,9 @@ class TestItemSet(TestCase):
         self.assertEqual(
             (
                 'PatientItemSet {\n'
-                '	patient1_id\n'
-                '	patient2_id\n'
-                '	patient3_id\n'
+                '	PatientItem(id="patient1_id", name="")\n'
+                '	PatientItem(id="patient2_id", name="Patient 2")\n'
+                '	PatientItem(id="patient3_id", name="Patient 3")\n'
                 '	... (and 2 others)\n'
                 '}'
             ),
@@ -338,9 +353,9 @@ class TestItemSet(TestCase):
         self.assertEqual([], PatientItemSet().to_list())
         self.assertEqual(
             [
-                {'id': 'patient1_id'},
-                {'id': 'patient2_id', 'key1': 'val1'},
-                {'id': 'patient3_id', 'key1': 1, 'key2': 'val2'},
+                {'id': 'patient1_id', 'name': 'Patient 1'},
+                {'id': 'patient2_id', 'key1': 'val1', 'name': ''},
+                {'id': 'patient3_id', 'key1': 1, 'key2': 'val2', 'name': ''},
             ],
             self.test_patient_set.to_list()
         )

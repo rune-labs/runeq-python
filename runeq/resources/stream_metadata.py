@@ -820,8 +820,8 @@ def get_patient_stream_metadata(
     **parameters
 ) -> StreamMetadataSet:
     """
-    Get stream metadata for streams that match ALL filter parameters. Only the
-    patient ID is required.
+    Get stream metadata for a patient's streams, matching ALL filter
+    parameters. Only the patient ID is required.
 
     Args:
         patient_id: Patient ID
@@ -835,6 +835,7 @@ def get_patient_stream_metadata(
             (e.g. heart_rate, step_count, etc).
         client: If specified, this client is used to fetch metadata from the
             API. Otherwise, the global GraphClient is used.
+        **parameters: A
 
     """
     client = client or global_graph_client()

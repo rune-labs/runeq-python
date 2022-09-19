@@ -18,10 +18,10 @@ class User(ItemBase):
     def __init__(
         self,
         id: str,
-        display_name: str,
+        name: str,
         created_at: float,
         active_org_id: str,
-        active_org_display_name: str,
+        active_org_name: str,
         **attributes
     ):
         """
@@ -29,25 +29,25 @@ class User(ItemBase):
 
         Args:
             id: User ID
-            display_name: Human-readable display name for the user
+            name: Human-readable display name for the user
             created_at: When the user was created (unix timestamp)
             active_org_id: ID of the user's currently active organization
-            active_org_display_name: Display name of the user's currently
+            active_org_name: Display name of the user's currently
                 active organization
 
         """
         norm_id = id
-        self.display_name = display_name
+        self.name = name
         self.created_at = created_at
         self.active_org_id = active_org_id
-        self.active_org_display_name = active_org_display_name
+        self.active_org_name = active_org_name
 
         super().__init__(
             id=norm_id,
-            display_name=display_name,
+            name=name,
             created_at=created_at,
             active_org_id=active_org_id,
-            active_org_display_name=active_org_display_name,
+            active_org_name=active_org_name,
             **attributes,
         )
 
@@ -83,11 +83,11 @@ def get_current_user(client: Optional[GraphClient] = None) -> User:
             user {
                 id
                 created_at: created
-                display_name: displayName
+                name: displayName
                 defaultMembership {
                     org {
                         id
-                        display_name: displayName
+                        name: displayName
                     }
                 }
                 email
@@ -103,9 +103,9 @@ def get_current_user(client: Optional[GraphClient] = None) -> User:
 
     return User(
         id=user_attrs["id"],
-        display_name=user_attrs.get("display_name"),
+        name=user_attrs.get("name"),
         created_at=user_attrs.get("created_at"),
         active_org_id=org.get("id"),
-        active_org_display_name=org.get("display_name"),
+        active_org_name=org.get("name"),
         email=user_attrs.get("email")
     )
