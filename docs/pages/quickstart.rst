@@ -193,8 +193,7 @@ you can use the **filter** operation to get a more specific subset of streams:
         filter_function=in_last_two_weeks
     )
 
-Combine multiple :class:`~runeq.resources.stream_metadata.StreamMetadataSet`s with
-the **update** method:
+You can also combine multiple :class:`~runeq.resources.stream_metadata.StreamMetadataSet` s, using **update**:
 
 .. code-block:: python
 
