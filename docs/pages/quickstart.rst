@@ -104,7 +104,7 @@ credentials:
 
     my_user = get_current_user()
     print(my_user)
-
+    print('Active Org:', my_user.active_org_name)
 
 You can also fetch metadata about all the patients you have access to:
 
@@ -115,13 +115,9 @@ You can also fetch metadata about all the patients you have access to:
     patients = get_all_patients()
 
     for patient in patients:
-        print('Code Name:\t', patient.code_name)
-        print('Patient ID:\t', patient.id)
-        print('Devices:')
+        print(patient)
         for device in patient.devices:
-            print(' - Type: ', device.device_type_id)
-            print('   Alias:', device.alias)
-            print('   ID:   ', device.id)
+            print(' ', device)
 
         print('')
 
@@ -145,7 +141,7 @@ a columnar data format, like a `pandas <https://pandas.pydata.org/>`_ DataFrame.
 
     import pandas as pd
 
-    devices = patients.devices()
+    devices = patients.devices
     devices_df = pd.DataFrame(devices.to_list())
 
 
@@ -197,13 +193,32 @@ you can use the **filter** operation to get a more specific subset of streams:
         filter_function=in_last_two_weeks
     )
 
+Combine multiple :class:`~runeq.resources.stream_metadata.StreamMetadataSet`s with
+the **update** method:
+
+.. code-block:: python
+
+    lfp_power_streams = patient_streams.filter(
+        category="neural",
+        measurement="lfp_trend_log_power",
+    )
+    tremor_streams = patient_streams.filter(
+        category="symptom",
+        measurement="tremor",
+        stream_type_id="duration"
+    )
+
+    lfp_and_tremor_streams = StreamMetadataSet()
+    lfp_and_tremor_streams.update(lfp_power_streams)
+    lfp_and_tremor_streams.update(tremor_streams)
+
 Using a :class:`~runeq.resources.stream_metadata.StreamMetadataSet`,
 you can fetch the **availability** of all or any of the streams:
 
 .. code-block:: python
 
-    availability_df = neural_device_streams.get_batch_availability_dataframe(
-        start_time=166000000,
+    availability_df = lfp_and_tremor_streams.get_batch_availability_dataframe(
+        start_time=1662000000,
         end_time=1663123000,
         resolution=3600,
         batch_operation="any",
@@ -214,7 +229,7 @@ pandas dataframe:
 
 .. code-block:: python
 
-    stream_df = percept_mdkit_streams.get_stream_dataframe(
+    stream_df = lfp_and_tremor_streams.get_stream_dataframe(
         start_time=1662499000,
         end_time=1663123000,
     )
