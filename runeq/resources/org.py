@@ -18,7 +18,7 @@ class Org(ItemBase):
     def __init__(
         self,
         id: str,
-        display_name: str,
+        name: str,
         created_at: float,
         **attributes
     ):
@@ -27,18 +27,18 @@ class Org(ItemBase):
 
         Args:
             id: ID of the organization
-            display_name: Human-readable name
+            name: Human-readable name
             created_at: When the organization was created (unix timestamp)
             **attributes: Other attributes associated with the organization
 
         """
         norm_id = Org.normalize_id(id)
-        self.display_name = display_name
+        self.name = name
         self.created_at = created_at
 
         super().__init__(
             id=norm_id,
-            display_name=display_name,
+            name=name,
             created_at=created_at,
             **attributes,
         )
@@ -119,7 +119,7 @@ def get_org(org_id: str, client: Optional[GraphClient] = None) -> Org:
             org (orgId: $org_id) {
                 id
                 created_at: created
-                display_name: displayName
+                name: displayName
             }
         }
     '''
@@ -135,7 +135,7 @@ def get_org(org_id: str, client: Optional[GraphClient] = None) -> Org:
     return Org(
         id=org_attrs["id"],
         created_at=org_attrs.get("created_at"),
-        display_name=org_attrs.get("display_name"),
+        name=org_attrs.get("name"),
     )
 
 
@@ -160,7 +160,7 @@ def get_orgs(client: Optional[GraphClient] = None) -> OrgSet:
                         org {
                             id
                             created_at: created
-                            display_name: displayName
+                            name: displayName
                         }
                     }
                 }
@@ -185,7 +185,7 @@ def get_orgs(client: Optional[GraphClient] = None) -> OrgSet:
             org = Org(
                 id=org_attrs["id"],
                 created_at=org_attrs.get("created_at"),
-                display_name=org_attrs.get("display_name"),
+                name=org_attrs.get("name"),
             )
             org_set.add(org)
 

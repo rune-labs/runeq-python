@@ -1,5 +1,5 @@
 """
-Tests for the V2 SDK Stream.
+Tests for fetching stream data.
 
 """
 from unittest import TestCase, mock

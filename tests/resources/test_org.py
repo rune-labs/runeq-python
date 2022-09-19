@@ -1,5 +1,5 @@
 """
-Tests for the V2 SDK Org.
+Tests for fetching org metadata.
 
 """
 from unittest import TestCase, mock
@@ -35,12 +35,27 @@ class TestOrg(TestCase):
         test_org = Org(
             id="org1-id",
             created_at=1629300943.9179766,
-            display_name="org1",
+            name="org1",
         )
 
         self.assertEqual("org1-id", test_org.id)
         self.assertEqual(1629300943.9179766, test_org.created_at)
-        self.assertEqual("org1", test_org.display_name)
+        self.assertEqual("org1", test_org.name)
+
+    def test_repr(self):
+        """
+        Test __repr__
+
+        """
+        test_org = Org(
+            id="org1-id",
+            created_at=1629300943.9179766,
+            name="Org 1",
+        )
+        self.assertEqual(
+            'Org(id="org1-id", name="Org 1")',
+            repr(test_org)
+        )
 
     def test_normalize_id(self):
         """
@@ -103,7 +118,7 @@ class TestOrg(TestCase):
                 "org": {
                     "id": "org1-id",
                     "created_at": 1630515986.9949625,
-                    "display_name": "org1"
+                    "name": "org1"
                 }
             }
         ]
@@ -114,7 +129,7 @@ class TestOrg(TestCase):
             {
                 "id": "org1-id",
                 "created_at": 1630515986.9949625,
-                "display_name": "org1"
+                "name": "org1"
             },
             org.to_dict(),
         )
@@ -137,21 +152,21 @@ class TestOrg(TestCase):
                                 "org": {
                                     "id": "org1-id",
                                     "created_at": 1571267538.391721,
-                                    "display_name": "org1"
+                                    "name": "org1"
                                 }
                             },
                             {
                                 "org": {
                                     "id": "org2-id",
                                     "created_at": 1630515986.9949625,
-                                    "display_name": "org2"
+                                    "name": "org2"
                                 }
                             },
                             {
                                 "org": {
                                     "id": "org3-id",
                                     "created_at": 1649888079.066764,
-                                    "display_name": "org3"
+                                    "name": "org3"
                                 }
                             }
                         ]
@@ -166,17 +181,17 @@ class TestOrg(TestCase):
             [
                 {
                     'created_at': 1571267538.391721,
-                    'display_name': 'org1',
+                    'name': 'org1',
                     'id': 'org1-id'
                 },
                 {
                     'created_at': 1630515986.9949625,
-                    'display_name': 'org2',
+                    'name': 'org2',
                     'id': 'org2-id'
                 },
                 {
                     'created_at': 1649888079.066764,
-                    'display_name': 'org3',
+                    'name': 'org3',
                     'id': 'org3-id'
                 }
             ],
@@ -202,7 +217,7 @@ class TestOrg(TestCase):
                                 "org": {
                                     "id": "org1-id",
                                     "created_at": 1571267538.391721,
-                                    "display_name": "org1"
+                                    "name": "org1"
                                 }
                             }
                         ]
@@ -220,7 +235,7 @@ class TestOrg(TestCase):
                                 "org": {
                                     "id": "org2-id",
                                     "created_at": 1630515986.9949625,
-                                    "display_name": "org2"
+                                    "name": "org2"
                                 }
                             }
                         ]
@@ -235,12 +250,12 @@ class TestOrg(TestCase):
             [
                 {
                     'created_at': 1571267538.391721,
-                    'display_name': 'org1',
+                    'name': 'org1',
                     'id': 'org1-id'
                 },
                 {
                     'created_at': 1630515986.9949625,
-                    'display_name': 'org2',
+                    'name': 'org2',
                     'id': 'org2-id'
                 }
             ],

@@ -31,8 +31,6 @@ jobs:
         steps:
             - checkout:
                 path: ~/runeq-python
-            - restore_cache:
-                key: runeq-python-<< parameters.executor >>-{{ checksum "requirements/common.txt" }}-{{ checksum "requirements/dev.txt" }}-{{ checksum "requirements/docs.txt" }}
             - run:
                 name: Install flake8
                 command: |
@@ -55,8 +53,6 @@ jobs:
         steps:
             - checkout:
                   path: ~/runeq-python
-            - restore_cache:
-                  key: runeq-python-<<parameters.executor>>-{{ checksum "requirements/common.txt" }}-{{ checksum "requirements/dev.txt" }}-{{ checksum "requirements/docs.txt" }}
             - run:
                   name: Install Dependencies
                   command: |
@@ -64,10 +60,6 @@ jobs:
                       . venv/bin/activate
                       pip install --upgrade pip
                       pip install -r requirements/dev.txt
-            - save_cache:
-                  key: runeq-python-<<parameters.executor>>-{{ checksum "requirements/common.txt" }}-{{ checksum "requirements/dev.txt" }}-{{ checksum "requirements/docs.txt" }}
-                  paths:
-                      - venv
             - run:
                   name: Run Tests and Coverage
                   command: |
@@ -92,8 +84,6 @@ jobs:
         steps:
             - checkout:
                 path: ~/runeq-python
-            - restore_cache:
-                key: runeq-python-<< parameters.executor >>-{{ checksum "requirements/common.txt" }}-{{ checksum "requirements/docs.txt" }}
             - run:
                 name: Install docs requirements
                 command: |
