@@ -494,7 +494,7 @@ def get_all_devices(
 
     """
     if not patients:
-        return get_all_patients(client=client).devices()
+        return get_all_patients(client=client).devices
 
     if type(patients) is list:
         all_devices = DeviceSet()
