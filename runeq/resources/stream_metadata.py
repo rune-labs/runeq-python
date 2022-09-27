@@ -832,6 +832,9 @@ def get_patient_stream_metadata(
         **parameters: A
 
     """
+    if not patient_id:
+        raise ValueError("must provide a patient_id")
+
     client = client or global_graph_client()
     query = '''
         query getStreamList($cursor: Cursor, $filters: StreamQueryFilters) {
