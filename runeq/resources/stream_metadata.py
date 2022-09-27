@@ -334,6 +334,20 @@ class StreamMetadata(ItemBase):
             client=client,
         )
 
+    def _add_metadata_to_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Returns a new dataframe, with metadata columns added.
+
+        """
+        return df.assign(
+            stream_id=self.id,
+            stream_type_id=self.stream_type.id,
+            patient_id=self.patient_id,
+            device_id=self.device_id,
+            algorithm=self.algorithm,
+            **self.parameters,
+        )
+
     def get_stream_dataframe(
         self,
         start_time: Optional[Union[float, datetime.date]] = None,
@@ -382,18 +396,8 @@ class StreamMetadata(ItemBase):
                 from the API. Otherwise, the global StreamClient is used.
 
         """
-        # Remove some columns to reduce verbosity
-        metadata = self.to_dict()
-        metadata['stream_type_id'] = metadata['stream_type']['id']
-        metadata['stream_id'] = metadata['id']
-        del metadata['id']
-        del metadata['stream_type']
-        del metadata['min_time']
-        del metadata['max_time']
-        del metadata['parameters']
-
         params = {
-            'stream_id': metadata['stream_id'],
+            'stream_id': self.id,
             'start_time': start_time,
             'start_time_ns': start_time_ns,
             'end_time': end_time,
@@ -411,8 +415,8 @@ class StreamMetadata(ItemBase):
             all_stream_dfs.append(pd.read_csv(StringIO(resp), sep=","))
 
         stream_df = pd.concat(all_stream_dfs, axis=0, ignore_index=True)
-
-        return stream_df.assign(**metadata)
+        # Add metadata before returning the dataframe
+        return self._add_metadata_to_dataframe(stream_df)
 
     def get_stream_availability_dataframe(
         self,
@@ -452,18 +456,8 @@ class StreamMetadata(ItemBase):
                 from the API. Otherwise, the global StreamClient is used.
 
         """
-        # Remove some columns to reduce verbosity
-        metadata = self.to_dict()
-        metadata['stream_type_id'] = metadata['stream_type']['id']
-        metadata['stream_id'] = metadata['id']
-        del metadata['id']
-        del metadata['stream_type']
-        del metadata['min_time']
-        del metadata['max_time']
-        del metadata['parameters']
-
         responses = get_stream_availability(
-            stream_ids=metadata['stream_id'],
+            stream_ids=self.id,
             start_time=start_time,
             end_time=end_time,
             resolution=resolution,
@@ -480,8 +474,8 @@ class StreamMetadata(ItemBase):
             all_stream_dfs.append(pd.read_csv(StringIO(resp), sep=","))
 
         stream_df = pd.concat(all_stream_dfs, axis=0, ignore_index=True)
-
-        return stream_df.assign(**metadata)
+        # Add metadata before returning the dataframe
+        return self._add_metadata_to_dataframe(stream_df)
 
 
 class StreamMetadataSet(ItemSet):
@@ -838,6 +832,9 @@ def get_patient_stream_metadata(
         **parameters: A
 
     """
+    if not patient_id:
+        raise ValueError("must provide a patient_id")
+
     client = client or global_graph_client()
     query = '''
         query getStreamList($cursor: Cursor, $filters: StreamQueryFilters) {
