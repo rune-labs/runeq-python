@@ -214,16 +214,7 @@ You can also combine multiple :class:`~runeq.resources.stream_metadata.StreamMet
     lfp_and_tremor_streams.update(tremor_streams)
 
 Using a :class:`~runeq.resources.stream_metadata.StreamMetadataSet`,
-you can fetch the **availability** of all or any of the streams.
-
-.. note::
-    The API for "batch availability" has a limit on the number of streams
-    that it can process at a time. If you're running the example code
-    with a patient who has multiple devices, the snippet below may exceed
-    the API limit.
-
-    Try restricting `lfp_power_streams` and `tremor_streams` to a single
-    device (each), by adding a `device_id` to the filter operations above.
+you can fetch the **availability** of all or any of the streams:
 
 .. code-block:: python
 
@@ -233,6 +224,16 @@ you can fetch the **availability** of all or any of the streams.
         resolution=3600,
         batch_operation="any",
     )
+
+.. note::
+    The API for "batch availability" has a limit on the number of streams
+    that it can process at a time. If you're running the example code
+    with a patient who has multiple devices, the snippet above may exceed
+    the API limit.
+
+    Try limiting the stream set to a smaller number of streams, by
+    defining a custom filter function that selects for a few of those
+    device IDs.
 
 When you're ready to fetch data, you can gather all the raw stream data into a
 pandas dataframe:
