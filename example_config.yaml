@@ -19,3 +19,10 @@ access_token_secret: TODO
 # Client Key Pair
 # client_key_id: TODO
 # client_access_key: TODO
+
+############
+# API URLs #
+############
+
+# stream_url: https://stream.runelabs.io
+# graph_url: https://graph.runelabs.io

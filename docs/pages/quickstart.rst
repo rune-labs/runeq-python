@@ -197,6 +197,8 @@ You can also combine multiple :class:`~runeq.resources.stream_metadata.StreamMet
 
 .. code-block:: python
 
+    from runeq.resources.stream_metadata import StreamMetadataSet
+
     lfp_power_streams = patient_streams.filter(
         category="neural",
         measurement="lfp_trend_log_power",
@@ -212,7 +214,16 @@ You can also combine multiple :class:`~runeq.resources.stream_metadata.StreamMet
     lfp_and_tremor_streams.update(tremor_streams)
 
 Using a :class:`~runeq.resources.stream_metadata.StreamMetadataSet`,
-you can fetch the **availability** of all or any of the streams:
+you can fetch the **availability** of all or any of the streams.
+
+.. note::
+    The API for "batch availability" has a limit on the number of streams
+    that it can process at a time. If you're running the example code
+    with a patient who has multiple devices, the snippet below may exceed
+    the API limit.
+
+    Try restricting `lfp_power_streams` and `tremor_streams` to a single
+    device (each), by adding a `device_id` to the filter operations above.
 
 .. code-block:: python
 
