@@ -229,11 +229,8 @@ you can fetch the **availability** of all or any of the streams:
     The API for "batch availability" has a limit on the number of streams
     that it can process at a time. If you're running the example code
     with a patient who has multiple devices, the snippet above may exceed
-    the API limit.
-
-    Try limiting the stream set to a smaller number of streams, by
-    defining a custom filter function that selects for a few of those
-    device IDs.
+    the API limit. Try limiting the number of streams in the set using a custom
+    filter function, to select for a few of those device IDs.
 
 When you're ready to fetch data, you can gather all the raw stream data into a
 pandas dataframe:
