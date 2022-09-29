@@ -157,7 +157,7 @@ the function accepts additional filters.
 
     from runeq.resources.stream_metadata import get_patient_stream_metadata
 
-    patient_id = "abc123"
+    patient_id = "c4bd060df1454aa0adc978985512c6e9"
     patient_streams = get_patient_stream_metadata(patient_id)
     print(f'Found {len(patient_streams)} streams')
 

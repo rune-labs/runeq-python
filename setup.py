@@ -10,13 +10,13 @@ with open('requirements/common.txt', 'r') as r:
 
 setup(
     name=package_name,
-    version='0.8.0',
+    version='0.9.0',
     author='Rune Labs',
     maintainer_email='support@runelabs.io',
     description='Query data from Rune Labs APIs',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    keywords='rune api query',
+    keywords='rune labs api query data',
     url='https://github.com/rune-labs/runeq-python',
     packages=find_packages(),
     install_requires=install_requires,
@@ -29,6 +29,7 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
     ],
     entry_points={
         'console_scripts': [
