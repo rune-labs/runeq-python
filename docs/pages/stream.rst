@@ -6,10 +6,13 @@ V1 Stream API
 The :class:`~runeq.stream` module contains classes that fetch timeseries data using
 `V1 Stream API <https://docs.runelabs.io/stream/index.html>`_.
 
+.. warning::
+    The V1 API is supported, but it is not longer under active development. We recommend
+    using the :class:`~runeq.resources` module instead, which provides access to data from the `V2 Stream API <https://docs.runelabs.io/stream/v2/index.html>`_.
 
-The V1 API is supported, but is not longer under active development. We recommend
-using the :class:`~runeq.resources` module instead, which provides access to data from the
-`V2 Stream API <https://docs.runelabs.io/stream/v2/index.html>`_.
+    However, you should be aware that the data returned by the V1 and V2 APIs are
+    independent. Some types of data may only be available from one API or the other.
+    If you have questions about which API to use, please contact Rune Support.
 
 Usage
 -----

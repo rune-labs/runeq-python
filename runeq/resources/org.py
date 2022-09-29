@@ -1,5 +1,6 @@
 """
-Fetch metadata about organizations.
+Fetch metadata about organizations. A research lab or clinical site is
+typically represented as an organization.
 
 """
 
