@@ -761,13 +761,12 @@ def get_stream_metadata(
     # Query stream list in batches of <= 100 streams, since graph api cannot
     # query for more than 100 streams at once.
     stream_list_results = []
-    for i in range((len(stream_ids) // 100) + 1):
+    for start in range(0, len(stream_ids), 100):
         result = client.execute(
             statement=query,
-            stream_ids=stream_ids[i * 100: (i + 1) * 100],
+            stream_ids=stream_ids[start:start + 100],
         )
         stream_list_results.append(result)
-
 
     seen_stream_ids = set(stream_ids)
     for result in stream_list_results:
