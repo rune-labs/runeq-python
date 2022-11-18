@@ -460,8 +460,25 @@ class TestStreamMetadata(TestCase):
             streams.to_list(),
         )
 
+    @mock.patch("runeq.resources.stream_metadata.get_patient")
+    def test_get_patient_stream_metadata_no_access(self, get_patient):
+        """
+        Test get_patient_stream_metadata fails if the user doesn't have access
+        to the patient ID or if the patient doesn't exist.
 
-    def test_get_patient_streams_basic(self):
+        """
+        get_patient.side_effect = Exception("NotFoundError")
+
+        with self.assertRaises(Exception) as context:
+            get_patient_stream_metadata(
+                patient_id='foo', 
+                client=self.mock_graph_client
+            )
+
+        self.assertTrue('NotFoundError' in str(context.exception))
+
+    @mock.patch("runeq.resources.stream_metadata.get_patient")
+    def test_get_patient_streams_basic(self, _):
         """
         Test filtering streams by all parameters.
 
@@ -639,8 +656,8 @@ class TestStreamMetadata(TestCase):
             streams.to_list(),
         )
 
-
-    def test_get_patient_streams_paginated(self):
+    @mock.patch("runeq.resources.stream_metadata.get_patient")
+    def test_get_patient_streams_paginated(self, _):
         """
         Test filtering streams by all parameters, where the user has to
         page through streams.
