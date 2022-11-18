@@ -471,7 +471,7 @@ class TestStreamMetadata(TestCase):
 
         with self.assertRaises(Exception) as context:
             get_patient_stream_metadata(
-                patient_id='foo', 
+                patient_id='foo',
                 client=self.mock_graph_client
             )
 
