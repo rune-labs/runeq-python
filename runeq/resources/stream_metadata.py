@@ -758,39 +758,45 @@ def get_stream_metadata(
     else:
         stream_ids = list(stream_ids)
 
-    result = client.execute(
-        statement=query,
-        stream_ids=stream_ids,
-    )
+    # Query stream list in batches of <= 100 streams, since graph api cannot
+    # query for more than 100 streams at once.
+    stream_list_results = []
+    for start in range(0, len(stream_ids), 100):
+        result = client.execute(
+            statement=query,
+            stream_ids=stream_ids[start:start + 100],
+        )
+        stream_list_results.append(result)
 
     seen_stream_ids = set(stream_ids)
-    stream_list = result.get("streamListByIds", {})
-    for stream_attrs in stream_list.get("streams", []):
-        stream_type = _parse_stream_type(stream_attrs["streamType"])
+    for result in stream_list_results:
+        stream_list = result.get("streamListByIds", {})
+        for stream_attrs in stream_list.get("streams", []):
+            stream_type = _parse_stream_type(stream_attrs["streamType"])
 
-        del stream_attrs["streamType"]
-        norm_dev_id = Device.normalize_id(stream_attrs["device_id"])
-        stream_attrs["device_id"] = norm_dev_id
+            del stream_attrs["streamType"]
+            norm_dev_id = Device.normalize_id(stream_attrs["device_id"])
+            stream_attrs["device_id"] = norm_dev_id
 
-        # Add query parameters to stream attributes
-        params = {}
-        if stream_attrs.get("parameters"):
-            for param in stream_attrs['parameters']:
-                stream_attrs[param["key"]] = param["value"]
-                params[param["key"]] = param["value"]
-            del stream_attrs['parameters']
+            # Add query parameters to stream attributes
+            params = {}
+            if stream_attrs.get("parameters"):
+                for param in stream_attrs['parameters']:
+                    stream_attrs[param["key"]] = param["value"]
+                    params[param["key"]] = param["value"]
+                del stream_attrs['parameters']
 
-        stream = StreamMetadata(
-            stream_type=stream_type,
-            parameters=params,
-            **stream_attrs
-        )
-        stream_set.add(stream)
+            stream = StreamMetadata(
+                stream_type=stream_type,
+                parameters=params,
+                **stream_attrs
+            )
+            stream_set.add(stream)
 
-        try:
-            seen_stream_ids.remove(stream.id)
-        except KeyError:
-            pass
+            try:
+                seen_stream_ids.remove(stream.id)
+            except KeyError:
+                pass
 
     if len(seen_stream_ids) > 0:
         raise RuneError(
