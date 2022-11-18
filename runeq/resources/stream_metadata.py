@@ -10,7 +10,7 @@ import pandas as pd
 
 from .client import GraphClient, StreamClient, global_graph_client
 from .common import ItemBase, ItemSet
-from .patient import Device, Patient
+from .patient import Device, Patient, get_patient
 from .stream import get_stream_availability, get_stream_data
 from runeq.errors import RuneError
 
@@ -840,6 +840,9 @@ def get_patient_stream_metadata(
     """
     if not patient_id:
         raise ValueError("must provide a patient_id")
+
+    # Checks whether patient is accessible, otherwise raises NotFoundError.
+    get_patient(patient_id=patient_id, client=client)
 
     client = client or global_graph_client()
     query = '''
