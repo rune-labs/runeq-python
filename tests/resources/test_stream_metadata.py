@@ -2,6 +2,7 @@
 Tests for fetching stream metadata.
 
 """
+import copy
 import json
 from unittest import TestCase, mock
 
@@ -460,12 +461,91 @@ class TestStreamMetadata(TestCase):
             streams.to_list(),
         )
 
+    def test_get_over_hundred_stream_metadata(self):
+        """
+        Test get stream metadata can query for >100 streams by batching
+        by requests of size <=100 streams.
+
+        """
+        self.mock_graph_client.execute = mock.Mock()
+
+        stream_resp = {
+            "created_at": 1655226140.508,
+            "algorithm": "a1",
+            "device_id": "patient-p1,device-d1",
+            "patient_id": "p1",
+            "streamType": {
+                "id": "duration",
+                "name": "Duration",
+                "description": "Duration over time.",
+                "shape": {
+                    "dimensions": [
+                        {
+                            "id": "time",
+                            "data_type": "timestamp",
+                            "quantity_name": "Time",
+                            "quantity_abbrev": "t",
+                            "unit_name": "Seconds",
+                            "unit_abbrev": "s"
+                        },
+                        {
+                            "id": "duration",
+                            "data_type": "sfloat",
+                            "quantity_name": "Duration",
+                            "quantity_abbrev": "Duration",
+                            "unit_name": "Seconds",
+                            "unit_abbrev": "s"
+                        }
+                    ]
+                }
+            },
+            "min_time": 1648231560,
+            "max_time": 1648234860
+        }
+
+        first_hundred_streams = []
+        for i in range(100):
+            resp = copy.deepcopy(stream_resp)
+            resp["id"] = str(i)
+            first_hundred_streams.append(resp)
+
+        next_fifty_streams = []
+        for i in range(100, 150):
+            resp = copy.deepcopy(stream_resp)
+            resp["id"] = str(i)
+            next_fifty_streams.append(resp)
+
+        self.mock_graph_client.execute.side_effect = [
+            {
+                "streamListByIds": {
+                    "pageInfo": {
+                        "endCursor": None
+                    },
+                    "streams": first_hundred_streams
+                }
+            },
+            {
+                "streamListByIds": {
+                    "pageInfo": {
+                        "endCursor": None
+                    },
+                    "streams": next_fifty_streams
+                }
+            },
+        ]
+
+        streams = get_stream_metadata(
+            stream_ids=[str(i) for i in range(150)],
+            client=self.mock_graph_client
+        )
+
+        self.assertEqual(150, len(streams.to_list()))
+
     @mock.patch("runeq.resources.stream_metadata.get_patient")
     def test_get_patient_stream_metadata_no_access(self, get_patient):
         """
         Test get_patient_stream_metadata fails if the user doesn't have access
         to the patient ID or if the patient doesn't exist.
-
         """
         get_patient.side_effect = Exception("NotFoundError")
 
