@@ -79,9 +79,12 @@ jobs:
             - checkout:
                 path: ~/runeq-python
             - run:
-                command: make init build-dist
+                name: Build docs
+                command: |
+                    make init build-dist
+                    tar -cvf dist.tar dist/
             - store_artifacts:
-                path: dist/
+                path: dist.tar
 
 workflows:
     version: 2

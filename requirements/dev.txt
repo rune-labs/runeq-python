@@ -1,9 +1,9 @@
 -r common.txt
 -r docs.txt
 # used only for development and CI
-coverage==5.1
-flake8==3.7.9
-setuptools~=63.2
-twine~=4.0
-unittest-xml-reporting==3.0.2
-wheel~=0.38
+coverage~=6.5
+flake8~=5.0
+setuptools
+twine
+unittest-xml-reporting~=3.0
+wheel

@@ -46,6 +46,10 @@ Preview documentation:
     
     make -C docs preview
 
+Build PyPI artifact:
+
+    make build-dist
+
 Clean up ignored files/artifacts:
 
     make clean
