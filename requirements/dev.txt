@@ -2,7 +2,7 @@
 -r docs.txt
 # used only for development and CI
 coverage~=6.5
-flake8~=5.0
+flake8~=4.0
 setuptools
 twine
 unittest-xml-reporting~=3.0
