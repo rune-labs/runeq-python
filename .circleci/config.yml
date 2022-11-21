@@ -32,17 +32,7 @@ jobs:
             - checkout:
                 path: ~/runeq-python
             - run:
-                name: Install flake8
-                command: |
-                    python3 -m venv venv
-                    . venv/bin/activate
-                    pip install --upgrade pip
-                    pip install flake8
-            - run:
-                name: Lint
-                command: |
-                    . venv/bin/activate
-                    flake8
+                command: make init lint
 
     test:
         parameters:
@@ -54,20 +44,7 @@ jobs:
             - checkout:
                   path: ~/runeq-python
             - run:
-                  name: Install Dependencies
-                  command: |
-                      python3 -m venv venv
-                      . venv/bin/activate
-                      pip install --upgrade pip
-                      pip install -r requirements/dev.txt
-            - run:
-                  name: Run Tests and Coverage
-                  command: |
-                      . venv/bin/activate
-                      coverage run --source runeq -m xmlrunner discover -v -s tests -p '*.py' -o test-reports
-                      coverage report
-                      coverage html
-                      coverage xml
+                  command: make init test-coverage
                   environment:
                       LD_LIBRARY_PATH: /usr/local/lib
             - store_test_results:
@@ -85,19 +62,10 @@ jobs:
             - checkout:
                 path: ~/runeq-python
             - run:
-                name: Install docs requirements
-                command: |
-                    python3 -m venv venv
-                    . venv/bin/activate
-                    pip install --upgrade pip
-                    pip install -r requirements/docs.txt
-            - run:
                 name: Build docs
                 command: |
-                    . venv/bin/activate
-                    cd docs/
-                    sphinx-build -b html . _build/html
-                    tar -cvf html_docs.tar _build/html
+                    make init build-docs
+                    tar -cvf docs/html_docs.tar _build/html
             - store_artifacts:
                 path: docs/html_docs.tar
 
