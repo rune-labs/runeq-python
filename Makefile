@@ -36,11 +36,12 @@ test-coverage:
 	. $(VENV_ACTIVATE) && coverage html
 	. $(VENV_ACTIVATE) && coverage xml
 
-.PHONY: build
-build: build-docs build-pypi
-	# TODO
-
 .PHONY: build-docs
 build-docs:
-	# Build docs
-	. $(VENV_ACTIVATE) && make -C docs
+	# Build docs (as HTML)
+	. $(VENV_ACTIVATE) && make -C docs html
+
+.PHONY: build-pypi
+build-pypi:
+	# Build artifact for PyPI
+	. $(VENV_ACTIVATE) && TODO

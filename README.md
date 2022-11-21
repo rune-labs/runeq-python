@@ -25,3 +25,27 @@ To install the library using pip:
 To install from source:
 
     python3 setup.py install
+
+## Development
+
+Initialize a virtual environment, with dev requirements installed:
+
+    make init
+
+Run tests:
+    
+    make test
+    # With coverage
+    make test-coverage
+
+Lint:
+
+    make lint
+
+Preview documentation:
+    
+    make -C docs preview
+
+Clean up ignored files/artifacts:
+
+    make clean
