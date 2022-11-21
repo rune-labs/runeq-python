@@ -41,7 +41,11 @@ build-docs:
 	# Build docs (as HTML)
 	. $(VENV_ACTIVATE) && make -C docs html
 
-.PHONY: build-pypi
-build-pypi:
+.PHONY: build-dist
+build-dist:
 	# Build artifact for PyPI
-	. $(VENV_ACTIVATE) && TODO
+	. $(VENV_ACTIVATE) && python setup.py sdist bdist_wheel
+	@echo "====================================="
+	@echo "To push to PyPI, run:"
+	@echo "   python3 -m twine upload dist/*"
+	@echo "====================================="

@@ -3,4 +3,7 @@
 # used only for development and CI
 coverage==5.1
 flake8==3.7.9
+setuptools~=63.2
+twine~=4.0
 unittest-xml-reporting==3.0.2
+wheel~=0.38

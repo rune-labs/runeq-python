@@ -69,6 +69,20 @@ jobs:
             - store_artifacts:
                 path: docs/html_docs.tar
 
+    build-pypi:
+        parameters:
+            executor:
+                type: executor
+        executor: << parameters.executor >>
+        working_directory: ~/runeq-python/
+        steps:
+            - checkout:
+                path: ~/runeq-python
+            - run:
+                command: make init build-dist
+            - store_artifacts:
+                path: dist/
+
 workflows:
     version: 2
     runeq:
