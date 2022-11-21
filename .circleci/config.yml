@@ -99,3 +99,7 @@ workflows:
                 matrix:
                     parameters:
                         executor: ["python3_10"]
+            - build-pypi:
+                matrix:
+                    parameters:
+                        executor: ["python3_10"]
