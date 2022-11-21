@@ -65,7 +65,7 @@ jobs:
                 name: Build docs
                 command: |
                     make init build-docs
-                    tar -cvf docs/html_docs.tar _build/html
+                    tar -cvf docs/html_docs.tar docs/_build/html
             - store_artifacts:
                 path: docs/html_docs.tar
 
