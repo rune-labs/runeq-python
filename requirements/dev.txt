@@ -1,9 +1,9 @@
 -r common.txt
 -r docs.txt
 # used only for development and CI
-coverage~=6.5
-flake8~=4.0
+coverage
+flake8
 setuptools
 twine
-unittest-xml-reporting~=3.0
+unittest-xml-reporting
 wheel
