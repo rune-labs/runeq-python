@@ -32,17 +32,7 @@ jobs:
             - checkout:
                 path: ~/runeq-python
             - run:
-                name: Install flake8
-                command: |
-                    python3 -m venv venv
-                    . venv/bin/activate
-                    pip install --upgrade pip
-                    pip install flake8
-            - run:
-                name: Lint
-                command: |
-                    . venv/bin/activate
-                    flake8
+                command: make init lint
 
     test:
         parameters:
@@ -54,20 +44,7 @@ jobs:
             - checkout:
                   path: ~/runeq-python
             - run:
-                  name: Install Dependencies
-                  command: |
-                      python3 -m venv venv
-                      . venv/bin/activate
-                      pip install --upgrade pip
-                      pip install -r requirements/dev.txt
-            - run:
-                  name: Run Tests and Coverage
-                  command: |
-                      . venv/bin/activate
-                      coverage run --source runeq -m xmlrunner discover -v -s tests -p '*.py' -o test-reports
-                      coverage report
-                      coverage html
-                      coverage xml
+                  command: make init test-coverage
                   environment:
                       LD_LIBRARY_PATH: /usr/local/lib
             - store_test_results:
@@ -85,21 +62,29 @@ jobs:
             - checkout:
                 path: ~/runeq-python
             - run:
-                name: Install docs requirements
+                name: Build docs
                 command: |
-                    python3 -m venv venv
-                    . venv/bin/activate
-                    pip install --upgrade pip
-                    pip install -r requirements/docs.txt
+                    make init build-docs
+                    tar -cvf docs/html_docs.tar docs/_build/html
+            - store_artifacts:
+                path: docs/html_docs.tar
+
+    build-pypi:
+        parameters:
+            executor:
+                type: executor
+        executor: << parameters.executor >>
+        working_directory: ~/runeq-python/
+        steps:
+            - checkout:
+                path: ~/runeq-python
             - run:
                 name: Build docs
                 command: |
-                    . venv/bin/activate
-                    cd docs/
-                    sphinx-build -b html . _build/html
-                    tar -cvf html_docs.tar _build/html
+                    make init build-dist
+                    tar -cvf dist.tar dist/
             - store_artifacts:
-                path: docs/html_docs.tar
+                path: dist.tar
 
 workflows:
     version: 2
@@ -114,6 +99,10 @@ workflows:
                     parameters:
                         executor: ["python3_6", "python3_7", "python3_8", "python3_9", "python3_10"]
             - docs:
+                matrix:
+                    parameters:
+                        executor: ["python3_10"]
+            - build-pypi:
                 matrix:
                     parameters:
                         executor: ["python3_10"]
