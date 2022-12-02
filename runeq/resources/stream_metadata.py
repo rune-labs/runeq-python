@@ -835,7 +835,7 @@ def get_patient_stream_metadata(
             (e.g. heart_rate, step_count, etc).
         client: If specified, this client is used to fetch metadata from the
             API. Otherwise, the global GraphClient is used.
-        **parameters: A
+        **parameters: Key/value pairs that label the stream.
 
     """
     if not patient_id:

@@ -34,7 +34,10 @@ class TestInitialize(TestCase):
             access_token_secret="bar",
         )
 
-        with self.assertRaisesRegex(errors.APIError, "404 NotFound"):
+        with self.assertRaisesRegex(
+            errors.APIError,
+            "401 InvalidAuthentication"
+        ):
             get_stream_data("stream_id").__next__()
 
     def test_init_with_client_keys(self):
