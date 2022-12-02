@@ -12,7 +12,8 @@ from gql import gql
 from gql.transport.requests import RequestsHTTPTransport
 import requests
 
-from runeq import Config, errors
+from runeq.config import Config
+from runeq import errors
 
 # Error when a client is not initialized
 INITIALIZATION_ERROR = errors.InitializationError(
