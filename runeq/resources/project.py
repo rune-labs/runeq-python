@@ -84,7 +84,9 @@ class ProjectSet(ItemSet):
         return Project
 
 
-def get_project(project_id: str, client: Optional[GraphClient] = None) -> Project:
+def get_project(
+    project_id: str, client: Optional[GraphClient] = None
+) -> Project:
     """
     Get the project with the specified ID.
 
