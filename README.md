@@ -32,24 +32,26 @@ Initialize a virtual environment, with dev requirements installed:
 
     make init
 
-Run tests:
+### Run tests
     
     make test
     # With coverage
     make test-coverage
 
-Lint:
+### Lint
 
     make lint
 
-Preview documentation:
+### Preview documentation
     
-    make -C docs preview
+    make build docs
 
-Build PyPI artifact:
+- This will build the documents in the `docs` directory. Open the `index.html` file in your browser to preview the documentation.
+
+### Build PyPI artifact:
 
     make build-dist
 
-Clean up ignored files/artifacts:
+### Clean up ignored files/artifacts
 
     make clean
