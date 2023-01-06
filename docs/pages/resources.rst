@@ -129,3 +129,19 @@ User Metadata
    :special-members: __init__
    :members:
    :inherited-members:
+
+Project Data
+-------------
+.. automodule:: runeq.resources.project
+
+.. autofunction:: get_projects
+.. autofunction:: get_project
+
+.. autoclass:: Project
+   :special-members: __init__
+   :members:
+   :inherited-members:
+.. autoclass:: ProjectSet
+   :special-members: __init__
+   :members:
+   :inherited-members:

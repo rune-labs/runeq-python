@@ -19,7 +19,13 @@ class Project(ItemBase):
         self,
         id: str,
         title: str,
+        status: str,
+        type: str,
+        started_at: float,
+        updated_at: float,
         created_at: float,
+        created_by: str,
+        updated_by: str,
         **attributes
     ):
         """
@@ -35,11 +41,23 @@ class Project(ItemBase):
         # Update to include required attributes
         self.title = title
         self.created_at = created_at
+        self.started_at = started_at
+        self.updated_at = updated_at
+        self.created_by = created_by
+        self.updated_by = updated_by
+        self.status = status
+        self.type = type
 
         super().__init__(
             id=id,
             title=title,
             created_at=created_at,
+            started_at=started_at,
+            updated_at=updated_at,
+            created_by=created_by,
+            updated_by=updated_by,
+            status=status,
+            type=type,
             **attributes,
         )
 
@@ -66,9 +84,7 @@ class ProjectSet(ItemSet):
         return Project
 
 
-def get_project(
-    project_id: str, client: Optional[GraphClient] = None
-) -> Project:
+def get_project(project_id: str, client: Optional[GraphClient] = None) -> Project:
     """
     Get the project with the specified ID.
 
@@ -79,25 +95,24 @@ def get_project(
 
     """
     client = client or global_graph_client()
-    query = '''
+    query = """
         query getProject($project_id: ID) {
             project (projectId: $project_id) {
-                id
-                created_at
-                title
-                description
-                project_status
-                project_type
-                started_at
-                created_by
+                id,
+                title,
+                status,
+                description,
+                type,
+                created_at: createdAt,
+                updated_at: updatedAt,
+                started_at: startedAt,
+                created_by: createdBy,
+                updated_by: updatedBy
             }
         }
-    '''
+    """
 
-    result = client.execute(
-        statement=query,
-        project_id=project_id
-    )
+    result = client.execute(statement=query, project_id=project_id)
 
     project_attrs = result["project"]
     return Project(**project_attrs)
@@ -113,7 +128,7 @@ def get_projects(client: Optional[GraphClient] = None) -> ProjectSet:
 
     """
     client = client or global_graph_client()
-    query = '''
+    query = """
         query($cursor: DateTimeUUIDCursor) {
             org {
                 id
@@ -122,6 +137,7 @@ def get_projects(client: Optional[GraphClient] = None) -> ProjectSet:
                         id,
                         title,
                         status,
+                        description,
                         type,
                         created_at: createdAt,
                         updated_at: updatedAt,
@@ -135,17 +151,14 @@ def get_projects(client: Optional[GraphClient] = None) -> ProjectSet:
                 }
             }
         }
-    '''
+    """
 
     next_cursor = None
     project_set = ProjectSet()
 
     # Use cursor to page through all org memberships
     while True:
-        result = client.execute(
-            statement=query,
-            cursor=next_cursor
-        )
+        result = client.execute(statement=query, cursor=next_cursor)
         project_list = result.get("org", {}).get("projectList", {})
 
         for project in project_list.get("projects", []):
