@@ -29,12 +29,19 @@ class Project(ItemBase):
         **attributes
     ):
         """
-        Initialize with metadata.
+        Initialize with data.
 
         Args:
             id: ID of the project
             title: Human-readable name
-            created_at: When the organization was created (unix timestamp)
+            created_at: When the project was created (unix timestamp)
+            status: Status of the project,
+            type: Type of project,
+            started_at: Time the project started (unix timestamp),
+            created_at: Time the project was created (unix timestamp),
+            created_by: UserID of who created the project,
+            updated_at: Time the project was last updated (unix timestamp),
+            updated_by: UserID of who updated the project,
             **attributes: Other attributes associated with the project
 
         """
@@ -158,7 +165,7 @@ def get_projects(client: Optional[GraphClient] = None) -> ProjectSet:
     next_cursor = None
     project_set = ProjectSet()
 
-    # Use cursor to page through all org memberships
+    # Use cursor to page through all projects
     while True:
         result = client.execute(statement=query, cursor=next_cursor)
         project_list = result.get("org", {}).get("projectList", {})
