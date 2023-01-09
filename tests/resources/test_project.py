@@ -14,7 +14,6 @@ class TestProject(TestCase):
     Unit tests for the Project class.
 
     """
-
     def setUp(self):
         """
         Set up mock graph client for testing.
@@ -29,22 +28,27 @@ class TestProject(TestCase):
         Test attributes for an initialized Project.
 
         """
-        test_org = Project(
+        test_project = Project(
             id="proj1-id",
             created_at=1630515986.9949625,
             updated_at=1630515986.9949625,
             title="Project 1",
             description="Test description.",
-            created_by="user-id-1",
-            updated_by="user-id-1",
+            created_by="user-1",
+            updated_by="user-1",
             started_at=1630515986.9949625,
             status="ACTIVE",
             type="SANDBOX",
         )
 
-        self.assertEqual("proj1-id", test_org.id)
-        self.assertEqual(1630515986.9949625, test_org.created_at)
-        self.assertEqual("Project 1", test_org.title)
+        self.assertEqual("proj1-id", test_project.id)
+        self.assertEqual(1630515986.9949625, test_project.created_at)
+        self.assertEqual("Project 1", test_project.title)
+        self.assertEqual(1630515986.9949625, test_project.updated_at)
+        self.assertEqual("user-1", test_project.created_by)
+        self.assertEqual("user-1", test_project.updated_by)
+        self.assertEqual("ACTIVE", test_project.status)
+        self.assertEqual("SANDBOX", test_project.type)
 
     def test_get_project(self):
         """

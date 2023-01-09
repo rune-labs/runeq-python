@@ -130,7 +130,7 @@ User Metadata
    :members:
    :inherited-members:
 
-Project Data
+Project Metadata
 -------------
 .. automodule:: runeq.resources.project
 

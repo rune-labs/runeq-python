@@ -37,6 +37,9 @@ Initialize a virtual environment, with dev requirements installed:
     make test
     # With coverage
     make test-coverage
+    # For a single test
+    make test-single
+
 
 ### Lint
 
@@ -44,7 +47,7 @@ Initialize a virtual environment, with dev requirements installed:
 
 ### Preview documentation
     
-    make build docs
+    make build-docs
 
 - This will build the documents in the `docs` directory. Open the `index.html` file in your browser to preview the documentation.
 

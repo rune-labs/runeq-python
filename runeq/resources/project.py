@@ -11,7 +11,10 @@ from .common import ItemBase, ItemSet
 
 class Project(ItemBase):
     """
-    Metadata for an project.
+    Metadata for a project.
+
+    A project contains a user defined group of patients. It has a user defined
+    start date which is used to track stream data metrics.
 
     """
 
@@ -34,14 +37,14 @@ class Project(ItemBase):
         Args:
             id: ID of the project
             title: Human-readable name
-            created_at: When the project was created (unix timestamp)
-            status: Status of the project,
-            type: Type of project,
-            started_at: Time the project started (unix timestamp),
-            created_at: Time the project was created (unix timestamp),
-            created_by: UserID of who created the project,
-            updated_at: Time the project was last updated (unix timestamp),
-            updated_by: UserID of who updated the project,
+            status: Status of the project
+            type: Type of project. Possible types include: EXPLORATORY,
+                CLINICAL_TRIAL,RETROSPECTIVE_STUDY, PROSPECTIVE_STUDY, SANDBOX
+            started_at: Time the project started (unix timestamp)
+            created_at: Time the project was created (unix timestamp)
+            created_by: Display name of who created the project
+            updated_at: Time the project was last updated (unix timestamp)
+            updated_by: Display name of who updated the project
             **attributes: Other attributes associated with the project
 
         """
@@ -106,7 +109,7 @@ def get_project(
     client = client or global_graph_client()
     query = """
         query getProject($project_id: ID) {
-            project (projectId: $project_id) {
+            project (id: $project_id) {
                 id,
                 title,
                 status,
