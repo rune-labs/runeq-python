@@ -13,8 +13,10 @@ class Project(ItemBase):
     """
     Metadata for a project.
 
-    A project contains a user defined group of patients. It has a user defined
-    start date which is used to track stream data metrics.
+    A project is a generic container for a group of patients
+    with workflow-related metadata: status, project type, description,
+    milestones dates, etc. Data availability QC metrics are computed
+    on a regular basis for all patients in a project.
 
     """
 
