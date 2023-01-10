@@ -28,6 +28,10 @@ test:
 	# Run test suite
 	. $(VENV_ACTIVATE) && python3 -m unittest -v -k tests
 
+.PHONY: test-single
+test-single:
+	. $(VENV_ACTIVATE) && python -m unittest -k $(TEST_NAME)
+
 .PHONY: test-coverage
 test-coverage:
 	# Run tests wth coverage report
