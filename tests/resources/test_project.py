@@ -6,7 +6,8 @@ from unittest import TestCase, mock
 
 from runeq.config import Config
 from runeq.resources.client import GraphClient
-from runeq.resources.project import Project, get_project, get_projects
+from runeq.resources.project import Cohort, CohortSet, Project, get_project, get_projects, get_project_patients, get_cohort_patients
+from runeq.resources.client import initialize
 
 
 class TestProject(TestCase):
@@ -14,6 +15,30 @@ class TestProject(TestCase):
     Unit tests for the Project class.
 
     """
+    # def test_temp(self):
+    #     """
+    #     THIS SHOULD NOT BE MERGED!!!!!
+    #     """
+    #     initialize(
+    #         access_token_id="",
+    #         access_token_secret="",
+    #         stream_url="https://stream-staging.runelabs.io",
+    #         graph_url="https://graph-staging.runelabs.io",
+    #     )
+
+        # patients = get_project_patients(id="e12b96c9-9bcc-4148-9d60-3d1a01fa96eb")
+        # for patient in patients:
+        #     print(patient.to_dict())
+        #     print(patient.metrics[0])
+
+        # patients = get_cohort_patients(id="5c9475b6-5559-450c-8cfc-1cee799dbaf5")
+        
+        # print("patients", patients)
+        # for patient in patients:
+        #     print(patient.to_dict())
+
+        # self.fail()
+        
     def setUp(self):
         """
         Set up mock graph client for testing.
@@ -28,6 +53,23 @@ class TestProject(TestCase):
         Test attributes for an initialized Project.
 
         """
+        example_cohorts = CohortSet(
+            [
+                Cohort(
+                    id="cohort-1",
+                    title="title-1",
+                    created_at=1630515986.9949625,
+                    updated_at=1630515986.9949625,
+                ),
+                Cohort(
+                    id="cohort-2",
+                    title="title-2",
+                    created_at=1630515986.9949625,
+                    updated_at=1630515986.9949625,
+                ),
+            ]
+        )
+
         test_project = Project(
             id="proj1-id",
             created_at=1630515986.9949625,
