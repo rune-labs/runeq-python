@@ -57,9 +57,9 @@ class Config:
             # Load from a specified YAML file
 
             >>> cfg = Config(access_token_id='foo', access_token_secret='bar')
-            # Set values using keyword arguments. This can be used with any valid
-            # combination of config options; the example above sets a user
-            # access token.
+            # Set values using keyword arguments. This can be used with any
+            # valid combination of config options; the example above sets a
+            # user access token.
 
         """
         self.graph_url = 'https://graph.runelabs.io'
