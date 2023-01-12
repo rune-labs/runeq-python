@@ -136,12 +136,31 @@ Project Metadata
 
 .. autofunction:: get_projects
 .. autofunction:: get_project
+.. autofunction:: get_project_patients
+.. autofunction:: get_cohort_patients
+
 
 .. autoclass:: Project
    :special-members: __init__
    :members:
    :inherited-members:
 .. autoclass:: ProjectSet
+   :special-members: __init__
+   :members:
+   :inherited-members:
+.. autoclass:: Cohort
+   :special-members: __init__
+   :members:
+   :inherited-members:
+.. autoclass:: CohortSet
+   :special-members: __init__
+   :members:
+   :inherited-members:
+.. autoclass:: Metric
+   :special-members: __init__
+   :members:
+   :inherited-members:
+.. autoclass:: MetricSet
    :special-members: __init__
    :members:
    :inherited-members:
