@@ -3,17 +3,18 @@ Fetch metadata about projects.
 
 """
 
-from typing import Iterable, List, Optional, Type, Union
+from typing import Iterable, Optional, Type
 
 from .client import GraphClient, global_graph_client
 from .common import ItemBase, ItemSet
+
 
 class Metric(ItemBase):
     """
     A measurement related to processed patient data. Each metric is related
     to a single processed data type, project, and time interval. These metrics
     are calculated periodically and updated.
-    
+
     """
     def __init__(
         self,
@@ -32,16 +33,17 @@ class Metric(ItemBase):
             id: Unique identifier of the patient
             type: Type of measurement/metric. Possible types include:
                 TOTAL_HOURS, LATEST_DATA, LAST_UPLOAD
-            data_type: Processed stream data type that is being measured. Possible
-                data types include:
-                    APPLEWATCH_SYMPTOM, APPLEWATCH_TREMOR, APPLEWATCH_DYSKINESIA,
-                    APPLEWATCH_HEART_RATE, PERCEPT_TREND_LOG_LFP
+            data_type: Processed stream data type that is being measured.
+                Possible data types include:
+                    APPLEWATCH_SYMPTOM, APPLEWATCH_TREMOR,
+                    APPLEWATCH_DYSKINESIA, APPLEWATCH_HEART_RATE,
+                    PERCEPT_TREND_LOG_LFP
             value:
-            time_interval: Period over which the metric was calculated. Possible time
-                intervals include:
+            time_interval: Period over which the metric was calculated.
+                Possible time intervals include:
                     FOURTEEN_DAYS, NINETY_DAYS, PROJECT_ALL
-            created_at: Time the patient was added to the cohort (unix timestamp)
-            updated_at: Time the cohort patient record was last updated (unix timestamp)
+            created_at: Time patient was added to the cohort (unix timestamp)
+            updated_at: Time cohort patient was last updated (unix timestamp)
 
         """
         self.type = type
@@ -60,6 +62,7 @@ class Metric(ItemBase):
             created_at=created_at,
             updated_at=updated_at,
         )
+
 
 class MetricSet(ItemSet):
     """
@@ -82,10 +85,12 @@ class MetricSet(ItemSet):
         """
         return Metric
 
+
 class CohortPatient(ItemBase):
     """
-    A patient who has been placed within a cohort and is now associated with the cohort.
-    
+    A patient who has been placed within a cohort and is now
+    associated with the cohort.
+
     """
     def __init__(
         self,
@@ -102,9 +107,9 @@ class CohortPatient(ItemBase):
 
         Args:
             id: Unique identifier of the patient
-            created_at: Time the patient was added to the cohort (unix timestamp)
+            created_at: Time patient was added to the cohort (unix timestamp)
             created_by: Display name of who added the patient to the cohort
-            updated_at: Time the cohort patient record was last updated (unix timestamp)
+            updated_at: Time cohort patient was last updated (unix timestamp)
             updated_by: Display name of who updated the cohort patient record
             **attributes: Other attributes associated with the cohort
 
@@ -134,11 +139,13 @@ class CohortPatient(ItemBase):
         attrs["metrics"] = self.metrics.to_list()
         return attrs
 
+
 # TODO: Determine if project_id should be part of class
 class ProjectPatient(ItemBase):
     """
-    A patient who has been placed within a project and is now associated with the project.
-    
+    A patient who has been placed within a project and is now
+    associated with the project.
+
     """
     def __init__(
         self,
@@ -155,9 +162,9 @@ class ProjectPatient(ItemBase):
 
         Args:
             id: Unique identifier of the patient
-            created_at: Time the patient was added to the project (unix timestamp)
+            created_at: Time patient was added to the project (unix timestamp)
             created_by: Display name of who added the patient to the project
-            updated_at: Time the project patient record was last updated (unix timestamp)
+            updated_at: Time project patient was last updated (unix timestamp)
             updated_by: Display name of who updated the project patient record
             **attributes: Other attributes associated with the project
 
@@ -186,6 +193,7 @@ class ProjectPatient(ItemBase):
         attrs = self._attributes.copy()
         attrs["metrics"] = self.metrics.to_list()
         return attrs
+
 
 # TODO: should cohorts have a to_dict method
 class CohortPatientSet(ItemSet):
@@ -231,15 +239,18 @@ class ProjectPatientSet(ItemSet):
         """
         return ProjectPatient
 
+
 # TODO: Determine if project_id should be a part of class
 class Cohort(ItemBase):
     """
     A generic sub-container for a group of patients within a project.
 
     A cohort is a generic container within a project for a group of patients
-    with workflow-related metadata: description, milestones dates, metrics, etc.
+    with workflow-related metadata: description, milestones dates,
+    metrics, etc.
+
     A single project can have multiple cohorts.
-    
+
     """
     def __init__(
         self,
@@ -280,6 +291,7 @@ class Cohort(ItemBase):
             **attributes,
         )
 
+
 class CohortSet(ItemSet):
     """
     A collection of Cohorts.
@@ -300,6 +312,7 @@ class CohortSet(ItemSet):
 
         """
         return Cohort
+
 
 class Project(ItemBase):
     """
@@ -366,6 +379,7 @@ class Project(ItemBase):
             **attributes,
         )
 
+
 class ProjectSet(ItemSet):
     """
     A collection of Projects.
@@ -386,6 +400,7 @@ class ProjectSet(ItemSet):
 
         """
         return Project
+
 
 def get_project(
     id: str, client: Optional[GraphClient] = None
@@ -412,7 +427,7 @@ def get_project(
                     cohorts {
                         id,
                         title,
-                        description,             
+                        description,
                         created_at: createdAt,
                         updated_at: updatedAt,
                         created_by: createdBy,
@@ -488,6 +503,7 @@ def get_projects(client: Optional[GraphClient] = None) -> ProjectSet:
 
     return project_set
 
+
 def _set_patient_metrics(
     metrics: dict
 ) -> MetricSet:
@@ -503,13 +519,14 @@ def _set_patient_metrics(
 
     return metric_set
 
+
 def get_project_patients(
     id: str,
     client: Optional[GraphClient] = None,
 ) -> ProjectPatientSet:
     """
     Get all patients in a project and their associated project,
-    processed data metrics. 
+    processed data metrics.
 
     Args:
         id: ID of the project
@@ -592,18 +609,19 @@ def get_project_patients(
 
     return project_patient_set
 
+
 def get_cohort_patients(
     id: str,
     client: Optional[GraphClient] = None,
 ) -> CohortSet:
     """
-    Get all patients in a cohort. 
+    Get all patients in a cohort.
 
     Args:
         id: ID of the cohort
         client: If specified, this client is used to fetch metadata from the
             API. Otherwise, the global GraphClient is used.
-    
+
     """
     client = client or global_graph_client()
     cohort_patients_query = """
@@ -666,7 +684,10 @@ def get_cohort_patients(
             patient = CohortPatient(**patient_attrs)
             cohort_patient_set.add(patient)
 
-        cursor = cohort_patient_list.get("pageInfo", {}).get("codeNameEndCursor")
+        cursor = cohort_patient_list.get("pageInfo", {}).get(
+            "codeNameEndCursor"
+        )
+
         if not cursor:
             break
 

@@ -105,12 +105,12 @@ class TestProject(TestCase):
             "cohortList": {
                 "cohorts": [
                     {
-                        "id": "test-id-1", 
-                        "title": "test-1", 
-                        "description": "Some cohort 1", 
-                        "created_at": 1667225389.222881, 
-                        "updated_at": 1667225389.084547, 
-                        "created_by": "Computer wizard", 
+                        "id": "test-id-1",
+                        "title": "test-1",
+                        "description": "Some cohort 1",
+                        "created_at": 1667225389.222881,
+                        "updated_at": 1667225389.084547,
+                        "created_by": "Computer wizard",
                         "updated_by": "Computer wizard"
                     }
                 ]
@@ -263,18 +263,18 @@ class TestProject(TestCase):
     def test_project_patient_attributes(self):
         """
         Test attributes for an initialized Project Patient.
-        
+
         """
         example_metrics = MetricSet(
             [
                 Metric(
-                    type="LAST_UPLOAD", 
-                    data_type="APPLEWATCH_DYSKINESIA", 
-                    value=1648235452.965804, 
-                    time_interval="FOURTEEN_DAYS", 
-                    created_at=1673467628.837126, 
-                    updated_at=1673467628.837126, 
-                    id="1bfcf11f-8d5c-4714-b774-6b47e03c5900",
+                    type="LAST_UPLOAD",
+                    data_type="APPLEWATCH_TREMOR",
+                    value=1648235452.965804,
+                    time_interval="FOURTEEN_DAYS",
+                    created_at=1673467628.837126,
+                    updated_at=1673467628.837126,
+                    id="1bfcf11f-8d5c-4714-b774-6b47e03c5900"
                 ),
             ]
         )
@@ -320,18 +320,18 @@ class TestProject(TestCase):
     def test_cohort_patient_attributes(self):
         """
         Test attributes for an initialized Cohort Patient.
-        
+
         """
         example_metrics = MetricSet(
             [
                 Metric(
-                    type="LAST_UPLOAD", 
-                    data_type="APPLEWATCH_DYSKINESIA", 
-                    value=1648235452.965804, 
-                    time_interval="FOURTEEN_DAYS", 
-                    created_at=1673467628.837126, 
-                    updated_at=1673467628.837126, 
-                    id="1bfcf11f-8d5c-4714-b774-6b47e03c5900",
+                    type="LAST_UPLOAD",
+                    data_type="APPLEWATCH_TREMOR",
+                    value=1648235452.965804,
+                    time_interval="FOURTEEN_DAYS",
+                    created_at=1673467628.837126,
+                    updated_at=1673467628.837126,
+                    id="1bfcf11f-8d5c-4714-b774-6b47e03c5900"
                 ),
             ]
         )
@@ -360,42 +360,42 @@ class TestProject(TestCase):
         self.mock_client.execute = mock.Mock()
         project_patients_expected = [
             {
-                "id": "patient-1", 
+                "id": "patient-1",
                 "metrics": [
                     {
-                        "id": "metric-1", 
-                        "updated_at": 1673467628.837126, 
-                        "created_at": 1673467628.837126, 
-                        "type": "LAST_UPLOAD", 
-                        "data_type": "APPLEWATCH_DYSKINESIA", 
-                        "value": 1648235452.965804, 
-                        "time_interval": "FOURTEEN_DAYS"
+                        "id": "metric-1",
+                        "updated_at": 1673467628.837126,
+                        "created_at": 1673467628.837126,
+                        "type": "LAST_UPLOAD",
+                        "data_type": "APPLEWATCH_TREMOR",
+                        "value": 1648235452.965804,
+                        "time_interval": "FOURTEEN_DAYS",
                     },
                 ],
-                "code_name": "code name 1", 
-                "created_at": 1673467625.063822, 
-                "updated_at": 1673467625.063822, 
-                "created_by": "user 1", 
-                "updated_by": "user 2", 
+                "code_name": "code name 1",
+                "created_at": 1673467625.063822,
+                "updated_at": 1673467625.063822,
+                "created_by": "user 1",
+                "updated_by": "user 2",
             },
             {
                 "id": "patient-2",
                 "metrics": [
                     {
-                        "id": "metric-2", 
-                        "updated_at": 1673467628.837126, 
-                        "created_at": 1673467628.837126, 
-                        "type": "LAST_UPLOAD", 
-                        "data_type": "APPLEWATCH_DYSKINESIA", 
-                        "value": 1648235452.965804, 
-                        "time_interval": "FOURTEEN_DAYS"
+                        "id": "metric-2",
+                        "updated_at": 1673467628.837126,
+                        "created_at": 1673467628.837126,
+                        "type": "LAST_UPLOAD",
+                        "data_type": "APPLEWATCH_TREMOR",
+                        "value": 1648235452.965804,
+                        "time_interval": "FOURTEEN_DAYS",
                     },
                 ],
-                "code_name": "code name 2", 
-                "created_at": 1673467625.063822, 
-                "updated_at": 1673467625.063822, 
-                "created_by": "user 2", 
-                "updated_by": "user 3", 
+                "code_name": "code name 2",
+                "created_at": 1673467625.063822,
+                "updated_at": 1673467625.063822,
+                "created_by": "user 2",
+                "updated_by": "user 3",
             },
         ]
 
@@ -406,48 +406,48 @@ class TestProject(TestCase):
                         {
                             "patient": {
                                 "id": "patient-1"
-                            }, 
+                            },
                             "metricList": {
                                 "metrics": [
                                     {
-                                        "id": "metric-1", 
-                                        "updated_at": 1673467628.837126, 
-                                        "created_at": 1673467628.837126, 
-                                        "type": "LAST_UPLOAD", 
-                                        "data_type": "APPLEWATCH_DYSKINESIA", 
-                                        "value": 1648235452.965804, 
-                                        "time_interval": "FOURTEEN_DAYS"
+                                        "id": "metric-1",
+                                        "updated_at": 1673467628.837126,
+                                        "created_at": 1673467628.837126,
+                                        "type": "LAST_UPLOAD",
+                                        "data_type": "APPLEWATCH_TREMOR",
+                                        "value": 1648235452.965804,
+                                        "time_interval": "FOURTEEN_DAYS",
                                     },
                                 ]
                             },
-                            "code_name": "code name 1", 
-                            "created_at": 1673467625.063822, 
-                            "updated_at": 1673467625.063822, 
-                            "created_by": "user 1", 
-                            "updated_by": "user 2", 
+                            "code_name": "code name 1",
+                            "created_at": 1673467625.063822,
+                            "updated_at": 1673467625.063822,
+                            "created_by": "user 1",
+                            "updated_by": "user 2",
                         },
                         {
                             "patient": {
                                 "id": "patient-2"
-                            }, 
+                            },
                             "metricList": {
                                 "metrics": [
                                     {
-                                        "id": "metric-2", 
-                                        "updated_at": 1673467628.837126, 
-                                        "created_at": 1673467628.837126, 
-                                        "type": "LAST_UPLOAD", 
-                                        "data_type": "APPLEWATCH_DYSKINESIA", 
-                                        "value": 1648235452.965804, 
-                                        "time_interval": "FOURTEEN_DAYS"
+                                        "id": "metric-2",
+                                        "updated_at": 1673467628.837126,
+                                        "created_at": 1673467628.837126,
+                                        "type": "LAST_UPLOAD",
+                                        "data_type": "APPLEWATCH_TREMOR",
+                                        "value": 1648235452.965804,
+                                        "time_interval": "FOURTEEN_DAYS",
                                     },
                                 ]
                             },
-                            "code_name": "code name 2", 
-                            "created_at": 1673467625.063822, 
-                            "updated_at": 1673467625.063822, 
-                            "created_by": "user 2", 
-                            "updated_by": "user 3", 
+                            "code_name": "code name 2",
+                            "created_at": 1673467625.063822,
+                            "updated_at": 1673467625.063822,
+                            "created_by": "user 2",
+                            "updated_by": "user 3",
                         },
                     ],
                     "pageInfo": {
@@ -458,7 +458,9 @@ class TestProject(TestCase):
         }
 
 
-        project_patinets = get_project_patients(client=self.mock_client, id="test-project-1")
+        project_patinets = get_project_patients(
+            client=self.mock_client, id="test-project-1"
+        )
 
         self.assertEqual(
             project_patients_expected,
@@ -473,42 +475,42 @@ class TestProject(TestCase):
         self.mock_client.execute = mock.Mock()
         project_patients_expected = [
             {
-                "id": "patient-1", 
+                "id": "patient-1",
                 "metrics": [
                     {
-                        "id": "metric-1", 
-                        "updated_at": 1673467628.837126, 
-                        "created_at": 1673467628.837126, 
-                        "type": "LAST_UPLOAD", 
-                        "data_type": "APPLEWATCH_DYSKINESIA", 
-                        "value": 1648235452.965804, 
+                        "id": "metric-1",
+                        "updated_at": 1673467628.837126,
+                        "created_at": 1673467628.837126,
+                        "type": "LAST_UPLOAD",
+                        "data_type": "APPLEWATCH_TREMOR",
+                        "value": 1648235452.965804,
                         "time_interval": "FOURTEEN_DAYS"
                     },
                 ],
-                "code_name": "code name 1", 
-                "created_at": 1673467625.063822, 
-                "updated_at": 1673467625.063822, 
-                "created_by": "user 1", 
-                "updated_by": "user 2", 
+                "code_name": "code name 1",
+                "created_at": 1673467625.063822,
+                "updated_at": 1673467625.063822,
+                "created_by": "user 1",
+                "updated_by": "user 2",
             },
             {
                 "id": "patient-2",
                 "metrics": [
                     {
-                        "id": "metric-2", 
-                        "updated_at": 1673467628.837126, 
-                        "created_at": 1673467628.837126, 
-                        "type": "LAST_UPLOAD", 
-                        "data_type": "APPLEWATCH_DYSKINESIA", 
-                        "value": 1648235452.965804, 
+                        "id": "metric-2",
+                        "updated_at": 1673467628.837126,
+                        "created_at": 1673467628.837126,
+                        "type": "LAST_UPLOAD",
+                        "data_type": "APPLEWATCH_TREMOR",
+                        "value": 1648235452.965804,
                         "time_interval": "FOURTEEN_DAYS"
                     },
                 ],
-                "code_name": "code name 2", 
-                "created_at": 1673467625.063822, 
-                "updated_at": 1673467625.063822, 
-                "created_by": "user 2", 
-                "updated_by": "user 3", 
+                "code_name": "code name 2",
+                "created_at": 1673467625.063822,
+                "updated_at": 1673467625.063822,
+                "created_by": "user 2",
+                "updated_by": "user 3",
             },
         ]
 
@@ -520,25 +522,25 @@ class TestProject(TestCase):
                             {
                                 "patient": {
                                     "id": "patient-1"
-                                }, 
+                                },
                                 "metricList": {
                                     "metrics": [
                                         {
-                                            "id": "metric-1", 
-                                            "updated_at": 1673467628.837126, 
-                                            "created_at": 1673467628.837126, 
-                                            "type": "LAST_UPLOAD", 
-                                            "data_type": "APPLEWATCH_DYSKINESIA", 
-                                            "value": 1648235452.965804, 
+                                            "id": "metric-1",
+                                            "updated_at": 1673467628.837126,
+                                            "created_at": 1673467628.837126,
+                                            "type": "LAST_UPLOAD",
+                                            "data_type": "APPLEWATCH_TREMOR",
+                                            "value": 1648235452.965804,
                                             "time_interval": "FOURTEEN_DAYS"
                                         },
                                     ]
                                 },
-                                "code_name": "code name 1", 
-                                "created_at": 1673467625.063822, 
-                                "updated_at": 1673467625.063822, 
-                                "created_by": "user 1", 
-                                "updated_by": "user 2", 
+                                "code_name": "code name 1",
+                                "created_at": 1673467625.063822,
+                                "updated_at": 1673467625.063822,
+                                "created_by": "user 1",
+                                "updated_by": "user 2",
                             },
                         ],
                         "pageInfo": {
@@ -554,48 +556,48 @@ class TestProject(TestCase):
                             {
                                 "patient": {
                                     "id": "patient-1"
-                                }, 
+                                },
                                 "metricList": {
                                     "metrics": [
                                         {
-                                            "id": "metric-1", 
-                                            "updated_at": 1673467628.837126, 
-                                            "created_at": 1673467628.837126, 
-                                            "type": "LAST_UPLOAD", 
-                                            "data_type": "APPLEWATCH_DYSKINESIA", 
-                                            "value": 1648235452.965804, 
+                                            "id": "metric-1",
+                                            "updated_at": 1673467628.837126,
+                                            "created_at": 1673467628.837126,
+                                            "type": "LAST_UPLOAD",
+                                            "data_type": "APPLEWATCH_TREMOR",
+                                            "value": 1648235452.965804,
                                             "time_interval": "FOURTEEN_DAYS"
                                         },
                                     ]
                                 },
-                                "code_name": "code name 1", 
-                                "created_at": 1673467625.063822, 
-                                "updated_at": 1673467625.063822, 
-                                "created_by": "user 1", 
-                                "updated_by": "user 2", 
+                                "code_name": "code name 1",
+                                "created_at": 1673467625.063822,
+                                "updated_at": 1673467625.063822,
+                                "created_by": "user 1",
+                                "updated_by": "user 2",
                             },
                             {
                                 "patient": {
                                     "id": "patient-2"
-                                }, 
+                                },
                                 "metricList": {
                                     "metrics": [
                                         {
-                                            "id": "metric-2", 
-                                            "updated_at": 1673467628.837126, 
-                                            "created_at": 1673467628.837126, 
-                                            "type": "LAST_UPLOAD", 
-                                            "data_type": "APPLEWATCH_DYSKINESIA", 
-                                            "value": 1648235452.965804, 
+                                            "id": "metric-2",
+                                            "updated_at": 1673467628.837126,
+                                            "created_at": 1673467628.837126,
+                                            "type": "LAST_UPLOAD",
+                                            "data_type": "APPLEWATCH_TREMOR",
+                                            "value": 1648235452.965804,
                                             "time_interval": "FOURTEEN_DAYS"
                                         },
                                     ]
                                 },
-                                "code_name": "code name 2", 
-                                "created_at": 1673467625.063822, 
-                                "updated_at": 1673467625.063822, 
-                                "created_by": "user 2", 
-                                "updated_by": "user 3", 
+                                "code_name": "code name 2",
+                                "created_at": 1673467625.063822,
+                                "updated_at": 1673467625.063822,
+                                "created_by": "user 2",
+                                "updated_by": "user 3",
                             },
                         ],
                         "pageInfo": {
@@ -603,10 +605,11 @@ class TestProject(TestCase):
                         },
                     }
                 }
-            }
-        ]
+            }]
 
-        project_patients = get_project_patients(client=self.mock_client, id="test-project-1")
+        project_patients = get_project_patients(
+            client=self.mock_client, id="test-project-1"
+        )
 
         self.assertEqual(
             project_patients_expected,
@@ -621,42 +624,42 @@ class TestProject(TestCase):
         self.mock_client.execute = mock.Mock()
         cohort_patients_expected = [
             {
-                "id": "patient-1", 
+                "id": "patient-1",
                 "metrics": [
                     {
-                        "id": "metric-1", 
-                        "updated_at": 1673467628.837126, 
-                        "created_at": 1673467628.837126, 
-                        "type": "LAST_UPLOAD", 
-                        "data_type": "APPLEWATCH_DYSKINESIA", 
-                        "value": 1648235452.965804, 
+                        "id": "metric-1",
+                        "updated_at": 1673467628.837126,
+                        "created_at": 1673467628.837126,
+                        "type": "LAST_UPLOAD",
+                        "data_type": "APPLEWATCH_TREMOR",
+                        "value": 1648235452.965804,
                         "time_interval": "FOURTEEN_DAYS"
                     },
                 ],
-                "code_name": "code name 1", 
-                "created_at": 1673467625.063822, 
-                "updated_at": 1673467625.063822, 
-                "created_by": "user 1", 
-                "updated_by": "user 2", 
+                "code_name": "code name 1",
+                "created_at": 1673467625.063822,
+                "updated_at": 1673467625.063822,
+                "created_by": "user 1",
+                "updated_by": "user 2",
             },
             {
                 "id": "patient-2",
                 "metrics": [
                     {
-                        "id": "metric-2", 
-                        "updated_at": 1673467628.837126, 
-                        "created_at": 1673467628.837126, 
-                        "type": "LAST_UPLOAD", 
-                        "data_type": "APPLEWATCH_DYSKINESIA", 
-                        "value": 1648235452.965804, 
+                        "id": "metric-2",
+                        "updated_at": 1673467628.837126,
+                        "created_at": 1673467628.837126,
+                        "type": "LAST_UPLOAD",
+                        "data_type": "APPLEWATCH_TREMOR",
+                        "value": 1648235452.965804,
                         "time_interval": "FOURTEEN_DAYS"
                     },
                 ],
-                "code_name": "code name 2", 
-                "created_at": 1673467625.063822, 
-                "updated_at": 1673467625.063822, 
-                "created_by": "user 2", 
-                "updated_by": "user 3", 
+                "code_name": "code name 2",
+                "created_at": 1673467625.063822,
+                "updated_at": 1673467625.063822,
+                "created_by": "user 2",
+                "updated_by": "user 3",
             },
         ]
 
@@ -667,48 +670,48 @@ class TestProject(TestCase):
                         {
                             "patient": {
                                 "id": "patient-1"
-                            }, 
+                            },
                             "metricList": {
                                 "metrics": [
                                     {
-                                        "id": "metric-1", 
-                                        "updated_at": 1673467628.837126, 
-                                        "created_at": 1673467628.837126, 
-                                        "type": "LAST_UPLOAD", 
-                                        "data_type": "APPLEWATCH_DYSKINESIA", 
-                                        "value": 1648235452.965804, 
+                                        "id": "metric-1",
+                                        "updated_at": 1673467628.837126,
+                                        "created_at": 1673467628.837126,
+                                        "type": "LAST_UPLOAD",
+                                        "data_type": "APPLEWATCH_TREMOR",
+                                        "value": 1648235452.965804,
                                         "time_interval": "FOURTEEN_DAYS"
                                     },
                                 ]
                             },
-                            "code_name": "code name 1", 
-                            "created_at": 1673467625.063822, 
-                            "updated_at": 1673467625.063822, 
-                            "created_by": "user 1", 
-                            "updated_by": "user 2", 
+                            "code_name": "code name 1",
+                            "created_at": 1673467625.063822,
+                            "updated_at": 1673467625.063822,
+                            "created_by": "user 1",
+                            "updated_by": "user 2",
                         },
                         {
                             "patient": {
                                 "id": "patient-2"
-                            }, 
+                            },
                             "metricList": {
                                 "metrics": [
                                     {
-                                        "id": "metric-2", 
-                                        "updated_at": 1673467628.837126, 
-                                        "created_at": 1673467628.837126, 
-                                        "type": "LAST_UPLOAD", 
-                                        "data_type": "APPLEWATCH_DYSKINESIA", 
-                                        "value": 1648235452.965804, 
+                                        "id": "metric-2",
+                                        "updated_at": 1673467628.837126,
+                                        "created_at": 1673467628.837126,
+                                        "type": "LAST_UPLOAD",
+                                        "data_type": "APPLEWATCH_TREMOR",
+                                        "value": 1648235452.965804,
                                         "time_interval": "FOURTEEN_DAYS"
                                     },
                                 ]
                             },
-                            "code_name": "code name 2", 
-                            "created_at": 1673467625.063822, 
-                            "updated_at": 1673467625.063822, 
-                            "created_by": "user 2", 
-                            "updated_by": "user 3", 
+                            "code_name": "code name 2",
+                            "created_at": 1673467625.063822,
+                            "updated_at": 1673467625.063822,
+                            "created_by": "user 2",
+                            "updated_by": "user 3",
                         },
                     ],
                     "pageInfo": {
@@ -719,7 +722,9 @@ class TestProject(TestCase):
         }
 
 
-        cohort_patients = get_cohort_patients(client=self.mock_client, id="test-project-1")
+        cohort_patients = get_cohort_patients(
+            client=self.mock_client, id="test-project-1"
+        )
 
         self.assertEqual(
             cohort_patients_expected,
@@ -734,42 +739,42 @@ class TestProject(TestCase):
         self.mock_client.execute = mock.Mock()
         cohort_patients_expected = [
             {
-                "id": "patient-1", 
+                "id": "patient-1",
                 "metrics": [
                     {
-                        "id": "metric-1", 
-                        "updated_at": 1673467628.837126, 
-                        "created_at": 1673467628.837126, 
-                        "type": "LAST_UPLOAD", 
-                        "data_type": "APPLEWATCH_DYSKINESIA", 
-                        "value": 1648235452.965804, 
+                        "id": "metric-1",
+                        "updated_at": 1673467628.837126,
+                        "created_at": 1673467628.837126,
+                        "type": "LAST_UPLOAD",
+                        "data_type": "APPLEWATCH_TREMOR",
+                        "value": 1648235452.965804,
                         "time_interval": "FOURTEEN_DAYS"
                     },
                 ],
-                "code_name": "code name 1", 
-                "created_at": 1673467625.063822, 
-                "updated_at": 1673467625.063822, 
-                "created_by": "user 1", 
-                "updated_by": "user 2", 
+                "code_name": "code name 1",
+                "created_at": 1673467625.063822,
+                "updated_at": 1673467625.063822,
+                "created_by": "user 1",
+                "updated_by": "user 2",
             },
             {
                 "id": "patient-2",
                 "metrics": [
                     {
-                        "id": "metric-2", 
-                        "updated_at": 1673467628.837126, 
-                        "created_at": 1673467628.837126, 
-                        "type": "LAST_UPLOAD", 
-                        "data_type": "APPLEWATCH_DYSKINESIA", 
-                        "value": 1648235452.965804, 
+                        "id": "metric-2",
+                        "updated_at": 1673467628.837126,
+                        "created_at": 1673467628.837126,
+                        "type": "LAST_UPLOAD",
+                        "data_type": "APPLEWATCH_TREMOR",
+                        "value": 1648235452.965804,
                         "time_interval": "FOURTEEN_DAYS"
                     },
                 ],
-                "code_name": "code name 2", 
-                "created_at": 1673467625.063822, 
-                "updated_at": 1673467625.063822, 
-                "created_by": "user 2", 
-                "updated_by": "user 3", 
+                "code_name": "code name 2",
+                "created_at": 1673467625.063822,
+                "updated_at": 1673467625.063822,
+                "created_by": "user 2",
+                "updated_by": "user 3",
             },
         ]
 
@@ -781,25 +786,25 @@ class TestProject(TestCase):
                             {
                                 "patient": {
                                     "id": "patient-1"
-                                }, 
+                                },
                                 "metricList": {
                                     "metrics": [
                                         {
-                                            "id": "metric-1", 
-                                            "updated_at": 1673467628.837126, 
-                                            "created_at": 1673467628.837126, 
-                                            "type": "LAST_UPLOAD", 
-                                            "data_type": "APPLEWATCH_DYSKINESIA", 
-                                            "value": 1648235452.965804, 
+                                            "id": "metric-1",
+                                            "updated_at": 1673467628.837126,
+                                            "created_at": 1673467628.837126,
+                                            "type": "LAST_UPLOAD",
+                                            "data_type": "APPLEWATCH_TREMOR",
+                                            "value": 1648235452.965804,
                                             "time_interval": "FOURTEEN_DAYS"
                                         },
                                     ]
                                 },
-                                "code_name": "code name 1", 
-                                "created_at": 1673467625.063822, 
-                                "updated_at": 1673467625.063822, 
-                                "created_by": "user 1", 
-                                "updated_by": "user 2", 
+                                "code_name": "code name 1",
+                                "created_at": 1673467625.063822,
+                                "updated_at": 1673467625.063822,
+                                "created_by": "user 1",
+                                "updated_by": "user 2",
                             },
                         ],
                         "pageInfo": {
@@ -815,48 +820,48 @@ class TestProject(TestCase):
                             {
                                 "patient": {
                                     "id": "patient-1"
-                                }, 
+                                },
                                 "metricList": {
                                     "metrics": [
                                         {
-                                            "id": "metric-1", 
-                                            "updated_at": 1673467628.837126, 
-                                            "created_at": 1673467628.837126, 
-                                            "type": "LAST_UPLOAD", 
-                                            "data_type": "APPLEWATCH_DYSKINESIA", 
-                                            "value": 1648235452.965804, 
+                                            "id": "metric-1",
+                                            "updated_at": 1673467628.837126,
+                                            "created_at": 1673467628.837126,
+                                            "type": "LAST_UPLOAD",
+                                            "data_type": "APPLEWATCH_TREMOR",
+                                            "value": 1648235452.965804,
                                             "time_interval": "FOURTEEN_DAYS"
                                         },
                                     ]
                                 },
-                                "code_name": "code name 1", 
-                                "created_at": 1673467625.063822, 
-                                "updated_at": 1673467625.063822, 
-                                "created_by": "user 1", 
-                                "updated_by": "user 2", 
+                                "code_name": "code name 1",
+                                "created_at": 1673467625.063822,
+                                "updated_at": 1673467625.063822,
+                                "created_by": "user 1",
+                                "updated_by": "user 2",
                             },
                             {
                                 "patient": {
                                     "id": "patient-2"
-                                }, 
+                                },
                                 "metricList": {
                                     "metrics": [
                                         {
-                                            "id": "metric-2", 
-                                            "updated_at": 1673467628.837126, 
-                                            "created_at": 1673467628.837126, 
-                                            "type": "LAST_UPLOAD", 
-                                            "data_type": "APPLEWATCH_DYSKINESIA", 
-                                            "value": 1648235452.965804, 
+                                            "id": "metric-2",
+                                            "updated_at": 1673467628.837126,
+                                            "created_at": 1673467628.837126,
+                                            "type": "LAST_UPLOAD",
+                                            "data_type": "APPLEWATCH_TREMOR",
+                                            "value": 1648235452.965804,
                                             "time_interval": "FOURTEEN_DAYS"
                                         },
                                     ]
                                 },
-                                "code_name": "code name 2", 
-                                "created_at": 1673467625.063822, 
-                                "updated_at": 1673467625.063822, 
-                                "created_by": "user 2", 
-                                "updated_by": "user 3", 
+                                "code_name": "code name 2",
+                                "created_at": 1673467625.063822,
+                                "updated_at": 1673467625.063822,
+                                "created_by": "user 2",
+                                "updated_by": "user 3",
                             },
                         ],
                         "pageInfo": {
@@ -867,7 +872,9 @@ class TestProject(TestCase):
             }
         ]
 
-        cohort_patients = get_cohort_patients(client=self.mock_client, id="test-project-1")
+        cohort_patients = get_cohort_patients(
+            client=self.mock_client, id="test-project-1"
+        )
 
         self.assertEqual(
             cohort_patients_expected,
