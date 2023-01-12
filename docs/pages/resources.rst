@@ -139,7 +139,6 @@ Project Metadata
 .. autofunction:: get_project_patients
 .. autofunction:: get_cohort_patients
 
-
 .. autoclass:: Project
    :special-members: __init__
    :members:
