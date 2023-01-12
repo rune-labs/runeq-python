@@ -127,7 +127,7 @@ class CohortPatient(ItemBase):
 
     def to_dict(self) -> dict:
         """
-        Dictionary representation of the Project Patient attributes.
+        Dictionary representation of the Cohort Patient attributes.
 
         """
         attrs = self._attributes.copy()
@@ -187,13 +187,14 @@ class ProjectPatient(ItemBase):
         attrs["metrics"] = self.metrics.to_list()
         return attrs
 
+# TODO: should cohorts have a to_dict method
 class CohortPatientSet(ItemSet):
     """
     A collection of CohortPatients.
 
     """
 
-    def __init__(self, items: Iterable[ProjectPatient] = ()):
+    def __init__(self, items: Iterable[CohortPatient] = ()):
         """
         Initialize with CohortPatients.
 
@@ -321,6 +322,7 @@ class Project(ItemBase):
         created_at: float,
         created_by: str,
         updated_by: str,
+        cohorts: Optional[Cohort] = None,
         **attributes
     ):
         """
@@ -349,6 +351,7 @@ class Project(ItemBase):
         self.updated_by = updated_by
         self.status = status
         self.type = type
+        self.cohorts = cohorts
 
         super().__init__(
             id=id,
@@ -385,7 +388,7 @@ class ProjectSet(ItemSet):
         return Project
 
 def get_project(
-    project_id: str, client: Optional[GraphClient] = None
+    id: str, client: Optional[GraphClient] = None
 ) -> Project:
     """
     Get the project with the specified ID.
@@ -398,8 +401,8 @@ def get_project(
     """
     client = client or global_graph_client()
     query = """
-        query getProject($project_id: ID) {
-            project (id: $project_id) {
+        query getProject($id: ID) {
+            project (id: $id) {
                 id,
                 title,
                 status,
@@ -425,7 +428,7 @@ def get_project(
         }
     """
 
-    result = client.execute(statement=query, project_id=project_id)
+    result = client.execute(statement=query, id=id)
 
     project_attrs = result["project"]
     return Project(**project_attrs)
