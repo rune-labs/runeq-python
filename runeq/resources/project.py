@@ -38,7 +38,7 @@ class Metric(ItemBase):
                     APPLEWATCH_SYMPTOM, APPLEWATCH_TREMOR,
                     APPLEWATCH_DYSKINESIA, APPLEWATCH_HEART_RATE,
                     PERCEPT_TREND_LOG_LFP
-            value:
+            value: Value of the metric (float)
             time_interval: Period over which the metric was calculated.
                 Possible time intervals include:
                     FOURTEEN_DAYS, NINETY_DAYS, PROJECT_ALL
@@ -140,7 +140,6 @@ class CohortPatient(ItemBase):
         return attrs
 
 
-# TODO: Determine if project_id should be part of class
 class ProjectPatient(ItemBase):
     """
     A patient who has been placed within a project and is now
@@ -195,7 +194,6 @@ class ProjectPatient(ItemBase):
         return attrs
 
 
-# TODO: should cohorts have a to_dict method
 class CohortPatientSet(ItemSet):
     """
     A collection of CohortPatients.
@@ -240,7 +238,6 @@ class ProjectPatientSet(ItemSet):
         return ProjectPatient
 
 
-# TODO: Determine if project_id should be a part of class
 class Cohort(ItemBase):
     """
     A generic sub-container for a group of patients within a project.
@@ -335,7 +332,7 @@ class Project(ItemBase):
         created_at: float,
         created_by: str,
         updated_by: str,
-        cohorts: Optional[Cohort] = None,
+        cohorts: CohortSet(),
         **attributes
     ):
         """
@@ -353,6 +350,7 @@ class Project(ItemBase):
             created_by: Display name of who created the project
             updated_at: Time the project was last updated (unix timestamp)
             updated_by: Display name of who updated the project
+            cohorts: Sub-containers of patients in a project
             **attributes: Other attributes associated with the project
 
         """
@@ -376,8 +374,19 @@ class Project(ItemBase):
             updated_by=updated_by,
             status=status,
             type=type,
+            cohorts=cohorts,
             **attributes,
         )
+
+    def to_dict(self) -> dict:
+        """
+        Dictionary representation of the Project attributes.
+
+        """
+        attrs = self._attributes.copy()
+        attrs["cohorts"] = self.cohorts.to_list()
+
+        return attrs
 
 
 class ProjectSet(ItemSet):
@@ -403,7 +412,7 @@ class ProjectSet(ItemSet):
 
 
 def get_project(
-    id: str, client: Optional[GraphClient] = None
+    project_id: str, client: Optional[GraphClient] = None
 ) -> Project:
     """
     Get the project with the specified ID.
@@ -443,9 +452,21 @@ def get_project(
         }
     """
 
-    result = client.execute(statement=query, id=id)
+    result = client.execute(statement=query, id=project_id)
 
     project_attrs = result["project"]
+
+    # Move cohorts to attribute level
+    cohorts = project_attrs.get("cohortList", {}).get("cohorts", [])
+    cohort_set = CohortSet()
+
+    for cohort in cohorts:
+        cohort_obj = Cohort(**cohort)
+        cohort_set.add(cohort_obj)
+
+    project_attrs["cohorts"] = cohort_set
+    del project_attrs["cohortList"]
+
     return Project(**project_attrs)
 
 
@@ -470,6 +491,17 @@ def get_projects(client: Optional[GraphClient] = None) -> ProjectSet:
                         status,
                         description,
                         type,
+                        cohortList {
+                            cohorts {
+                                id,
+                                title,
+                                description,
+                                created_at: createdAt,
+                                updated_at: updatedAt,
+                                created_by: createdBy,
+                                updated_by: updatedBy,
+                            }
+                        },
                         created_at: createdAt,
                         updated_at: updatedAt,
                         started_at: startedAt,
@@ -493,6 +525,16 @@ def get_projects(client: Optional[GraphClient] = None) -> ProjectSet:
         project_list = result.get("org", {}).get("projectList", {})
 
         for project in project_list.get("projects", []):
+            cohorts = project.get("cohortList", {}).get("cohorts", [])
+            cohort_set = CohortSet()
+
+            for cohort in cohorts:
+                cohort_obj = Cohort(**cohort)
+                cohort_set.add(cohort_obj)
+
+            project["cohorts"] = cohort_set
+            del project["cohortList"]
+
             project = Project(**project)
             project_set.add(project)
 
@@ -504,7 +546,7 @@ def get_projects(client: Optional[GraphClient] = None) -> ProjectSet:
     return project_set
 
 
-def _set_patient_metrics(
+def _parse_patient_metrics(
     metrics: dict
 ) -> MetricSet:
     """
@@ -521,15 +563,14 @@ def _set_patient_metrics(
 
 
 def get_project_patients(
-    id: str,
+    project_id: str,
     client: Optional[GraphClient] = None,
 ) -> ProjectPatientSet:
     """
-    Get all patients in a project and their associated project,
-    processed data metrics.
+    Get all patients in a project and their associated project data metrics.
 
     Args:
-        id: ID of the project
+        project_id: ID of the project
         client: If specified, this client is used to fetch metadata from the
             API. Otherwise, the global GraphClient is used.
 
@@ -577,7 +618,7 @@ def get_project_patients(
     while True:
         result = client.execute(
             statement=project_patients_query,
-            id=id,
+            id=project_id,
             cursor_input=cursor_input,
         )
 
@@ -592,7 +633,7 @@ def get_project_patients(
             del patient_attrs["patient"]
 
             metrics = patient_attrs.get("metricList").get("metrics")
-            patient_attrs["metrics"] = _set_patient_metrics(metrics)
+            patient_attrs["metrics"] = _parse_patient_metrics(metrics)
             del patient_attrs["metricList"]
 
             patient = ProjectPatient(**patient_attrs)
@@ -611,14 +652,14 @@ def get_project_patients(
 
 
 def get_cohort_patients(
-    id: str,
+    cohort_id: str,
     client: Optional[GraphClient] = None,
 ) -> CohortSet:
     """
     Get all patients in a cohort.
 
     Args:
-        id: ID of the cohort
+        cohort_id: ID of the cohort
         client: If specified, this client is used to fetch metadata from the
             API. Otherwise, the global GraphClient is used.
 
@@ -663,7 +704,7 @@ def get_cohort_patients(
     while True:
         result = client.execute(
             statement=cohort_patients_query,
-            id=id,
+            id=cohort_id,
             cursor_input=cursor_input,
         )
 
@@ -678,7 +719,7 @@ def get_cohort_patients(
             del patient_attrs["patient"]
 
             metrics = patient_attrs.get("metricList", {}).get("metrics", [])
-            patient_attrs["metrics"] = _set_patient_metrics(metrics)
+            patient_attrs["metrics"] = _parse_patient_metrics(metrics)
             del patient_attrs["metricList"]
 
             patient = CohortPatient(**patient_attrs)

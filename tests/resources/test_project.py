@@ -90,6 +90,17 @@ class TestProject(TestCase):
         Test get project for specified project_id.
 
         """
+        example_cohorts = [
+            {
+                "id": "test-id-1",
+                "title": "test-1",
+                "description": "Some cohort 1",
+                "created_at": 1667225389.222881,
+                "updated_at": 1667225389.084547,
+                "created_by": "Computer wizard",
+                "updated_by": "Computer wizard"
+            }
+        ]
         self.mock_client.execute = mock.Mock()
         example_project = {
             "id": "proj1-id",
@@ -103,18 +114,22 @@ class TestProject(TestCase):
             "status": "ACTIVE",
             "type": "SANDBOX",
             "cohortList": {
-                "cohorts": [
-                    {
-                        "id": "test-id-1",
-                        "title": "test-1",
-                        "description": "Some cohort 1",
-                        "created_at": 1667225389.222881,
-                        "updated_at": 1667225389.084547,
-                        "created_by": "Computer wizard",
-                        "updated_by": "Computer wizard"
-                    }
-                ]
+                "cohorts": example_cohorts
             }
+        }
+
+        expected_project = {
+            "id": "proj1-id",
+            "created_at": 1630515986.9949625,
+            "updated_at": 1630515986.9949625,
+            "title": "Project 1",
+            "description": "Test description.",
+            "created_by": "user-id-1",
+            "updated_by": "user-id-1",
+            "started_at": 1630515986.9949625,
+            "status": "ACTIVE",
+            "type": "SANDBOX",
+            "cohorts": example_cohorts,
         }
 
         self.mock_client.execute.side_effect = [{"project": example_project}]
@@ -122,7 +137,7 @@ class TestProject(TestCase):
         project = get_project("proj1-id", client=self.mock_client)
 
         self.assertEqual(
-            example_project,
+            expected_project,
             project.to_dict(),
         )
 
@@ -144,6 +159,7 @@ class TestProject(TestCase):
                 "updated_at": 1630515986.9949625,
                 "type": "SANDBOX",
                 "updated_by": "user-id-1",
+                "cohorts": []
             },
             {
                 "id": "proj2-id",
@@ -156,6 +172,7 @@ class TestProject(TestCase):
                 "status": "ACTIVE",
                 "type": "SANDBOX",
                 "updated_by": "user-id-1",
+                "cohorts": []
             },
             {
                 "id": "proj3-id",
@@ -168,13 +185,60 @@ class TestProject(TestCase):
                 "status": "ACTIVE",
                 "type": "SANDBOX",
                 "updated_by": "user-id-1",
+                "cohorts": []
             },
         ]
         self.mock_client.execute.return_value = {
             "org": {
                 "id": "org-rune,org",
                 "projectList": {
-                    "projects": projects_expected,
+                    "projects": [
+                        {
+                            "id": "proj1-id",
+                            "created_at": 1630515986.9949625,
+                            "title": "Project 1",
+                            "description": "Test description.",
+                            "created_by": "user-id-1",
+                            "started_at": 1630515986.9949625,
+                            "status": "ACTIVE",
+                            "updated_at": 1630515986.9949625,
+                            "type": "SANDBOX",
+                            "updated_by": "user-id-1",
+                            "cohortList": {
+                                "cohorts": []
+                            }
+                        },
+                        {
+                            "id": "proj2-id",
+                            "created_at": 1630517987.9949625,
+                            "title": "Project 2",
+                            "description": "Test description 2.",
+                            "created_by": "user-id-2",
+                            "started_at": 1630517986.9949625,
+                            "updated_at": 1630515986.9949625,
+                            "status": "ACTIVE",
+                            "type": "SANDBOX",
+                            "updated_by": "user-id-1",
+                            "cohortList": {
+                                "cohorts": []
+                            }
+                        },
+                        {
+                            "id": "proj3-id",
+                            "created_at": 1630519988.9949625,
+                            "title": "Project 3",
+                            "description": "Test description 3.",
+                            "created_by": "user-id-3",
+                            "started_at": 1630519986.9949625,
+                            "updated_at": 1630515986.9949625,
+                            "status": "ACTIVE",
+                            "type": "SANDBOX",
+                            "updated_by": "user-id-1",
+                            "cohortList": {
+                                "cohorts": []
+                            }
+                        },
+                    ],
                     "pageInfo": {"endCursor": None},
                 },
             }
@@ -205,6 +269,7 @@ class TestProject(TestCase):
             "type": "SANDBOX",
             "created_by": "user-id-1",
             "updated_by": "user-id-1",
+            "cohorts": []
         }
         project_2 = {
             "id": "proj2-id",
@@ -217,6 +282,7 @@ class TestProject(TestCase):
             "status": "ACTIVE",
             "type": "SANDBOX",
             "updated_by": "user-id-1",
+            "cohorts": []
         }
         project_3 = {
             "id": "proj3-id",
@@ -229,6 +295,7 @@ class TestProject(TestCase):
             "status": "ACTIVE",
             "type": "SANDBOX",
             "updated_by": "user-id-1",
+            "cohorts": []
         }
 
         self.mock_client.execute = mock.Mock()
@@ -237,7 +304,39 @@ class TestProject(TestCase):
                 "org": {
                     "id": "org-rune,org",
                     "projectList": {
-                        "projects": [project_1, project_2],
+                        "projects": [
+                            {
+                                "id": "proj1-id",
+                                "created_at": 1630515986.9949625,
+                                "updated_at": 1630515986.9949625,
+                                "title": "Project 1",
+                                "description": "Test description.",
+                                "created_by": "user-id-1",
+                                "started_at": 1630515986.9949625,
+                                "status": "ACTIVE",
+                                "type": "SANDBOX",
+                                "created_by": "user-id-1",
+                                "updated_by": "user-id-1",
+                                "cohortList": {
+                                    "cohorts": []
+                                }
+                            },
+                            {
+                                "id": "proj2-id",
+                                "created_at": 1630517986.9949625,
+                                "updated_at": 1630515986.9949625,
+                                "title": "Project 2",
+                                "description": "Test description 2.",
+                                "created_by": "user-id-2",
+                                "started_at": 1630517986.9949625,
+                                "status": "ACTIVE",
+                                "type": "SANDBOX",
+                                "updated_by": "user-id-1",
+                                "cohortList": {
+                                    "cohorts": []
+                                }
+                            }
+                        ],
                         "pageInfo": {"endCursor": "test_check_next"},
                     },
                 }
@@ -246,7 +345,23 @@ class TestProject(TestCase):
                 "org": {
                     "id": "org-rune,org",
                     "projectList": {
-                        "projects": [project_3],
+                        "projects": [
+                            {
+                                "id": "proj3-id",
+                                "created_at": 1630519986.9949625,
+                                "updated_at": 1630515986.9949625,
+                                "title": "Project 3",
+                                "description": "Test description 3.",
+                                "created_by": "user-id-3",
+                                "started_at": 1630519986.9949625,
+                                "status": "ACTIVE",
+                                "type": "SANDBOX",
+                                "updated_by": "user-id-1",
+                                "cohortList": {
+                                    "cohorts": []
+                                }
+                            }
+                        ],
                         "pageInfo": {"endCursor": None},
                     },
                 }
@@ -459,7 +574,7 @@ class TestProject(TestCase):
 
 
         project_patinets = get_project_patients(
-            client=self.mock_client, id="test-project-1"
+            client=self.mock_client, project_id="test-project-1"
         )
 
         self.assertEqual(
@@ -608,7 +723,7 @@ class TestProject(TestCase):
             }]
 
         project_patients = get_project_patients(
-            client=self.mock_client, id="test-project-1"
+            client=self.mock_client, project_id="test-project-1"
         )
 
         self.assertEqual(
@@ -723,7 +838,7 @@ class TestProject(TestCase):
 
 
         cohort_patients = get_cohort_patients(
-            client=self.mock_client, id="test-project-1"
+            client=self.mock_client, cohort_id="test-cohort-1"
         )
 
         self.assertEqual(
@@ -873,7 +988,7 @@ class TestProject(TestCase):
         ]
 
         cohort_patients = get_cohort_patients(
-            client=self.mock_client, id="test-project-1"
+            client=self.mock_client, cohort_id="test-cohort-1"
         )
 
         self.assertEqual(
