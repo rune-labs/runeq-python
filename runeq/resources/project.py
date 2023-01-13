@@ -111,6 +111,7 @@ class CohortPatient(ItemBase):
             created_by: Display name of who added the patient to the cohort
             updated_at: Time cohort patient was last updated (unix timestamp)
             updated_by: Display name of who updated the cohort patient record
+            metrics: Project data metrics related to the patient's data
             **attributes: Other attributes associated with the cohort
 
         """
@@ -165,6 +166,7 @@ class ProjectPatient(ItemBase):
             created_by: Display name of who added the patient to the project
             updated_at: Time project patient was last updated (unix timestamp)
             updated_by: Display name of who updated the project patient record
+            metrics: Project data metrics related to the patient's data
             **attributes: Other attributes associated with the project
 
         """
