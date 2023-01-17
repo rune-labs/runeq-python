@@ -35,13 +35,13 @@ class Metric(ItemBase):
                 TOTAL_HOURS, LATEST_DATA, LAST_UPLOAD
             data_type: Processed stream data type that is being measured.
                 Possible data types include:
-                    APPLEWATCH_SYMPTOM, APPLEWATCH_TREMOR,
-                    APPLEWATCH_DYSKINESIA, APPLEWATCH_HEART_RATE,
-                    PERCEPT_TREND_LOG_LFP
+                APPLEWATCH_SYMPTOM, APPLEWATCH_TREMOR,
+                APPLEWATCH_DYSKINESIA, APPLEWATCH_HEART_RATE,
+                PERCEPT_TREND_LOG_LFP
             value: Value of the metric (float)
             time_interval: Period over which the metric was calculated.
                 Possible time intervals include:
-                    FOURTEEN_DAYS, NINETY_DAYS, PROJECT_ALL
+                FOURTEEN_DAYS, NINETY_DAYS, PROJECT_ALL
             created_at: Time patient was added to the cohort (unix timestamp)
             updated_at: Time cohort patient was last updated (unix timestamp)
 
@@ -69,7 +69,6 @@ class MetricSet(ItemSet):
     A collection of Metrics.
 
     """
-
     def __init__(self, items: Iterable[Metric] = ()):
         """
         Initialize with Metrics.

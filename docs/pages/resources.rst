@@ -131,13 +131,16 @@ User Metadata
    :inherited-members:
 
 Project Metadata
--------------
+----------------
+
 .. automodule:: runeq.resources.project
+
+Projects
+********
 
 .. autofunction:: get_projects
 .. autofunction:: get_project
 .. autofunction:: get_project_patients
-.. autofunction:: get_cohort_patients
 
 .. autoclass:: Project
    :special-members: __init__
@@ -147,6 +150,12 @@ Project Metadata
    :special-members: __init__
    :members:
    :inherited-members:
+
+
+Cohorts
+********
+.. autofunction:: get_cohort_patients
+
 .. autoclass:: Cohort
    :special-members: __init__
    :members:
@@ -155,6 +164,11 @@ Project Metadata
    :special-members: __init__
    :members:
    :inherited-members:
+
+
+Metrics
+********
+
 .. autoclass:: Metric
    :special-members: __init__
    :members:
