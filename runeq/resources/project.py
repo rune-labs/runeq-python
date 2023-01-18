@@ -146,11 +146,12 @@ class ProjectPatientMetadata(ItemBase):
 
         """
         metadata_obj = self.to_dict()
+        metadata_df = pd.DataFrame(metadata_obj)
 
         return pd.concat(
             [
-                metadata_obj.drop('metrics', axis=1),
-                pd.DataFrame(metadata_obj['metrics'].tolist())
+                metadata_df.drop('metrics', axis=1),
+                pd.DataFrame(metadata_df['metrics'].tolist())
             ],
             axis=1
         )
