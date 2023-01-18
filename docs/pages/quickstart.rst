@@ -245,3 +245,7 @@ pandas dataframe:
 You can also work directly with responses from the V2 Stream API. See
 :class:`~runeq.resources.stream` and
 :class:`~runeq.resources.stream_metadata.StreamMetadata` for details.
+
+Working with Projects
+- How to get all project patients & patient records associated with them (get all patients example)
+- How to get project summary metrics

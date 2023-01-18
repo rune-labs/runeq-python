@@ -10,8 +10,8 @@ from runeq.resources.project import (
     Cohort,
     CohortSet,
     Project,
-    ProjectPatient,
-    CohortPatient,
+    ProjectPatientMetadata,
+    CohortPatientMetadata,
     MetricSet,
     Metric,
     get_project,
@@ -393,7 +393,7 @@ class TestProject(TestCase):
                 ),
             ]
         )
-        test_project = ProjectPatient(
+        test_project = ProjectPatientMetadata(
             id="proj-patient-id",
             created_at=1630515986.9949625,
             updated_at=1630515986.9949625,
@@ -450,7 +450,7 @@ class TestProject(TestCase):
                 ),
             ]
         )
-        test_project = CohortPatient(
+        test_project = CohortPatientMetadata(
             id="cohort-patient-id",
             created_at=1630515986.9949625,
             updated_at=1630515986.9949625,
@@ -573,13 +573,13 @@ class TestProject(TestCase):
         }
 
 
-        project_patinets = get_project_patients(
+        project_patients = get_project_patients(
             client=self.mock_client, project_id="test-project-1"
         )
 
         self.assertEqual(
             project_patients_expected,
-            project_patinets.to_list(),
+            project_patients.to_list(),
         )
 
     def test_get_project_patients_pagination(self):
