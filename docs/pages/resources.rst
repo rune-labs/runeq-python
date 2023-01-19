@@ -150,6 +150,14 @@ Projects
    :special-members: __init__
    :members:
    :inherited-members:
+.. autoclass:: ProjectPatientMetadata
+   :special-members: __init__
+   :members:
+   :inherited-members:
+.. autoclass:: ProjectPatientMetadataSet
+   :special-members: __init__
+   :members:
+   :inherited-members:
 
 
 Cohorts
@@ -161,6 +169,14 @@ Cohorts
    :members:
    :inherited-members:
 .. autoclass:: CohortSet
+   :special-members: __init__
+   :members:
+   :inherited-members:
+   .. autoclass:: CohortPatientMetadata
+   :special-members: __init__
+   :members:
+   :inherited-members:
+.. autoclass:: CohortPatientMetadataSet
    :special-members: __init__
    :members:
    :inherited-members:
