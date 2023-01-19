@@ -144,6 +144,48 @@ a columnar data format, like a `pandas <https://pandas.pydata.org/>`_ DataFrame.
     devices = patients.devices
     devices_df = pd.DataFrame(devices.to_list())
 
+Similarly to fetching information about patients, you can fetch information about projects,
+and metadata related to the patients within projects (and cohorts).
+
+You can find information about a single project:
+
+.. code-block:: python
+
+    from runeq.resources.project import get_project
+
+    project = get_project(project_id="example_id")
+    print(project.to_dict())
+
+To view all the patients in a project, and their related project metrics you can use the
+following example:
+
+.. code-block:: python
+
+    from runeq.resources.project import get_all_project_patients
+
+    project_patients = get_all_project_patients(project_id="example_id")
+
+    for project_patient in project_patients:
+        print(project_patient)
+        for metric in patient.metrics:
+            print(' ', metric)
+
+        print('')
+
+It may be easier to view a single project patient in a dataframe which you can do by:
+
+.. code-block:: python
+
+    from runeq.resources.project import get_all_project_patients
+
+    project_patients = get_all_project_patients(project_id="example_id")
+
+    for patient in project_patients:
+        df = patient.get_patient_metadata_dataframe()
+        break
+
+    df
+
 
 Fetch Timeseries Data
 *********************
@@ -245,7 +287,3 @@ pandas dataframe:
 You can also work directly with responses from the V2 Stream API. See
 :class:`~runeq.resources.stream` and
 :class:`~runeq.resources.stream_metadata.StreamMetadata` for details.
-
-Working with Projects
-- How to get all project patients & patient records associated with them (get all patients example)
-- How to get project summary metrics
