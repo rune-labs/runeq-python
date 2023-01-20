@@ -670,29 +670,6 @@ class TestProject(TestCase):
                         "projectPatients": [
                             {
                                 "patient": {
-                                    "id": "patient-1"
-                                },
-                                "metricList": {
-                                    "metrics": [
-                                        {
-                                            "id": "metric-1",
-                                            "updated_at": 1673467628.837126,
-                                            "created_at": 1673467628.837126,
-                                            "type": "LAST_UPLOAD",
-                                            "data_type": "APPLEWATCH_TREMOR",
-                                            "value": 1648235452.965804,
-                                            "time_interval": "FOURTEEN_DAYS"
-                                        },
-                                    ]
-                                },
-                                "code_name": "code name 1",
-                                "created_at": 1673467625.063822,
-                                "updated_at": 1673467625.063822,
-                                "created_by": "user 1",
-                                "updated_by": "user 2",
-                            },
-                            {
-                                "patient": {
                                     "id": "patient-2"
                                 },
                                 "metricList": {
@@ -932,29 +909,6 @@ class TestProject(TestCase):
                 "cohort": {
                     "cohortPatientList": {
                         "cohortPatients": [
-                            {
-                                "patient": {
-                                    "id": "patient-1"
-                                },
-                                "metricList": {
-                                    "metrics": [
-                                        {
-                                            "id": "metric-1",
-                                            "updated_at": 1673467628.837126,
-                                            "created_at": 1673467628.837126,
-                                            "type": "LAST_UPLOAD",
-                                            "data_type": "APPLEWATCH_TREMOR",
-                                            "value": 1648235452.965804,
-                                            "time_interval": "FOURTEEN_DAYS"
-                                        },
-                                    ]
-                                },
-                                "code_name": "code name 1",
-                                "created_at": 1673467625.063822,
-                                "updated_at": 1673467625.063822,
-                                "created_by": "user 1",
-                                "updated_by": "user 2",
-                            },
                             {
                                 "patient": {
                                     "id": "patient-2"
