@@ -179,10 +179,9 @@ It may be easier to view a single project patient in a dataframe which you can d
     from runeq.resources.project import get_all_project_patients
 
     project_patients = get_all_project_patients(project_id="example_id")
+    target_patient_id = "patient_id_example"
 
-    for patient in project_patients:
-        df = patient.get_patient_metadata_dataframe()
-        break
+    df = project_patients[target_patient_id].get_patient_metadata_dataframe()
 
     df
 
