@@ -155,7 +155,7 @@ class ProjectPatientMetadata(ItemBase):
             "id": "metric_id",
         }
         metadata_obj = self.to_dict()
-        metadata_df = pd.DataFrame(metadata_obj)
+        metadata_df = pd.DataFrame(metadata_obj).rename(columns={"code_name": "project_code_name"})
 
         return pd.concat(
             [
