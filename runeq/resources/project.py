@@ -155,12 +155,16 @@ class ProjectPatientMetadata(ItemBase):
             "id": "metric_id",
         }
         metadata_obj = self.to_dict()
-        metadata_df = pd.DataFrame(metadata_obj).rename(columns={"code_name": "project_code_name"})
+        metadata_df = pd.DataFrame(metadata_obj).rename(
+            columns={"code_name": "project_code_name"}
+        )
 
         return pd.concat(
             [
                 metadata_df.drop('metrics', axis=1),
-                pd.DataFrame(metadata_df['metrics'].tolist()).rename(columns=column_name_map)
+                pd.DataFrame(metadata_df['metrics'].tolist()).rename(
+                    columns=column_name_map
+                )
             ],
             axis=1
         )
