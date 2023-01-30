@@ -145,13 +145,22 @@ class ProjectPatientMetadata(ItemBase):
         Returns a new dataframe displaying the patient's metadata.
 
         """
+        column_name_map = {
+            "type": "metric_type",
+            "data_type": "metric_data_type",
+            "value": "metric_value",
+            "time_interval": "metric_time_interval",
+            "created_at": "metric_created_at",
+            "updated_at": "metric_updated_at",
+            "id": "metric_id",
+        }
         metadata_obj = self.to_dict()
         metadata_df = pd.DataFrame(metadata_obj)
 
         return pd.concat(
             [
                 metadata_df.drop('metrics', axis=1),
-                pd.DataFrame(metadata_df['metrics'].tolist())
+                pd.DataFrame(metadata_df['metrics'].tolist()).rename(columns=column_name_map)
             ],
             axis=1
         )
