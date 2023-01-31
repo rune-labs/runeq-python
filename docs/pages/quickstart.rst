@@ -161,13 +161,13 @@ following example:
 
 .. code-block:: python
 
-    from runeq.resources.project import get_all_project_patients
+    from runeq.resources.project import get_project_patients
 
-    project_patients = get_all_project_patients(project_id="example_id")
+    project_patients = get_project_patients(project_id="example_id")
 
     for project_patient in project_patients:
         print(project_patient)
-        for metric in patient.metrics:
+        for metric in project_patient.metrics:
             print(' ', metric)
 
         print('')
@@ -176,9 +176,9 @@ It may be easier to view a single project patient in a dataframe which you can d
 
 .. code-block:: python
 
-    from runeq.resources.project import get_all_project_patients
+    from runeq.resources.project import get_project_patients
 
-    project_patients = get_all_project_patients(project_id="example_id")
+    project_patients = get_project_patients(project_id="example_id")
     target_patient_id = "patient_id_example"
 
     df = project_patients[target_patient_id].get_patient_metadata_dataframe()
