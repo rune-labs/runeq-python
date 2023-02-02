@@ -4,6 +4,7 @@ Fetch metadata about streams, including stream types.
 """
 import datetime
 from io import StringIO
+import json
 from typing import Callable, Iterable, Iterator, List, Optional, Type, Union
 
 import pandas as pd
@@ -415,6 +416,12 @@ class StreamMetadata(ItemBase):
             all_stream_dfs.append(pd.read_csv(StringIO(resp), sep=","))
 
         stream_df = pd.concat(all_stream_dfs, axis=0, ignore_index=True)
+
+        # Convert "dict" dimensions to native dicts (from strings)
+        for dim in self.stream_type.dimensions:
+            if dim.data_type == 'dict':
+                stream_df[dim.id] = stream_df[dim.id].apply(json.loads)
+
         # Add metadata before returning the dataframe
         return self._add_metadata_to_dataframe(stream_df)
 
