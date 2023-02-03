@@ -988,7 +988,6 @@ class TestStreamMetadata(TestCase):
         self.assertEqual(1, len(stream1_streams))
         self.assertIsNotNone(stream1_streams.get("stream1"))
 
-
     def test_get_stream_dataframe(self):
         """
         Test get stream as dataframe with stream metadata and data.
@@ -1134,6 +1133,112 @@ class TestStreamMetadata(TestCase):
                     "4": "s1",
                     "5": "s1",
                     "6": "s1"
+                }
+            },
+            json.loads(stream_df.to_json())
+        )
+
+    def test_get_stream_dataframe_dicts(self):
+        """
+        Test that the stringified JSON of dict dimensions is unpacked in
+        the dataframe representation
+
+        """
+        self.mock_stream_client.get_data = mock.Mock()
+        self.mock_stream_client.get_data.return_value = iter(
+            [
+                '''time,event,measurement_duration_ns
+1648231560.000000,"{""hello"":""world""}",0
+1648231565.000000,"{""rune"":""labs""}",0'''
+            ]
+        )
+
+        self.mock_graph_client.execute = mock.Mock()
+        self.mock_graph_client.execute.side_effect = [
+            {
+                "streamListByIds": {
+                    "pageInfo": {
+                        "endCursor": None
+                    },
+                    "streams": [
+                        {
+                            "id": "s1",
+                            "created_at": 1655226140,
+                            "algorithm": "a1",
+                            "device_id": "patient-p1,device-d1",
+                            "patient_id": "p1",
+                            "streamType": {
+                                "id": "event",
+                                "name": "Event",
+                                "description": "",
+                                "shape": {
+                                    "dimensions": [
+                                        {
+                                            "id": "time",
+                                            "data_type": "timestamp",
+                                            "quantity_name": "Time",
+                                            "quantity_abbrev": "t",
+                                            "unit_name": "Seconds",
+                                            "unit_abbrev": "s"
+                                        },
+                                        {
+                                            'data_type': 'dict',
+                                            'quantity_name': 'Payload',
+                                            'unit_name': '',
+                                            'quantity_abbrev': 'Payload',
+                                            'unit_abbrev': '',
+                                            'id': 'event'
+                                        }
+                                    ]
+                                }
+                            },
+                            "min_time": 1648231560,
+                            "max_time": 1648231565
+                        }
+                    ]
+                }
+            }
+        ]
+
+        stream_df = get_stream_dataframe(
+            stream_ids="s1",
+            stream_client=self.mock_stream_client,
+            graph_client=self.mock_graph_client
+        )
+
+        self.assertEqual(
+            {
+                "time": {
+                    "0": 1648231560.0,
+                    "1": 1648231565.0,
+                },
+                "event": {
+                    "0": {"hello": "world"},
+                    "1": {"rune": "labs"}
+                },
+                "measurement_duration_ns": {
+                    "0": 0,
+                    "1": 0
+                },
+                "algorithm": {
+                    "0": "a1",
+                    "1": "a1",
+                },
+                "device_id": {
+                    "0": "d1",
+                    "1": "d1",
+                },
+                "patient_id": {
+                    "0": "p1",
+                    "1": "p1",
+                },
+                "stream_type_id": {
+                    "0": "event",
+                    "1": "event",
+                },
+                "stream_id": {
+                    "0": "s1",
+                    "1": "s1",
                 }
             },
             json.loads(stream_df.to_json())
