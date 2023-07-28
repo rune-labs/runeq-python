@@ -350,7 +350,10 @@ class TestOrg(TestCase):
         # Test that active org is switched when the context manager
         # is active, and then restored on exit
         with active_org(org2_id, self.mock_client) as new_org:
-            mock_set_active_org.assert_called_once_with(org2_id, self.mock_client)
+            mock_set_active_org.assert_called_once_with(
+                org2_id,
+                self.mock_client
+            )
             self.assertEqual(new_org.id, org2_id)
 
             mock_set_active_org.reset_mock()
@@ -362,7 +365,10 @@ class TestOrg(TestCase):
         # Active org is restored even if an exception is raised
         with self.assertRaises(ValueError):
             with active_org(org2_id, self.mock_client):
-                mock_set_active_org.assert_called_once_with(org2_id, self.mock_client)
+                mock_set_active_org.assert_called_once_with(
+                    org2_id,
+                    self.mock_client
+                )
                 raise ValueError()
 
         mock_set_active_org.assert_called_with(org1_id, self.mock_client)
