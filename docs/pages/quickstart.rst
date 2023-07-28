@@ -87,16 +87,7 @@ To get started with the library, use :class:`~runeq.initialize`:
 
 This loads credentials from your configuration file (see :ref:`quickstart_config`).
 
-Usage
------
-
-Explore Metadata
-****************
-
-After initializing the library, you can fetch metadata about various resources.
-
-For example, you can get information about your user, based on the authentication
-credentials:
+You can see information about your authenticated user:
 
 .. code-block:: python
 
@@ -106,7 +97,36 @@ credentials:
     print(my_user)
     print('Active Org:', my_user.active_org_name)
 
-You can also fetch metadata about all the patients you have access to:
+    # Fetch all the organizations that your user belongs to
+    print('My Orgs')
+    all_orgs = get_orgs()
+    for org in all_orgs:
+        print(org)
+
+.. note::
+    If you belong to multiple organizations, note that only one organization is "active" at a time.
+    You can only access resources that belong to your active organization. This impacts both what is
+    returned by the SDK _and_ what you see when you log in to the Rune web portal.
+
+    You can change your active org through the SDK (see below) or in Rune's web portal.
+
+.. code-block:: python
+
+    from runeq.resources.org import set_active_org
+
+    # set_active_org accepts an org ID (as shown) or an Org instance
+    org_id = "aa0c21f97d6a0593b0a247c68f015d68b787655e"
+    set_active_org(org_id)
+
+Usage
+-----
+
+Explore Metadata
+****************
+
+After initializing the library, you can fetch metadata about various resources.
+
+For example, you can fetch metadata about all the patients you have access to:
 
 .. code-block:: python
 

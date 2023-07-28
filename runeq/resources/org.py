@@ -222,9 +222,9 @@ def set_active_org(
             user {
                 defaultMembership {
                     org {
-                                id
-                                created_at: created
-                                name: displayName
+                        id
+                        created_at: created
+                        name: displayName
                     }
                 }
             }

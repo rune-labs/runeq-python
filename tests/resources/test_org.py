@@ -6,7 +6,14 @@ from unittest import TestCase, mock
 
 from runeq.config import Config
 from runeq.resources.client import GraphClient
-from runeq.resources.org import Org, get_org, get_orgs
+from runeq.resources.org import (
+    active_org,
+    get_org,
+    get_orgs,
+    Org,
+    set_active_org
+)
+from runeq.resources.user import User
 
 
 class TestOrg(TestCase):
@@ -112,24 +119,48 @@ class TestOrg(TestCase):
         Test get org for specified org_id.
 
         """
-        self.mock_client.execute = mock.Mock()
-        self.mock_client.execute.side_effect = [
-            {
-                "org": {
-                    "id": "org1-id",
-                    "created_at": 1630515986.9949625,
-                    "name": "org1"
+        self.mock_client.execute = mock.Mock(return_value={
+            "user": {
+                "membershipList": {
+                    "pageInfo": {
+                        "endCursor": None
+                    },
+                    "memberships": [
+                        {
+                            "org": {
+                                "id": "org1-id",
+                                "created_at": 1571267538.391721,
+                                "name": "org1"
+                            }
+                        },
+                        {
+                            "org": {
+                                "id": "org2-id",
+                                "created_at": 1630515986.9949625,
+                                "name": "org2"
+                            }
+                        }
+                    ]
                 }
             }
-        ]
+        })
 
         org = get_org("org1-id", client=self.mock_client)
-
         self.assertEqual(
             {
                 "id": "org1-id",
-                "created_at": 1630515986.9949625,
+                "created_at": 1571267538.391721,
                 "name": "org1"
+            },
+            org.to_dict(),
+        )
+
+        org = get_org("org2-id", client=self.mock_client)
+        self.assertEqual(
+            {
+                "id": "org2-id",
+                "created_at": 1630515986.9949625,
+                "name": "org2"
             },
             org.to_dict(),
         )
@@ -262,3 +293,76 @@ class TestOrg(TestCase):
             orgs.to_list(),
         )
 
+    def test_set_active_org(self):
+
+        org_id = "org1-id"
+        self.mock_client.execute = mock.Mock()
+        self.mock_client.execute.side_effect = [
+            {
+                "updateDefaultMembership": {
+                    "user": {
+                        "defaultMembership": {
+                            "org": {
+                                "id": org_id,
+                                "name": "org1",
+                                "created_at": 1571267538.391721,
+                            }
+                        }
+                    }
+                }
+            }
+        ]
+
+        new_org = set_active_org(org_id, self.mock_client)
+        self.mock_client.execute.assert_called_once()
+        self.assertEqual(
+            new_org.to_dict(),
+            {
+                'created_at': 1571267538.391721,
+                'name': 'org1',
+                'id': 'org1-id'
+            }
+        )
+
+    @mock.patch('runeq.resources.org.get_current_user')
+    @mock.patch('runeq.resources.org.set_active_org')
+    def test_with_active_org(self, mock_set_active_org, mock_get_current_user):
+        """
+        Test active org context manager.
+
+        """
+        org1_id = "org1-id"
+        org2_id = "org2-id"
+
+        mock_get_current_user.return_value = User(
+            id="user1-id",
+            created_at=1629300943.9179766,
+            name="User 1",
+            active_org_id=org1_id,
+            active_org_name="Org 1",
+        )
+        mock_set_active_org.return_value = Org(
+            id=org2_id,
+            created_at=1629300943.9179766,
+            name="org2",
+        )
+
+        # Test that active org is switched when the context manager
+        # is active, and then restored on exit
+        with active_org(org2_id, self.mock_client) as new_org:
+            mock_set_active_org.assert_called_once_with(org2_id, self.mock_client)
+            self.assertEqual(new_org.id, org2_id)
+
+            mock_set_active_org.reset_mock()
+
+        mock_set_active_org.assert_called_with(org1_id, self.mock_client)
+
+        mock_set_active_org.reset_mock()
+
+        # Active org is restored even if an exception is raised
+        with self.assertRaises(ValueError):
+            with active_org(org2_id, self.mock_client):
+                mock_set_active_org.assert_called_once_with(org2_id, self.mock_client)
+                raise ValueError()
+
+        mock_set_active_org.assert_called_with(org1_id, self.mock_client)
