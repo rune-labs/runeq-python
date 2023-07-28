@@ -17,7 +17,7 @@ For multi-patient analyses, we recommended using **user access tokens**.
     You can only access resources that belong to your active organization. This impacts both what is
     returned by the SDK *and* what you see in the `Rune web portal <https://app.runelabs.io>`_.
 
-    You can change your active organization through code (see :ref:`change_active_org`) or
+    You can change your active organization through code (see :ref:`set_active_org`) or
     in the `Rune web portal <https://app.runelabs.io>`_ (click on the profile icon, in the top right corner).
 
 To create a new access token:
@@ -96,10 +96,10 @@ To see information about your authenticated user:
 Usage
 -----
 
-.. _change_active_org:
+.. _set_active_org:
 
-Change Active Org
-*****************
+Set Active Org
+**************
 
 To get metadata about all the organizations that you belong to:
 
