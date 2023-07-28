@@ -67,6 +67,8 @@ Organization Metadata
 
 .. autofunction:: get_org
 .. autofunction:: get_orgs
+.. autofunction:: set_active_org
+.. autofunction:: active_org
 
 .. autoclass:: Org
    :special-members: __init__
@@ -172,7 +174,7 @@ Cohorts
    :special-members: __init__
    :members:
    :inherited-members:
-   .. autoclass:: CohortPatientMetadata
+.. autoclass:: CohortPatientMetadata
    :special-members: __init__
    :members:
    :inherited-members:

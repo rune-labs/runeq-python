@@ -6,12 +6,16 @@ Quickstart
 Prerequisites
 -------------
 
-API Credentials
-***************
-
 To access Rune's APIs, you will need to obtain API credentials.
 For multi-patient analyses, we recommended using **user access tokens**.
-These provide access to all the user's allowed resources.
+
+.. note::
+    If you belong to multiple organizations, note that only one organization is "active" at a time.
+    You can only access resources that belong to your active organization. This impacts both what is
+    returned by the SDK *and* what you see in the `Rune web portal <https://app.runelabs.io>`_.
+
+    You can change your active organization through code (see :ref:`quickstart_init`) or
+    in the `Rune web portal <https://app.runelabs.io>`_ (click on the profile icon, in the top right corner).
 
 To create a new access token:
 
@@ -28,16 +32,6 @@ with this library.
 It is highly recommended that you rotate your access tokens every 3-6 months,
 by creating a new token and deactivating the old one. Store your access tokens
 securely, and do not share them.
-
-Multiple Organizations
-**********************
-
-For users who are members of multiple organizations, note that
-user access tokens only operate within the context of the organization that
-is **currently active**. To switch your active organization, log in to
-the `Rune web portal <https://app.runelabs.io>`_ and click on the profile icon
-in the top right corner. If you are a member of multiple organizations, the
-profile icon's dropdown menu will have an option to switch your organization.
 
 .. _quickstart_config:
 
@@ -77,7 +71,8 @@ you're rotating your access token, getting set up on a different computer, etc).
 Initialization
 --------------
 
-To get started with the library, use :class:`~runeq.initialize`:
+To get started with the library, use :class:`~runeq.initialize`. This loads credentials from your
+configuration file (see :ref:`quickstart_config`).
 
 .. code-block:: python
 
@@ -85,9 +80,7 @@ To get started with the library, use :class:`~runeq.initialize`:
 
     initialize()
 
-This loads credentials from your configuration file (see :ref:`quickstart_config`).
-
-You can see information about your authenticated user:
+To see information about your authenticated user:
 
 .. code-block:: python
 
@@ -95,7 +88,8 @@ You can see information about your authenticated user:
 
     my_user = get_current_user()
     print(my_user)
-    print('Active Org:', my_user.active_org_name)
+    print('Active Org Name:', my_user.active_org_name)
+    print('Active Org ID:', my_user.active_org_id)
 
     # Fetch all the organizations that your user belongs to
     print('My Orgs')
@@ -103,18 +97,15 @@ You can see information about your authenticated user:
     for org in all_orgs:
         print(org)
 
-.. note::
-    If you belong to multiple organizations, note that only one organization is "active" at a time.
-    You can only access resources that belong to your active organization. This impacts both what is
-    returned by the SDK _and_ what you see when you log in to the Rune web portal.
+Change Active Org
+*****************
 
-    You can change your active org through the SDK (see below) or in Rune's web portal.
+To set your user's active org:
 
 .. code-block:: python
 
     from runeq.resources.org import set_active_org
 
-    # set_active_org accepts an org ID (as shown) or an Org instance
     org_id = "aa0c21f97d6a0593b0a247c68f015d68b787655e"
     set_active_org(org_id)
 
@@ -126,7 +117,7 @@ Explore Metadata
 
 After initializing the library, you can fetch metadata about various resources.
 
-For example, you can fetch metadata about all the patients you have access to:
+For example, you can fetch metadata about all the patients in your active org:
 
 .. code-block:: python
 
@@ -142,8 +133,8 @@ For example, you can fetch metadata about all the patients you have access to:
         print('')
 
 
-:class:`~runeq.resources.patient.get_all_patients` returns a :class:`~runeq.resources.patient.PatientSet`,
-which can be serialized as a list of dictionaries, e.g. to save the metadata to a file:
+:class:`~runeq.resources.patient.get_all_patients` returns a :class:`~runeq.resources.patient.PatientSet`.
+This object can be serialized as a list of dictionaries, e.g. to save the metadata to a file:
 
 .. code-block:: python
 

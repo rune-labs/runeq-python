@@ -210,7 +210,7 @@ def set_active_org(
             API. Otherwise, the global GraphClient is used.
 
     Returns:
-        The active organization (
+        The active organization
 
     """
     client = client or global_graph_client()
@@ -253,16 +253,9 @@ def active_org(org: Union[str, Org], client: Optional[GraphClient] = None):
     On exit, the user's active organization is restored.
 
     Args:
-        org: an org ID or Org
+        org: an organization ID or Org
         client: If specified, this client is used to fetch metadata from the
             API. Otherwise, the global GraphClient is used.
-
-    Returns:
-
-    Examples:
-        with active_org("abc124") as new_org:
-            print('The current org is', new_org.name)
-            # do something
 
     """
     current_user = get_current_user(client)
