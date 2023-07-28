@@ -6,6 +6,9 @@ Quickstart
 Prerequisites
 -------------
 
+API Credentials
+***************
+
 To access Rune's APIs, you will need to obtain API credentials.
 For multi-patient analyses, we recommended using **user access tokens**.
 
@@ -14,7 +17,7 @@ For multi-patient analyses, we recommended using **user access tokens**.
     You can only access resources that belong to your active organization. This impacts both what is
     returned by the SDK *and* what you see in the `Rune web portal <https://app.runelabs.io>`_.
 
-    You can change your active organization through code (see :ref:`quickstart_init`) or
+    You can change your active organization through code (see :ref:`change_active_org`) or
     in the `Rune web portal <https://app.runelabs.io>`_ (click on the profile icon, in the top right corner).
 
 To create a new access token:
@@ -36,7 +39,7 @@ securely, and do not share them.
 .. _quickstart_config:
 
 Configuration Setup
--------------------
+*******************
 
 ``runeq`` uses a `YAML <https://yaml.org/>`_-formatted file to manage configuration
 settings (e.g. API credentials). The easiest way to set up this configuration is via
@@ -88,29 +91,36 @@ To see information about your authenticated user:
 
     my_user = get_current_user()
     print(my_user)
-    print('Active Org Name:', my_user.active_org_name)
-    print('Active Org ID:', my_user.active_org_id)
+    print('Active Org:', my_user.active_org_name)
 
-    # Fetch all the organizations that your user belongs to
-    print('My Orgs')
-    all_orgs = get_orgs()
-    for org in all_orgs:
-        print(org)
+Usage
+-----
+
+.. _change_active_org:
 
 Change Active Org
 *****************
 
-To set your user's active org:
+To get metadata about all the organizations that you belong to:
+
+.. code-block:: python
+
+    from runeq.resources.org import get_orgs
+
+    all_orgs = get_orgs()
+    for org in all_orgs:
+        print(org)
+
+You can set your active organization using an org ID:
 
 .. code-block:: python
 
     from runeq.resources.org import set_active_org
 
     org_id = "aa0c21f97d6a0593b0a247c68f015d68b787655e"
-    set_active_org(org_id)
+    active_org = set_active_org(org_id)
+    print('Active Org:', active_org.name)
 
-Usage
------
 
 Explore Metadata
 ****************

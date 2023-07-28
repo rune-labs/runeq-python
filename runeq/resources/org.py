@@ -232,7 +232,7 @@ def set_active_org(
     }
     '''
 
-    result = client.execute(statement=statement, id=org_id)
+    result = client.execute(statement=statement, input={"orgId": org_id})
 
     user_attrs = result.get("updateDefaultMembership", {}).get("user", {})
     org_attrs = user_attrs.get("defaultMembership", {}).get("org")
