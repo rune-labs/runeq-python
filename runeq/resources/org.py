@@ -3,11 +3,12 @@ Fetch metadata about organizations. A research lab or clinical site is
 typically represented as an organization.
 
 """
-
-from typing import Iterable, Optional, Type
+from contextlib import contextmanager
+from typing import Iterable, Optional, Type, Union
 
 from .client import GraphClient, global_graph_client
 from .common import ItemBase, ItemSet
+from .user import get_current_user
 
 
 class Org(ItemBase):
@@ -104,49 +105,10 @@ class OrgSet(ItemSet):
         return Org
 
 
-def get_org(org_id: str, client: Optional[GraphClient] = None) -> Org:
+def _iter_all_orgs(client: Optional[GraphClient] = None):
     """
-    Get the org with the specified ID.
-
-    Args:
-        org_id: Organization ID
-        client: If specified, this client is used to fetch metadata from the
-            API. Otherwise, the global GraphClient is used.
-
-    """
-    client = client or global_graph_client()
-    query = '''
-        query getOrg($org_id: ID) {
-            org (orgId: $org_id) {
-                id
-                created_at: created
-                name: displayName
-            }
-        }
-    '''
-
-    full_org_id = Org.denormalize_id(org_id)
-
-    result = client.execute(
-        statement=query,
-        org_id=full_org_id
-    )
-
-    org_attrs = result["org"]
-    return Org(
-        id=org_attrs["id"],
-        created_at=org_attrs.get("created_at"),
-        name=org_attrs.get("name"),
-    )
-
-
-def get_orgs(client: Optional[GraphClient] = None) -> OrgSet:
-    """
-    Get all the organizations that the current user is a member of.
-
-    Args:
-        client: If specified, this client is used to fetch metadata from the
-            API. Otherwise, the global GraphClient is used.
+    Fetch all orgs that the current user is a member of, and yield each
+    one (while paging through the response)
 
     """
     client = client or global_graph_client()
@@ -170,9 +132,9 @@ def get_orgs(client: Optional[GraphClient] = None) -> OrgSet:
     '''
 
     next_cursor = None
-    org_set = OrgSet()
 
-    # Use cursor to page through all org memberships
+    # Use cursor to page through all orgs that the user is a member of. Yield
+    # each one as an Org
     while True:
         result = client.execute(
             statement=query,
@@ -188,11 +150,128 @@ def get_orgs(client: Optional[GraphClient] = None) -> OrgSet:
                 created_at=org_attrs.get("created_at"),
                 name=org_attrs.get("name"),
             )
-            org_set.add(org)
+            yield org
 
         # endCursor is None when there are no more pages of data
         next_cursor = membership_list.get("pageInfo", {}).get("endCursor")
         if not next_cursor:
             break
 
+
+def get_org(org_id: str, client: Optional[GraphClient] = None) -> Org:
+    """
+    Get the org with the specified ID.
+
+    Args:
+        org_id: Organization ID
+        client: If specified, this client is used to fetch metadata from the
+            API. Otherwise, the global GraphClient is used.
+
+    """
+    org_id = Org.normalize_id(org_id)
+    # The getOrg query only works for the user's currently active organization.
+    # To make this work for any org that the user is a member of, use
+    # getOrgMemberships and try to find a matching org ID. It's slow, but it
+    # works for now.
+    for org in _iter_all_orgs(client):
+        if org_id == org.id:
+            return org
+
+    raise ValueError("Org not found with id: %s" % org_id)
+
+
+def get_orgs(client: Optional[GraphClient] = None) -> OrgSet:
+    """
+    Get all the organizations that the current user is a member of.
+
+    Args:
+        client: If specified, this client is used to fetch metadata from the
+            API. Otherwise, the global GraphClient is used.
+
+    """
+
+    org_set = OrgSet()
+    for org in _iter_all_orgs(client):
+        org_set.add(org)
+
     return org_set
+
+
+def set_active_org(
+    org: Union[str, Org],
+    client: Optional[GraphClient] = None
+) -> Org:
+    """
+    Set the active organization for the current user.
+
+    Args:
+        org: an org ID or Org
+        client: If specified, this client is used to fetch metadata from the
+            API. Otherwise, the global GraphClient is used.
+
+    Returns:
+        The active organization (
+
+    """
+    client = client or global_graph_client()
+    org_id = org.id if isinstance(org, Org) else org
+
+    statement = '''
+    mutation updateDefaultMembership($input: UpdateDefaultMembershipInput!) {
+        updateDefaultMembership(input: $input) {
+            user {
+                defaultMembership {
+                    org {
+                                id
+                                created_at: created
+                                name: displayName
+                    }
+                }
+            }
+        }
+    }
+    '''
+
+    result = client.execute(statement=statement, id=org_id)
+
+    user_attrs = result.get("updateDefaultMembership", {}).get("user", {})
+    org_attrs = user_attrs.get("defaultMembership", {}).get("org")
+
+    new_org = Org(
+        id=org_attrs["id"],
+        created_at=org_attrs.get("created_at"),
+        name=org_attrs.get("name"),
+    )
+
+    return new_org
+
+
+@contextmanager
+def active_org(org: Union[str, Org], client: Optional[GraphClient] = None):
+    """
+    A context manager that temporarily switches the user's active organization.
+    On exit, the user's active organization is restored.
+
+    Args:
+        org: an org ID or Org
+        client: If specified, this client is used to fetch metadata from the
+            API. Otherwise, the global GraphClient is used.
+
+    Returns:
+
+    Examples:
+        with active_org("abc124") as new_org:
+            print('The current org is', new_org.name)
+            # do something
+
+    """
+    current_user = get_current_user(client)
+    orig_org_id = current_user.active_org_id
+
+    # Change the active org
+    new_org = set_active_org(org, client)
+    try:
+        yield new_org
+    finally:
+        # Set active org back
+        set_active_org(orig_org_id, client)
