@@ -3,12 +3,10 @@ Fetch metadata about organizations. A research lab or clinical site is
 typically represented as an organization.
 
 """
-from contextlib import contextmanager
 from typing import Iterable, Optional, Type, Union
 
 from .client import GraphClient, global_graph_client
 from .common import ItemBase, ItemSet
-from .user import get_current_user
 
 
 class Org(ItemBase):
@@ -244,27 +242,3 @@ def set_active_org(
     )
 
     return new_org
-
-
-@contextmanager
-def active_org(org: Union[str, Org], client: Optional[GraphClient] = None):
-    """
-    A context manager that temporarily switches the user's active organization.
-    On exit, the user's active organization is restored.
-
-    Args:
-        org: an organization ID or Org
-        client: If specified, this client is used to fetch metadata from the
-            API. Otherwise, the global GraphClient is used.
-
-    """
-    current_user = get_current_user(client)
-    orig_org_id = current_user.active_org_id
-
-    # Change the active org
-    new_org = set_active_org(org, client)
-    try:
-        yield new_org
-    finally:
-        # Set active org back
-        set_active_org(orig_org_id, client)
