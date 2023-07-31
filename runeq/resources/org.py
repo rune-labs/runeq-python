@@ -177,7 +177,7 @@ def get_org(org_id: str, client: Optional[GraphClient] = None) -> Org:
         if org_id == org.id:
             return org
 
-    raise ValueError(f"Org not found with id: f{org_id}")
+    raise ValueError(f"Org not found with id: {org_id}")
 
 
 def get_orgs(client: Optional[GraphClient] = None) -> OrgSet:
