@@ -6,7 +6,12 @@ from unittest import TestCase, mock
 
 from runeq.config import Config
 from runeq.resources.client import GraphClient
-from runeq.resources.org import Org, get_org, get_orgs
+from runeq.resources.org import (
+    get_org,
+    get_orgs,
+    Org,
+    set_active_org
+)
 
 
 class TestOrg(TestCase):
@@ -112,24 +117,48 @@ class TestOrg(TestCase):
         Test get org for specified org_id.
 
         """
-        self.mock_client.execute = mock.Mock()
-        self.mock_client.execute.side_effect = [
-            {
-                "org": {
-                    "id": "org1-id",
-                    "created_at": 1630515986.9949625,
-                    "name": "org1"
+        self.mock_client.execute = mock.Mock(return_value={
+            "user": {
+                "membershipList": {
+                    "pageInfo": {
+                        "endCursor": None
+                    },
+                    "memberships": [
+                        {
+                            "org": {
+                                "id": "org1-id",
+                                "created_at": 1571267538.391721,
+                                "name": "org1"
+                            }
+                        },
+                        {
+                            "org": {
+                                "id": "org2-id",
+                                "created_at": 1630515986.9949625,
+                                "name": "org2"
+                            }
+                        }
+                    ]
                 }
             }
-        ]
+        })
 
         org = get_org("org1-id", client=self.mock_client)
-
         self.assertEqual(
             {
                 "id": "org1-id",
-                "created_at": 1630515986.9949625,
+                "created_at": 1571267538.391721,
                 "name": "org1"
+            },
+            org.to_dict(),
+        )
+
+        org = get_org("org2-id", client=self.mock_client)
+        self.assertEqual(
+            {
+                "id": "org2-id",
+                "created_at": 1630515986.9949625,
+                "name": "org2"
             },
             org.to_dict(),
         )
@@ -262,3 +291,36 @@ class TestOrg(TestCase):
             orgs.to_list(),
         )
 
+    def test_set_active_org(self):
+        """
+        Test setting the user's active organization
+
+        """
+        org_id = "org1-id"
+        self.mock_client.execute = mock.Mock()
+        self.mock_client.execute.side_effect = [
+            {
+                "updateDefaultMembership": {
+                    "user": {
+                        "defaultMembership": {
+                            "org": {
+                                "id": org_id,
+                                "name": "org1",
+                                "created_at": 1571267538.391721,
+                            }
+                        }
+                    }
+                }
+            }
+        ]
+
+        new_org = set_active_org(org_id, self.mock_client)
+        self.mock_client.execute.assert_called_once()
+        self.assertEqual(
+            new_org.to_dict(),
+            {
+                'created_at': 1571267538.391721,
+                'name': 'org1',
+                'id': 'org1-id'
+            }
+        )

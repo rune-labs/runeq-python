@@ -38,10 +38,12 @@ class ItemBase:
 
     def __eq__(self, right):
         """
-        Compare two items for equality by ID.
+        Two items are equal if they are the same type and have the same ID
 
         """
-        return type(self) == type(right) and self._id == right.id
+        # intentionally comparing types instead of using isinstance(), because
+        # we don't want to consider a subclass to be equal
+        return type(self) == type(right) and self.id == right.id  # noqa: E721
 
     def __getitem__(self, attr: str):
         """
