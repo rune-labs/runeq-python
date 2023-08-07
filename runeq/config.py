@@ -5,6 +5,8 @@ Configuration for accessing Rune APIs.
 import os
 import yaml
 
+import boto3
+
 
 AUTH_METHOD_CLIENT_KEYS = 'client_keys'
 """
@@ -70,6 +72,9 @@ class Config:
         self._client_access_key = None
         self._client_key_id = None
         self._jwt = None
+        self._jwt_client_id = None
+        self._jwt_refresh_token = None
+        self._cognito_client = boto3.client("cognito-idp")
 
         if args and kwargs:
             raise TypeError(
@@ -109,6 +114,8 @@ class Config:
         client_key_id=None,
         client_access_key=None,
         jwt=None,
+        jwt_client_id=None,
+        jwt_refresh_token=None,
         stream_url=None,
         graph_url=None,
         **kwargs,
@@ -141,7 +148,8 @@ class Config:
             num_auth_methods_set = sum([
                 bool(access_token_id or access_token_secret),
                 bool(client_access_key or client_key_id),
-                bool(jwt)
+                bool(jwt),
+                bool(jwt_refresh_token and jwt_client_id),
             ])
 
             if num_auth_methods_set > 1:
@@ -154,6 +162,8 @@ class Config:
             elif client_key_id and client_access_key:
                 auth_method = AUTH_METHOD_CLIENT_KEYS
             elif jwt:
+                auth_method = AUTH_METHOD_JWT
+            elif jwt_refresh_token and jwt_client_id:
                 auth_method = AUTH_METHOD_JWT
             else:
                 raise ValueError(
@@ -177,6 +187,12 @@ class Config:
 
         if jwt is not None:
             self._jwt = jwt
+
+        if jwt_client_id is not None:
+            self._jwt_client_id = jwt_client_id
+
+        if jwt_refresh_token is not None:
+            self._jwt_refresh_token = jwt_refresh_token
 
         # access auth headers to ensure they're valid
         _ = self.auth_headers
@@ -204,11 +220,36 @@ class Config:
 
         """
         if not self._jwt:
-            raise ValueError('JWT is not set')
+            if not self.refresh_auth():
+                raise ValueError('JWT is not set')
 
         return {
             'X-Rune-User-Access-Token': self._jwt,
         }
+
+    def refresh_auth(self) -> bool:
+        """
+        Use the refresh token to get a new JWT.
+
+        Returns:
+             Bool indicating if JWT was refreshed.
+
+        Raises:
+            Exception if the refresh token request fails
+
+        """
+        if not self._jwt_refresh_token:
+            return False
+
+        response = self._cognito_client.initiate_auth(
+            AuthFlow='REFRESH_TOKEN_AUTH',
+            AuthParameters={
+                'REFRESH_TOKEN': self._jwt_refresh_token,
+            },
+            ClientId=self._jwt_client_id
+        )
+        self._jwt = response['AuthenticationResult']['AccessToken']
+        return True
 
     @property
     def access_token_auth_headers(self):
