@@ -20,6 +20,7 @@ def get_stream_data(
     page_token: Optional[str] = None,
     timestamp: Optional[str] = "iso",
     timezone: Optional[int] = None,
+    timezone_name: Optional[str] = None,
     translate_enums: Optional[bool] = True,
     client: Optional[StreamClient] = None
 ) -> Iterator[Union[str, dict]]:
@@ -50,6 +51,10 @@ def get_stream_data(
             string-based timestamp formats such as datetime and iso.
             For example, PST (UTC-0800) is represented as -28800.
             If omitted, the timezone is UTC.
+        timezone_name: The name from the IANA timezone database used to
+            calculate string-based timestamp formats such as datetime and iso.
+            Returns the correct UTC offset for a given date/time in order to
+            account for daylight savings time.
         translate_enums: If True, enum values are returned as their string
             representation. Otherwise, enums are returned as integer values.
         client: If specified, this client is used to fetch data from the
@@ -92,6 +97,7 @@ def get_stream_data(
         page_token=page_token,
         timestamp=timestamp,
         timezone=timezone,
+        timezone_name=timezone_name,
         translate_enums=translate_enums,
     )
 
@@ -107,6 +113,7 @@ def get_stream_availability(
     page_token: Optional[str] = None,
     timestamp: Optional[str] = 'iso',
     timezone: Optional[int] = None,
+    timezone_name: Optional[str] = None,
     client: Optional[StreamClient] = None
 ) -> Iterator[Union[str, dict]]:
     """
@@ -142,6 +149,10 @@ def get_stream_availability(
             string-based timestamp formats such as datetime and iso.
             For example, PST (UTC-0800) is represented as -28800.
             If omitted, the timezone is UTC.
+        timezone_name: The name from the IANA timezone database used to
+            calculate string-based timestamp formats such as datetime and iso.
+            Returns the correct UTC offset for a given date/time in order to
+            account for daylight savings time.
         client: If specified, this client is used to fetch data from the
             API. Otherwise, the global
             :class:`~runeq.resources.client.StreamClient` is used.
@@ -166,6 +177,7 @@ def get_stream_availability(
         'page_token': page_token,
         'timestamp': timestamp,
         'timezone': timezone,
+        'timezone_name': timezone_name,
     }
 
     if type(start_time) is datetime.date:
