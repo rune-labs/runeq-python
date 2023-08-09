@@ -1,5 +1,5 @@
 import os
-from unittest import TestCase
+from unittest import mock, TestCase
 
 from runeq import Config
 
@@ -128,6 +128,69 @@ class TestConfig(TestCase):
         with self.assertRaises(ValueError):
             _ = cfg.access_token_auth_headers
 
+        # cognito refresh token
+        with mock.patch('runeq.config.boto3.client') as boto3_client:
+            mock_cognito = mock.Mock()
+            mock_cognito.initiate_auth.return_value = {
+                'AuthenticationResult': {
+                    'AccessToken': 'def456'
+                }
+            }
+            boto3_client.return_value = mock_cognito
+
+            cfg = Config(cognito_refresh_token='ref', cognito_client_id='cli')
+
+        cognito_jwt_headers = {
+            'X-Rune-User-Access-Token': 'def456'
+        }
+        self.assertEqual(cognito_jwt_headers, cfg.auth_headers)
+        self.assertEqual(cognito_jwt_headers, cfg.jwt_auth_headers)
+        with self.assertRaises(ValueError):
+            _ = cfg.client_auth_headers
+
+        with self.assertRaises(ValueError):
+            _ = cfg.access_token_auth_headers
+
+    @mock.patch('runeq.config.boto3.client')
+    def test_refresh_auth(self, mock_boto3):
+        """Test that refresh_auth updates JWT value and returns a bool"""
+        mock_cognito = mock.Mock()
+        mock_cognito.initiate_auth.return_value = {
+            'AuthenticationResult': {
+                'AccessToken': 'jwt1'
+            }
+        }
+        mock_boto3.return_value = mock_cognito
+
+        # refresh_auth returns False if the Config isn't using a refresh token
+        for cfg in (
+            Config(client_key_id='abc', client_access_key='123'),
+            Config(access_token_id='foo', access_token_secret='bar'),
+            Config(jwt='abc123')
+        ):
+            self.assertFalse(cfg.refresh_auth())
+            mock_cognito.initiate_auth.assert_not_called()
+
+        # with a refresh token, initiate_auth is called once on init
+        cfg = Config(cognito_refresh_token='ref', cognito_client_id='cli')
+        self.assertEqual(mock_cognito.initiate_auth.call_count, 1)
+        self.assertEqual(cfg.auth_headers, {
+            'X-Rune-User-Access-Token': 'jwt1'
+        })
+
+        # check that auth headers change after refreshing
+        mock_cognito.initiate_auth.return_value = {
+            'AuthenticationResult': {
+                'AccessToken': 'jwt2'
+            }
+        }
+        self.assertTrue(cfg.refresh_auth())
+
+        self.assertEqual(mock_cognito.initiate_auth.call_count, 2)
+        self.assertEqual(cfg.auth_headers, {
+            'X-Rune-User-Access-Token': 'jwt2'
+        })
+
     def test_init_kwargs_invalid(self):
         """
         Test initializing with invalid kwargs.
@@ -156,6 +219,13 @@ class TestConfig(TestCase):
                 access_token_id='foo',
                 client_access_key='123',
                 jwt='zee'
+            )
+
+        with self.assertRaises(ValueError):
+            Config(
+                jwt='zee',
+                cognito_client_id='foo',
+                cognito_refresh_token='bar',
             )
 
     def test_init_invalid(self):

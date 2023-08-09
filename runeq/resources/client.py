@@ -199,7 +199,7 @@ class StreamClient:
 
             if r.ok:
                 return r
-            elif 400 <= r.status_code < 500:
+            elif i < 1 and 400 <= r.status_code < 500:
                 refreshed = self.config.refresh_auth()
                 if not refreshed:
                     break
