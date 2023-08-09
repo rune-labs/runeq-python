@@ -297,8 +297,8 @@ class Config:
         else:
             raise ValueError(
                 f'Invalid auth_method "{self.auth_method}": expected one of '
-                f'({AUTH_METHOD_CLIENT_KEYS}, '
+                f'({AUTH_METHOD_ACCESS_TOKEN}, '
+                f'{AUTH_METHOD_CLIENT_KEYS}, '
                 f'{AUTH_METHOD_JWT}, '
-                f'{AUTH_METHOD_COGNITO_REFRESH}, '
-                f'{AUTH_METHOD_ACCESS_TOKEN})'
+                f'{AUTH_METHOD_COGNITO_REFRESH})'
             )
