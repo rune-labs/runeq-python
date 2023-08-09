@@ -120,9 +120,9 @@ class Config:
         client_key_id=None,
         client_access_key=None,
         jwt=None,
-        cognito_region_name='us-west-2',
         cognito_client_id=None,
         cognito_refresh_token=None,
+        cognito_region_name='us-west-2',
         stream_url=None,
         graph_url=None,
         **kwargs,
@@ -201,8 +201,10 @@ class Config:
         if cognito_refresh_token is not None:
             self._cognito_refresh_token = cognito_refresh_token
 
-        # TODO: region configuration...
-        self._cognito_client = boto3.client("cognito-idp", region_name=cognito_region_name)
+        self._cognito_client = boto3.client(
+            "cognito-idp",
+            region_name=cognito_region_name,
+        )
 
         # access auth headers to ensure they're valid
         _ = self.auth_headers
@@ -288,7 +290,9 @@ class Config:
             return self.access_token_auth_headers
         elif self.auth_method == AUTH_METHOD_CLIENT_KEYS:
             return self.client_auth_headers
-        elif self.auth_method in (AUTH_METHOD_JWT, AUTH_METHOD_COGNITO_REFRESH):
+        elif self.auth_method == AUTH_METHOD_JWT:
+            return self.jwt_auth_headers
+        elif self.auth_method == AUTH_METHOD_COGNITO_REFRESH:
             return self.jwt_auth_headers
         else:
             raise ValueError(
