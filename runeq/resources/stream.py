@@ -114,8 +114,8 @@ def get_stream_data(
 
 def get_stream_availability(
     stream_ids: Union[str, Iterable[str]],
-    start_time: Union[float, datetime.date],
-    end_time: Union[float, datetime.date],
+    start_time: _time_type,
+    end_time: _time_type,
     resolution: int,
     batch_operation: Optional[str] = None,
     format: Optional[str] = 'csv',
@@ -135,9 +135,9 @@ def get_stream_availability(
         stream_ids: 1 or multiple stream IDs. If multiple stream IDs are
             specified, **batch_operation** is also required.
         start_time: Start time for the query, provided as a unix timestamp
-            (in seconds) or a datetime.date.
+            (in seconds), a datetime.datetime, or a datetime.date.
         end_time: End time for the query, provided as a unix timestamp
-            (in seconds) or a datetime.date.
+            (in seconds), a datetime.datetime, or a datetime.date.
         resolution: Interval between returned timestamps, in seconds.
         batch_operation: Either "any" or "all", which determines
             what type of batch calculation will determine availability for
@@ -178,8 +178,8 @@ def get_stream_availability(
 
     """
     params = {
-        'start_time': start_time,
-        'end_time': end_time,
+        'start_time': _time_type_to_unix_secs(start_time),
+        'end_time': _time_type_to_unix_secs(end_time),
         'resolution': resolution,
         'batch_operation': batch_operation,
         'format': format,
@@ -189,11 +189,6 @@ def get_stream_availability(
         'timezone': timezone,
         'timezone_name': timezone_name,
     }
-
-    if type(start_time) is datetime.date:
-        params['start_time'] = time.mktime(start_time.timetuple())
-    if type(end_time) is datetime.date:
-        params['end_time'] = time.mktime(end_time.timetuple())
 
     client = client or global_stream_client()
 
