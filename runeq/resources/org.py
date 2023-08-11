@@ -20,6 +20,7 @@ class Org(ItemBase):
         id: str,
         name: str,
         created_at: float,
+        tags: Iterable = (),
         **attributes
     ):
         """
@@ -29,17 +30,20 @@ class Org(ItemBase):
             id: ID of the organization
             name: Human-readable name
             created_at: When the organization was created (unix timestamp)
+            tags: Organization tags
             **attributes: Other attributes associated with the organization
 
         """
         norm_id = Org.normalize_id(id)
         self.name = name
         self.created_at = created_at
+        self.tags = list(tags)
 
         super().__init__(
             id=norm_id,
             name=name,
             created_at=created_at,
+            tags=self.tags,
             **attributes,
         )
 
@@ -122,6 +126,7 @@ def _iter_all_orgs(client: Optional[GraphClient] = None):
                             id
                             created_at: created
                             name: displayName
+                            tags: orgTags
                         }
                     }
                 }
@@ -143,12 +148,7 @@ def _iter_all_orgs(client: Optional[GraphClient] = None):
 
         for membership in membership_list.get("memberships", []):
             org_attrs = membership["org"]
-            org = Org(
-                id=org_attrs["id"],
-                created_at=org_attrs.get("created_at"),
-                name=org_attrs.get("name"),
-            )
-            yield org
+            yield Org(**org_attrs)
 
         # endCursor is None when there are no more pages of data
         next_cursor = membership_list.get("pageInfo", {}).get("endCursor")
@@ -223,6 +223,7 @@ def set_active_org(
                         id
                         created_at: created
                         name: displayName
+                        tags: orgTags
                     }
                 }
             }
@@ -234,11 +235,4 @@ def set_active_org(
 
     user_attrs = result.get("updateDefaultMembership", {}).get("user", {})
     org_attrs = user_attrs.get("defaultMembership", {}).get("org")
-
-    new_org = Org(
-        id=org_attrs["id"],
-        created_at=org_attrs.get("created_at"),
-        name=org_attrs.get("name"),
-    )
-
-    return new_org
+    return Org(**org_attrs)
