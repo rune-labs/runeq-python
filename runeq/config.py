@@ -5,6 +5,8 @@ Configuration for accessing Rune APIs.
 import os
 import yaml
 
+import boto3
+
 
 AUTH_METHOD_CLIENT_KEYS = 'client_keys'
 """
@@ -15,6 +17,12 @@ Auth method to use a Client Key pair for authentication.
 AUTH_METHOD_JWT = 'jwt'
 """
 Auth method to use a JWT for authentication.
+
+"""
+
+AUTH_METHOD_COGNITO_REFRESH = 'cognito_refresh'
+"""
+Auth method to use a Cognito refresh token for authentication.
 
 """
 
@@ -65,11 +73,14 @@ class Config:
         self.graph_url = 'https://graph.runelabs.io'
         self.stream_url = 'https://stream.runelabs.io'
         self.auth_method = None
+
         self._access_token_id = None
         self._access_token_secret = None
         self._client_access_key = None
         self._client_key_id = None
         self._jwt = None
+        self._cognito_client_id = None
+        self._cognito_refresh_token = None
 
         if args and kwargs:
             raise TypeError(
@@ -109,6 +120,9 @@ class Config:
         client_key_id=None,
         client_access_key=None,
         jwt=None,
+        cognito_client_id=None,
+        cognito_refresh_token=None,
+        cognito_region_name='us-west-2',
         stream_url=None,
         graph_url=None,
         **kwargs,
@@ -141,7 +155,8 @@ class Config:
             num_auth_methods_set = sum([
                 bool(access_token_id or access_token_secret),
                 bool(client_access_key or client_key_id),
-                bool(jwt)
+                bool(jwt),
+                bool(cognito_refresh_token and cognito_client_id),
             ])
 
             if num_auth_methods_set > 1:
@@ -155,6 +170,8 @@ class Config:
                 auth_method = AUTH_METHOD_CLIENT_KEYS
             elif jwt:
                 auth_method = AUTH_METHOD_JWT
+            elif cognito_refresh_token and cognito_client_id:
+                auth_method = AUTH_METHOD_COGNITO_REFRESH
             else:
                 raise ValueError(
                     'Cannot infer auth method: a complete set of credentials '
@@ -177,6 +194,17 @@ class Config:
 
         if jwt is not None:
             self._jwt = jwt
+
+        if cognito_client_id is not None:
+            self._cognito_client_id = cognito_client_id
+
+        if cognito_refresh_token is not None:
+            self._cognito_refresh_token = cognito_refresh_token
+
+        self._cognito_client = boto3.client(
+            "cognito-idp",
+            region_name=cognito_region_name,
+        )
 
         # access auth headers to ensure they're valid
         _ = self.auth_headers
@@ -204,11 +232,36 @@ class Config:
 
         """
         if not self._jwt:
-            raise ValueError('JWT is not set')
+            if not self.refresh_auth():
+                raise ValueError('JWT is not set')
 
         return {
             'X-Rune-User-Access-Token': self._jwt,
         }
+
+    def refresh_auth(self) -> bool:
+        """
+        Use the refresh token to get a new JWT.
+
+        Returns:
+             Bool indicating if JWT was refreshed.
+
+        Raises:
+            Exception if the refresh token request fails
+
+        """
+        if not self._cognito_refresh_token:
+            return False
+
+        response = self._cognito_client.initiate_auth(
+            AuthFlow='REFRESH_TOKEN_AUTH',
+            AuthParameters={
+                'REFRESH_TOKEN': self._cognito_refresh_token,
+            },
+            ClientId=self._cognito_client_id
+        )
+        self._jwt = response['AuthenticationResult']['AccessToken']
+        return True
 
     @property
     def access_token_auth_headers(self):
@@ -239,8 +292,13 @@ class Config:
             return self.client_auth_headers
         elif self.auth_method == AUTH_METHOD_JWT:
             return self.jwt_auth_headers
+        elif self.auth_method == AUTH_METHOD_COGNITO_REFRESH:
+            return self.jwt_auth_headers
         else:
             raise ValueError(
                 f'Invalid auth_method "{self.auth_method}": expected one of '
-                f'({AUTH_METHOD_CLIENT_KEYS}, {AUTH_METHOD_JWT})'
+                f'({AUTH_METHOD_ACCESS_TOKEN}, '
+                f'{AUTH_METHOD_CLIENT_KEYS}, '
+                f'{AUTH_METHOD_JWT}, '
+                f'{AUTH_METHOD_COGNITO_REFRESH})'
             )

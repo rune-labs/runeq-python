@@ -77,20 +77,25 @@ class GraphClient:
 
         """
         self.config = config
+        self._set_gql_client()
+
+    def _set_gql_client(self):
+        """
+        Use the config to create a GQL client
+
+        """
         transport = RequestsHTTPTransport(
             # NOTE: retries are managed by the requests.HTTPAdapter, which
             # doesn't retry failed connections
             retries=3,
-            url=f"{config.graph_url}/graphql",
+            url=f"{self.config.graph_url}/graphql",
             use_json=True,
             headers={
                 "Content-Type": "application/json",
-                **config.auth_headers
+                **self.config.auth_headers
             },
         )
-        self._gql_client = GQLClient(
-            transport=transport,
-        )
+        self._gql_client = GQLClient(transport=transport)
 
     @_retry(requests.exceptions.ConnectionError)
     def execute(self, statement: str, **variables) -> Dict:
@@ -98,10 +103,25 @@ class GraphClient:
         Execute a GraphQL query against the API.
 
         """
-        return self._gql_client.execute(
-            gql(statement),
-            variable_values=variables
-        )
+        for i in range(2):
+            try:
+                return self._gql_client.execute(
+                    gql(statement),
+                    variable_values=variables,
+                )
+            except Exception:
+                # The GraphQL client doesn't give us a good way to check
+                # specifically for auth errors. After any error, try
+                # refreshing auth credentials & repeat the GraphQL request
+                if i > 0:
+                    raise
+
+                refreshed = self.config.refresh_auth()
+                if refreshed:
+                    # recreate the gql client, to pick up new headers
+                    self._set_gql_client()
+                else:
+                    raise
 
 
 class StreamClient:
@@ -153,15 +173,7 @@ class StreamClient:
         return_json = params.get("format") == "json"
 
         while True:
-            r = requests.get(
-                url,
-                headers=self.config.auth_headers,
-                params=params
-            )
-
-            self._check_response(r)
-            r.raise_for_status()
-
+            r = self._get(url, params)
             if return_json:
                 yield r.json()
             else:
@@ -172,13 +184,27 @@ class StreamClient:
 
             params["page_token"] = r.headers[self.HEADER_NEXT_PAGE]
 
-    def _check_response(self, r: requests.Response) -> None:
-        """
-        Raise an exception if the request was not successful.
+    def _get(self, url, params) -> requests.Response:
+        """Make a GET request. Raises an exception on API errors.
 
+        On a 400-range status code, refreshes auth tokens and tries the request
+        again (if refresh was successful).
         """
-        if r.ok:
-            return
+        for i in range(2):
+            r = requests.get(
+                url,
+                headers=self.config.auth_headers,
+                params=params
+            )
+
+            if r.ok:
+                return r
+            elif i < 1 and 400 <= r.status_code < 500:
+                refreshed = self.config.refresh_auth()
+                if not refreshed:
+                    break
+            else:
+                break
 
         # When possible, the API returns details about what went wrong in
         # the json body of the response. Incorporate that detail into the error
@@ -186,11 +212,12 @@ class StreamClient:
         try:
             data = r.json()
         except Exception:
-            r.raise_for_status()
-            return
+            data = {}
 
         if "error" in data:
             raise errors.APIError(r.status_code, data["error"])
+
+        r.raise_for_status()
 
 
 def initialize(*args, **kwargs):
