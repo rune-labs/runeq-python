@@ -2,6 +2,7 @@
 Tests for fetching stream data.
 
 """
+from datetime import datetime, timezone
 from unittest import TestCase, mock
 
 from runeq.config import Config
@@ -67,6 +68,87 @@ class TestStreamData(TestCase):
         expected = [expected_data, expected_data]
         actual = list(stream)
         self.assertEqual(expected, actual)
+        self.assertEqual(mock_requests.get.call_count, 2)
+
+    @mock.patch("runeq.resources.client.requests")
+    def test_get_stream_data_params(self, mock_requests):
+        """
+        Check the request construction for fetching stream data
+
+        """
+        # Mock an empty response - this test is just for the request
+        mock_response = mock.Mock()
+        mock_response.ok = True
+        mock_response.headers = {}
+        mock_response.json.return_value = {}
+        mock_requests.get.return_value = mock_response
+
+        data = get_stream_data(
+            "stream1",
+            start_time=1691760000,
+            end_time=1691762094.123,
+            format="json",
+            limit=10,
+            page_token="page-token",
+            timestamp="unix",
+            timezone_name="America/Los_Angeles",
+            translate_enums=False,
+            client=self.stream_client,
+        )
+        # consume the iterator
+        _ = list(data)
+
+        expected_headers = {
+            "X-Rune-Client-Key-ID": "test",
+            "X-Rune-Client-Access-Key": "config",
+        }
+
+        mock_requests.get.assert_called_once_with(
+            "https://stream.runelabs.io/v2/streams/stream1",
+            headers=expected_headers,
+            params={
+                "start_time": 1691760000,
+                "start_time_ns": None,
+                "end_time": 1691762094.123,
+                "end_time_ns": None,
+                "format": "json",
+                "limit": 10,
+                "page_token": "page-token",
+                "timestamp": "unix",
+                "timezone": None,
+                "timezone_name": "America/Los_Angeles",
+                "translate_enums": False,
+            }
+        )
+
+        mock_requests.get.reset_mock()
+
+        # Test timestamp conversion
+        data = get_stream_data(
+            'stream2',
+            start_time=datetime(2023, 8, 1, tzinfo=timezone.utc),
+            end_time=datetime(2023, 8, 11, 10, 26, 45, 1, tzinfo=timezone.utc),
+            client=self.stream_client,
+        )
+        _ = list(data)
+
+        mock_requests.get.assert_called_once_with(
+            "https://stream.runelabs.io/v2/streams/stream2",
+            headers=expected_headers,
+            params={
+                "start_time": 1690848000.0,
+                "start_time_ns": None,
+                "end_time": 1691749605.000001,
+                "end_time_ns": None,
+                "format": "csv",
+                "limit": None,
+                "page_token": None,
+                "timestamp": "iso",
+                "timezone": None,
+                "timezone_name": None,
+                "translate_enums": True,
+            },
+        )
 
     @mock.patch("runeq.resources.client.requests")
     def test_get_stream_data_json(self, mock_requests):

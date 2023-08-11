@@ -12,7 +12,7 @@ import pandas as pd
 from .client import GraphClient, StreamClient, global_graph_client
 from .common import ItemBase, ItemSet
 from .patient import Device, Patient, get_patient
-from .stream import get_stream_availability, get_stream_data
+from .stream import get_stream_availability, get_stream_data, _time_type
 from runeq.errors import RuneError
 
 
@@ -268,9 +268,9 @@ class StreamMetadata(ItemBase):
 
     def iter_stream_data(
         self,
-        start_time: Optional[Union[float, datetime.date]] = None,
+        start_time: Optional[_time_type] = None,
         start_time_ns: Optional[int] = None,
-        end_time: Optional[Union[float, datetime.date]] = None,
+        end_time: Optional[_time_type] = None,
         end_time_ns: Optional[int] = None,
         format: Optional[str] = "csv",
         limit: Optional[int] = None,
@@ -285,11 +285,11 @@ class StreamMetadata(ItemBase):
 
         Args:
             start_time: Start time for the query, provided as a unix timestamp
-                (in seconds) or a datetime.date.
+                (in seconds), a datetime.datetime, or a datetime.date.
             start_time_ns: Start time for the query, provided as a unix
                 timestamp (in nanoseconds).
             end_time: End time for the query, provided as a unix timestamp
-                (in seconds) or a datetime.date.
+                (in seconds), a datetime.datetime, or a datetime.date.
             end_time_ns: End time for the query, provided as a unix timestamp
                 (in nanoseconds).
             format: Either "csv" (default) or "json". Determines the content
