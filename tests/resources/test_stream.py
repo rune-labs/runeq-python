@@ -95,7 +95,7 @@ class TestStreamData(TestCase):
             translate_enums=False,
             client=self.stream_client,
         )
-        # consume the iterator
+        # call list() to consume the iterator
         _ = list(data)
 
         expected_headers = {
@@ -130,6 +130,7 @@ class TestStreamData(TestCase):
             end_time=datetime(2023, 8, 11, 10, 26, 45, 1, tzinfo=timezone.utc),
             client=self.stream_client,
         )
+        # call list() to consume the iterator
         _ = list(data)
 
         mock_requests.get.assert_called_once_with(
