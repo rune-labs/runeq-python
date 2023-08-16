@@ -2,18 +2,31 @@
 Query data directly from the V2 Stream API.
 
 """
-from datetime import datetime
+from datetime import date, datetime
 import time
 from typing import Iterable, Iterator, Optional, Union
 
 from .client import StreamClient, global_stream_client
 
 
+_time_type = Union[int, float, date, datetime]
+
+
+def _time_type_to_unix_secs(t: _time_type) -> Union[int, float]:
+    """Standardize time input as timestamp (in unix secs)"""
+    if isinstance(t, datetime):
+        return t.timestamp()
+    elif isinstance(t, date):
+        return time.mktime(t.timetuple())
+    else:
+        return t
+
+
 def get_stream_data(
     stream_id: str,
-    start_time: Optional[Union[float, datetime.date]] = None,
+    start_time: Optional[_time_type] = None,
     start_time_ns: Optional[int] = None,
-    end_time: Optional[Union[float, datetime.date]] = None,
+    end_time: Optional[_time_type] = None,
     end_time_ns: Optional[int] = None,
     format: Optional[str] = "csv",
     limit: Optional[int] = None,
@@ -30,11 +43,11 @@ def get_stream_data(
     Args:
         stream_id: ID of the stream
         start_time: Start time for the query, provided as a unix timestamp
-                (in seconds) or a datetime.date.
+            (in seconds), a datetime.datetime, or a datetime.date.
         start_time_ns: Start time for the query, provided as a unix timestamp
             (in nanoseconds).
         end_time: End time for the query, provided as a unix timestamp
-            (in seconds) or a datetime.date.
+            (in seconds), a datetime.datetime, or a datetime.date.
         end_time_ns: End time for the query, provided as a unix timestamp
             (in nanoseconds).
         format: Either "csv" (default) or "json". Determines the content type
@@ -77,11 +90,8 @@ def get_stream_data(
             "only end_time or end_time_ns can be defined, not both."
         )
 
-    # Convert datetime.date times to float unix times in seconds
-    if type(start_time) is datetime.date:
-        start_time = time.mktime(start_time.timetuple())
-    if type(end_time) is datetime.date:
-        end_time = time.mktime(end_time.timetuple())
+    start_time = _time_type_to_unix_secs(start_time)
+    end_time = _time_type_to_unix_secs(end_time)
 
     client = client or global_stream_client()
     path = f"/v2/streams/{stream_id}"
@@ -104,8 +114,8 @@ def get_stream_data(
 
 def get_stream_availability(
     stream_ids: Union[str, Iterable[str]],
-    start_time: Union[float, datetime.date],
-    end_time: Union[float, datetime.date],
+    start_time: _time_type,
+    end_time: _time_type,
     resolution: int,
     batch_operation: Optional[str] = None,
     format: Optional[str] = 'csv',
@@ -125,9 +135,9 @@ def get_stream_availability(
         stream_ids: 1 or multiple stream IDs. If multiple stream IDs are
             specified, **batch_operation** is also required.
         start_time: Start time for the query, provided as a unix timestamp
-            (in seconds) or a datetime.date.
+            (in seconds), a datetime.datetime, or a datetime.date.
         end_time: End time for the query, provided as a unix timestamp
-            (in seconds) or a datetime.date.
+            (in seconds), a datetime.datetime, or a datetime.date.
         resolution: Interval between returned timestamps, in seconds.
         batch_operation: Either "any" or "all", which determines
             what type of batch calculation will determine availability for
@@ -168,8 +178,8 @@ def get_stream_availability(
 
     """
     params = {
-        'start_time': start_time,
-        'end_time': end_time,
+        'start_time': _time_type_to_unix_secs(start_time),
+        'end_time': _time_type_to_unix_secs(end_time),
         'resolution': resolution,
         'batch_operation': batch_operation,
         'format': format,
@@ -179,11 +189,6 @@ def get_stream_availability(
         'timezone': timezone,
         'timezone_name': timezone_name,
     }
-
-    if type(start_time) is datetime.date:
-        params['start_time'] = time.mktime(start_time.timetuple())
-    if type(end_time) is datetime.date:
-        params['end_time'] = time.mktime(end_time.timetuple())
 
     client = client or global_stream_client()
 

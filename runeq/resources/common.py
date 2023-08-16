@@ -6,6 +6,8 @@ from abc import ABC, abstractmethod
 from collections import OrderedDict
 from typing import Any, Dict, Iterable, Iterator, List, Type, Union
 
+import pandas as pd
+
 
 class ItemBase:
     """
@@ -226,3 +228,7 @@ class ItemSet(ABC):
             items_list.append(item.to_dict())
 
         return items_list
+
+    def to_dataframe(self) -> pd.DataFrame:
+        """Convert items to a dataframe (wraps `to_list()`)"""
+        return pd.DataFrame(self.to_list())
