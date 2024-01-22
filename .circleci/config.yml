@@ -101,7 +101,7 @@ workflows:
             - lint:
                 matrix:
                     parameters:
-                        executor: ["python3_11"]
+                        executor: ["python3_12"]
             - test:
                 matrix:
                     parameters:
@@ -109,8 +109,8 @@ workflows:
             - docs:
                 matrix:
                     parameters:
-                        executor: ["python3_11"]
+                        executor: ["python3_12"]
             - build-pypi:
                 matrix:
                     parameters:
-                        executor: ["python3_11"]
+                        executor: ["python3_12"]
