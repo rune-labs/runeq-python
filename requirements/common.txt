@@ -1,5 +1,5 @@
 boto3>=1.23.0
-click~=7.1
+click>=7.1
 gql~=2.0.0
 numpy>=1.18.2
 PyYAML>=5.3.1
