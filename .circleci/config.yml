@@ -25,6 +25,10 @@ executors:
         docker:
             - image: cimg/python:3.11
 
+    python3_12:
+        docker:
+            - image: cimg/python:3.12
+
 jobs:
     lint:
         parameters:
@@ -101,7 +105,7 @@ workflows:
             - test:
                 matrix:
                     parameters:
-                        executor: ["python3_6", "python3_7", "python3_8", "python3_9", "python3_10", "python3_11"]
+                        executor: ["python3_6", "python3_7", "python3_8", "python3_9", "python3_10", "python3_11", "python3_12"]
             - docs:
                 matrix:
                     parameters:
