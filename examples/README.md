@@ -52,8 +52,8 @@ demonstrates how to check data availability using "availability" representations
 
 These examples demonstrate common workflows performed using the Rune Labs API/SDK, and can be used a templates to customize for your own applications.
 
-* [Exporting Data from the Rune Labs Platform to File](example_export_data_to_csv) <br>
-pulls "raw" data, at full time resolution, and saves it to CSV files (using tremor, dyskinesia, sleep, heart rate, and step count as examples)
+* [Coming soon...]() <br>
+More workflow examples will be available soon
 
 * [Coming soon...]() <br>
 More workflow examples will be available soon
@@ -66,6 +66,4 @@ Handy utility functions found in the above tutorials and examples:
 
 **Function** | **Notebook**
 --- | --- 
-`dump_df_to_csv` | [Exporting Data from the Rune Labs Platform to File](example_export_data_to_csv)
 `plot_availability` | [Checking Data Availability](07_checking_data_availability.ipynb)
-`prune_streams_without_data` | [Exporting Data from the Rune Labs Platform to File](example_export_data_to_csv)
