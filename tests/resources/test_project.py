@@ -8,16 +8,16 @@ from runeq.config import Config
 from runeq.resources.client import GraphClient
 from runeq.resources.project import (
     Cohort,
+    CohortPatientMetadata,
     CohortSet,
+    Metric,
+    MetricSet,
     Project,
     ProjectPatientMetadata,
-    CohortPatientMetadata,
-    MetricSet,
-    Metric,
-    get_project,
-    get_projects,
-    get_project_patients,
     get_cohort_patients,
+    get_project,
+    get_project_patients,
+    get_projects,
 )
 
 
@@ -26,6 +26,7 @@ class TestProject(TestCase):
     Unit tests for the Project class.
 
     """
+
     def setUp(self):
         """
         Set up mock graph client for testing.
@@ -98,7 +99,7 @@ class TestProject(TestCase):
                 "created_at": 1667225389.222881,
                 "updated_at": 1667225389.084547,
                 "created_by": "Computer wizard",
-                "updated_by": "Computer wizard"
+                "updated_by": "Computer wizard",
             }
         ]
         self.mock_client.execute = mock.Mock()
@@ -113,9 +114,7 @@ class TestProject(TestCase):
             "started_at": 1630515986.9949625,
             "status": "ACTIVE",
             "type": "SANDBOX",
-            "cohortList": {
-                "cohorts": example_cohorts
-            }
+            "cohortList": {"cohorts": example_cohorts},
         }
 
         expected_project = {
@@ -159,7 +158,7 @@ class TestProject(TestCase):
                 "updated_at": 1630515986.9949625,
                 "type": "SANDBOX",
                 "updated_by": "user-id-1",
-                "cohorts": []
+                "cohorts": [],
             },
             {
                 "id": "proj2-id",
@@ -172,7 +171,7 @@ class TestProject(TestCase):
                 "status": "ACTIVE",
                 "type": "SANDBOX",
                 "updated_by": "user-id-1",
-                "cohorts": []
+                "cohorts": [],
             },
             {
                 "id": "proj3-id",
@@ -185,7 +184,7 @@ class TestProject(TestCase):
                 "status": "ACTIVE",
                 "type": "SANDBOX",
                 "updated_by": "user-id-1",
-                "cohorts": []
+                "cohorts": [],
             },
         ]
         self.mock_client.execute.return_value = {
@@ -204,9 +203,7 @@ class TestProject(TestCase):
                             "updated_at": 1630515986.9949625,
                             "type": "SANDBOX",
                             "updated_by": "user-id-1",
-                            "cohortList": {
-                                "cohorts": []
-                            }
+                            "cohortList": {"cohorts": []},
                         },
                         {
                             "id": "proj2-id",
@@ -219,9 +216,7 @@ class TestProject(TestCase):
                             "status": "ACTIVE",
                             "type": "SANDBOX",
                             "updated_by": "user-id-1",
-                            "cohortList": {
-                                "cohorts": []
-                            }
+                            "cohortList": {"cohorts": []},
                         },
                         {
                             "id": "proj3-id",
@@ -234,9 +229,7 @@ class TestProject(TestCase):
                             "status": "ACTIVE",
                             "type": "SANDBOX",
                             "updated_by": "user-id-1",
-                            "cohortList": {
-                                "cohorts": []
-                            }
+                            "cohortList": {"cohorts": []},
                         },
                     ],
                     "pageInfo": {"endCursor": None},
@@ -269,7 +262,7 @@ class TestProject(TestCase):
             "type": "SANDBOX",
             "created_by": "user-id-1",
             "updated_by": "user-id-1",
-            "cohorts": []
+            "cohorts": [],
         }
         project_2 = {
             "id": "proj2-id",
@@ -282,7 +275,7 @@ class TestProject(TestCase):
             "status": "ACTIVE",
             "type": "SANDBOX",
             "updated_by": "user-id-1",
-            "cohorts": []
+            "cohorts": [],
         }
         project_3 = {
             "id": "proj3-id",
@@ -295,7 +288,7 @@ class TestProject(TestCase):
             "status": "ACTIVE",
             "type": "SANDBOX",
             "updated_by": "user-id-1",
-            "cohorts": []
+            "cohorts": [],
         }
 
         self.mock_client.execute = mock.Mock()
@@ -317,9 +310,7 @@ class TestProject(TestCase):
                                 "type": "SANDBOX",
                                 "created_by": "user-id-1",
                                 "updated_by": "user-id-1",
-                                "cohortList": {
-                                    "cohorts": []
-                                }
+                                "cohortList": {"cohorts": []},
                             },
                             {
                                 "id": "proj2-id",
@@ -332,10 +323,8 @@ class TestProject(TestCase):
                                 "status": "ACTIVE",
                                 "type": "SANDBOX",
                                 "updated_by": "user-id-1",
-                                "cohortList": {
-                                    "cohorts": []
-                                }
-                            }
+                                "cohortList": {"cohorts": []},
+                            },
                         ],
                         "pageInfo": {"endCursor": "test_check_next"},
                     },
@@ -357,9 +346,7 @@ class TestProject(TestCase):
                                 "status": "ACTIVE",
                                 "type": "SANDBOX",
                                 "updated_by": "user-id-1",
-                                "cohortList": {
-                                    "cohorts": []
-                                }
+                                "cohortList": {"cohorts": []},
                             }
                         ],
                         "pageInfo": {"endCursor": None},
@@ -389,7 +376,7 @@ class TestProject(TestCase):
                     time_interval="FOURTEEN_DAYS",
                     created_at=1673467628.837126,
                     updated_at=1673467628.837126,
-                    id="1bfcf11f-8d5c-4714-b774-6b47e03c5900"
+                    id="1bfcf11f-8d5c-4714-b774-6b47e03c5900",
                 ),
             ]
         )
@@ -446,7 +433,7 @@ class TestProject(TestCase):
                     time_interval="FOURTEEN_DAYS",
                     created_at=1673467628.837126,
                     updated_at=1673467628.837126,
-                    id="1bfcf11f-8d5c-4714-b774-6b47e03c5900"
+                    id="1bfcf11f-8d5c-4714-b774-6b47e03c5900",
                 ),
             ]
         )
@@ -519,9 +506,7 @@ class TestProject(TestCase):
                 "projectPatientList": {
                     "projectPatients": [
                         {
-                            "patient": {
-                                "id": "patient-1"
-                            },
+                            "patient": {"id": "patient-1"},
                             "metricList": {
                                 "metrics": [
                                     {
@@ -542,9 +527,7 @@ class TestProject(TestCase):
                             "updated_by": "user 2",
                         },
                         {
-                            "patient": {
-                                "id": "patient-2"
-                            },
+                            "patient": {"id": "patient-2"},
                             "metricList": {
                                 "metrics": [
                                     {
@@ -565,13 +548,10 @@ class TestProject(TestCase):
                             "updated_by": "user 3",
                         },
                     ],
-                    "pageInfo": {
-                        "codeNameEndCursor": None
-                    },
+                    "pageInfo": {"codeNameEndCursor": None},
                 }
             }
         }
-
 
         project_patients = get_project_patients(
             client=self.mock_client, project_id="test-project-1"
@@ -599,7 +579,7 @@ class TestProject(TestCase):
                         "type": "LAST_UPLOAD",
                         "data_type": "APPLEWATCH_TREMOR",
                         "value": 1648235452.965804,
-                        "time_interval": "FOURTEEN_DAYS"
+                        "time_interval": "FOURTEEN_DAYS",
                     },
                 ],
                 "code_name": "code name 1",
@@ -618,7 +598,7 @@ class TestProject(TestCase):
                         "type": "LAST_UPLOAD",
                         "data_type": "APPLEWATCH_TREMOR",
                         "value": 1648235452.965804,
-                        "time_interval": "FOURTEEN_DAYS"
+                        "time_interval": "FOURTEEN_DAYS",
                     },
                 ],
                 "code_name": "code name 2",
@@ -635,9 +615,7 @@ class TestProject(TestCase):
                     "projectPatientList": {
                         "projectPatients": [
                             {
-                                "patient": {
-                                    "id": "patient-1"
-                                },
+                                "patient": {"id": "patient-1"},
                                 "metricList": {
                                     "metrics": [
                                         {
@@ -647,7 +625,7 @@ class TestProject(TestCase):
                                             "type": "LAST_UPLOAD",
                                             "data_type": "APPLEWATCH_TREMOR",
                                             "value": 1648235452.965804,
-                                            "time_interval": "FOURTEEN_DAYS"
+                                            "time_interval": "FOURTEEN_DAYS",
                                         },
                                     ]
                                 },
@@ -658,9 +636,7 @@ class TestProject(TestCase):
                                 "updated_by": "user 2",
                             },
                         ],
-                        "pageInfo": {
-                            "codeNameEndCursor": "code name 1"
-                        },
+                        "pageInfo": {"codeNameEndCursor": "code name 1"},
                     }
                 }
             },
@@ -669,9 +645,7 @@ class TestProject(TestCase):
                     "projectPatientList": {
                         "projectPatients": [
                             {
-                                "patient": {
-                                    "id": "patient-2"
-                                },
+                                "patient": {"id": "patient-2"},
                                 "metricList": {
                                     "metrics": [
                                         {
@@ -681,7 +655,7 @@ class TestProject(TestCase):
                                             "type": "LAST_UPLOAD",
                                             "data_type": "APPLEWATCH_TREMOR",
                                             "value": 1648235452.965804,
-                                            "time_interval": "FOURTEEN_DAYS"
+                                            "time_interval": "FOURTEEN_DAYS",
                                         },
                                     ]
                                 },
@@ -692,12 +666,11 @@ class TestProject(TestCase):
                                 "updated_by": "user 3",
                             },
                         ],
-                        "pageInfo": {
-                            "codeNameEndCursor": None
-                        },
+                        "pageInfo": {"codeNameEndCursor": None},
                     }
                 }
-            }]
+            },
+        ]
 
         project_patients = get_project_patients(
             client=self.mock_client, project_id="test-project-1"
@@ -725,7 +698,7 @@ class TestProject(TestCase):
                         "type": "LAST_UPLOAD",
                         "data_type": "APPLEWATCH_TREMOR",
                         "value": 1648235452.965804,
-                        "time_interval": "FOURTEEN_DAYS"
+                        "time_interval": "FOURTEEN_DAYS",
                     },
                 ],
                 "code_name": "code name 1",
@@ -744,7 +717,7 @@ class TestProject(TestCase):
                         "type": "LAST_UPLOAD",
                         "data_type": "APPLEWATCH_TREMOR",
                         "value": 1648235452.965804,
-                        "time_interval": "FOURTEEN_DAYS"
+                        "time_interval": "FOURTEEN_DAYS",
                     },
                 ],
                 "code_name": "code name 2",
@@ -760,9 +733,7 @@ class TestProject(TestCase):
                 "cohortPatientList": {
                     "cohortPatients": [
                         {
-                            "patient": {
-                                "id": "patient-1"
-                            },
+                            "patient": {"id": "patient-1"},
                             "metricList": {
                                 "metrics": [
                                     {
@@ -772,7 +743,7 @@ class TestProject(TestCase):
                                         "type": "LAST_UPLOAD",
                                         "data_type": "APPLEWATCH_TREMOR",
                                         "value": 1648235452.965804,
-                                        "time_interval": "FOURTEEN_DAYS"
+                                        "time_interval": "FOURTEEN_DAYS",
                                     },
                                 ]
                             },
@@ -783,9 +754,7 @@ class TestProject(TestCase):
                             "updated_by": "user 2",
                         },
                         {
-                            "patient": {
-                                "id": "patient-2"
-                            },
+                            "patient": {"id": "patient-2"},
                             "metricList": {
                                 "metrics": [
                                     {
@@ -795,7 +764,7 @@ class TestProject(TestCase):
                                         "type": "LAST_UPLOAD",
                                         "data_type": "APPLEWATCH_TREMOR",
                                         "value": 1648235452.965804,
-                                        "time_interval": "FOURTEEN_DAYS"
+                                        "time_interval": "FOURTEEN_DAYS",
                                     },
                                 ]
                             },
@@ -806,13 +775,10 @@ class TestProject(TestCase):
                             "updated_by": "user 3",
                         },
                     ],
-                    "pageInfo": {
-                        "codeNameEndCursor": None
-                    },
+                    "pageInfo": {"codeNameEndCursor": None},
                 }
             }
         }
-
 
         cohort_patients = get_cohort_patients(
             client=self.mock_client, cohort_id="test-cohort-1"
@@ -840,7 +806,7 @@ class TestProject(TestCase):
                         "type": "LAST_UPLOAD",
                         "data_type": "APPLEWATCH_TREMOR",
                         "value": 1648235452.965804,
-                        "time_interval": "FOURTEEN_DAYS"
+                        "time_interval": "FOURTEEN_DAYS",
                     },
                 ],
                 "code_name": "code name 1",
@@ -859,7 +825,7 @@ class TestProject(TestCase):
                         "type": "LAST_UPLOAD",
                         "data_type": "APPLEWATCH_TREMOR",
                         "value": 1648235452.965804,
-                        "time_interval": "FOURTEEN_DAYS"
+                        "time_interval": "FOURTEEN_DAYS",
                     },
                 ],
                 "code_name": "code name 2",
@@ -876,9 +842,7 @@ class TestProject(TestCase):
                     "cohortPatientList": {
                         "cohortPatients": [
                             {
-                                "patient": {
-                                    "id": "patient-1"
-                                },
+                                "patient": {"id": "patient-1"},
                                 "metricList": {
                                     "metrics": [
                                         {
@@ -888,7 +852,7 @@ class TestProject(TestCase):
                                             "type": "LAST_UPLOAD",
                                             "data_type": "APPLEWATCH_TREMOR",
                                             "value": 1648235452.965804,
-                                            "time_interval": "FOURTEEN_DAYS"
+                                            "time_interval": "FOURTEEN_DAYS",
                                         },
                                     ]
                                 },
@@ -899,9 +863,7 @@ class TestProject(TestCase):
                                 "updated_by": "user 2",
                             },
                         ],
-                        "pageInfo": {
-                            "codeNameEndCursor": "code name 1"
-                        },
+                        "pageInfo": {"codeNameEndCursor": "code name 1"},
                     }
                 }
             },
@@ -910,9 +872,7 @@ class TestProject(TestCase):
                     "cohortPatientList": {
                         "cohortPatients": [
                             {
-                                "patient": {
-                                    "id": "patient-2"
-                                },
+                                "patient": {"id": "patient-2"},
                                 "metricList": {
                                     "metrics": [
                                         {
@@ -922,7 +882,7 @@ class TestProject(TestCase):
                                             "type": "LAST_UPLOAD",
                                             "data_type": "APPLEWATCH_TREMOR",
                                             "value": 1648235452.965804,
-                                            "time_interval": "FOURTEEN_DAYS"
+                                            "time_interval": "FOURTEEN_DAYS",
                                         },
                                     ]
                                 },
@@ -933,12 +893,10 @@ class TestProject(TestCase):
                                 "updated_by": "user 3",
                             },
                         ],
-                        "pageInfo": {
-                            "codeNameEndCursor": None
-                        },
+                        "pageInfo": {"codeNameEndCursor": None},
                     }
                 }
-            }
+            },
         ]
 
         cohort_patients = get_cohort_patients(

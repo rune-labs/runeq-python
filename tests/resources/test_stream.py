@@ -22,10 +22,7 @@ class TestStreamData(TestCase):
 
         """
         self.stream_client = StreamClient(
-            Config(
-                client_key_id='test',
-                client_access_key='config'
-            )
+            Config(client_key_id="test", client_access_key="config")
         )
         self.maxDiff = None
 
@@ -48,9 +45,7 @@ class TestStreamData(TestCase):
         # Mock a paginated response
         mock_response1 = mock.Mock()
         mock_response1.ok = True
-        mock_response1.headers = {
-            "X-Rune-Next-Page-Token": "foobar"
-        }
+        mock_response1.headers = {"X-Rune-Next-Page-Token": "foobar"}
         mock_response1.text = expected_data
 
         mock_response2 = mock.Mock()
@@ -58,12 +53,12 @@ class TestStreamData(TestCase):
         mock_response2.headers = {}
         mock_response2.text = expected_data
 
-        mock_requests.get.side_effect = [
-            mock_response1,
-            mock_response2
-        ]
+        mock_requests.get.side_effect = [mock_response1, mock_response2]
 
-        stream = get_stream_data('test_stream_id', client=self.stream_client,)
+        stream = get_stream_data(
+            "test_stream_id",
+            client=self.stream_client,
+        )
 
         expected = [expected_data, expected_data]
         actual = list(stream)
@@ -118,14 +113,14 @@ class TestStreamData(TestCase):
                 "timezone": None,
                 "timezone_name": "America/Los_Angeles",
                 "translate_enums": False,
-            }
+            },
         )
 
         mock_requests.get.reset_mock()
 
         # Test timestamp conversion
         data = get_stream_data(
-            'stream2',
+            "stream2",
             start_time=datetime(2023, 8, 1, tzinfo=timezone.utc),
             end_time=datetime(2023, 8, 11, 10, 26, 45, 1, tzinfo=timezone.utc),
             client=self.stream_client,
@@ -171,7 +166,7 @@ class TestStreamData(TestCase):
                     0.026072751730680466,
                     0.027338741347193718,
                     0.028795091435313225,
-                    0.029819512739777565
+                    0.029819512739777565,
                 ],
                 "measurement_duration_ns": [
                     20000000,
@@ -183,7 +178,7 @@ class TestStreamData(TestCase):
                     20000000,
                     20000000,
                     20000000,
-                    20000000
+                    20000000,
                 ],
                 "time": [
                     "2022-07-28T14:26:45.167568Z",
@@ -195,17 +190,15 @@ class TestStreamData(TestCase):
                     "2022-07-28T14:26:45.36221Z",
                     "2022-07-28T14:26:45.362269Z",
                     "2022-07-28T14:26:45.36234Z",
-                    "2022-07-28T14:26:45.3624Z"
-                ]
-            }
+                    "2022-07-28T14:26:45.3624Z",
+                ],
+            },
         }
 
         # Mock a paginated response
         mock_response1 = mock.Mock()
         mock_response1.ok = True
-        mock_response1.headers = {
-            "X-Rune-Next-Page-Token": "foobar"
-        }
+        mock_response1.headers = {"X-Rune-Next-Page-Token": "foobar"}
         mock_response1.json.return_value = expected_data
 
         mock_response2 = mock.Mock()
@@ -213,13 +206,10 @@ class TestStreamData(TestCase):
         mock_response2.headers = {}
         mock_response2.json.return_value = expected_data
 
-        mock_requests.get.side_effect = [
-            mock_response1,
-            mock_response2
-        ]
+        mock_requests.get.side_effect = [mock_response1, mock_response2]
 
         stream = get_stream_data(
-            'test_stream_id',
+            "test_stream_id",
             format="json",
             client=self.stream_client,
         )
@@ -247,9 +237,7 @@ class TestStreamData(TestCase):
         # Mock a paginated response
         mock_response1 = mock.Mock()
         mock_response1.ok = True
-        mock_response1.headers = {
-            "X-Rune-Next-Page-Token": "foobar"
-        }
+        mock_response1.headers = {"X-Rune-Next-Page-Token": "foobar"}
         mock_response1.text = expected_data
 
         mock_response2 = mock.Mock()
@@ -257,13 +245,10 @@ class TestStreamData(TestCase):
         mock_response2.headers = {}
         mock_response2.text = expected_data
 
-        mock_requests.get.side_effect = [
-            mock_response1,
-            mock_response2
-        ]
+        mock_requests.get.side_effect = [mock_response1, mock_response2]
 
         availability = get_stream_availability(
-            stream_ids='test_stream_id',
+            stream_ids="test_stream_id",
             start_time=123,
             end_time=345,
             resolution=300,
@@ -293,31 +278,18 @@ class TestStreamData(TestCase):
                     "2022-07-28T14:55:00Z",
                     "2022-07-28T15:00:00Z",
                     "2022-07-28T15:05:00Z",
-                    "2022-07-28T15:10:00Z"
+                    "2022-07-28T15:10:00Z",
                 ],
-                "availability": [
-                    1,
-                    1,
-                    0,
-                    0,
-                    1,
-                    1,
-                    0,
-                    1,
-                    1,
-                    1
-                ]
+                "availability": [1, 1, 0, 0, 1, 1, 0, 1, 1, 1],
             },
             "approx_available_duration_s": 3000,
-            "cardinality": 10
+            "cardinality": 10,
         }
 
         # Mock a paginated response
         mock_response1 = mock.Mock()
         mock_response1.ok = True
-        mock_response1.headers = {
-            "X-Rune-Next-Page-Token": "foobar"
-        }
+        mock_response1.headers = {"X-Rune-Next-Page-Token": "foobar"}
         mock_response1.json.return_value = expected_data
 
         mock_response2 = mock.Mock()
@@ -325,13 +297,10 @@ class TestStreamData(TestCase):
         mock_response2.headers = {}
         mock_response2.json.return_value = expected_data
 
-        mock_requests.get.side_effect = [
-            mock_response1,
-            mock_response2
-        ]
+        mock_requests.get.side_effect = [mock_response1, mock_response2]
 
         availability = get_stream_availability(
-            stream_ids='test_stream_id',
+            stream_ids="test_stream_id",
             start_time=123,
             end_time=345,
             resolution=300,
@@ -362,9 +331,7 @@ class TestStreamData(TestCase):
         # Mock a paginated response
         mock_response1 = mock.Mock()
         mock_response1.ok = True
-        mock_response1.headers = {
-            "X-Rune-Next-Page-Token": "foobar"
-        }
+        mock_response1.headers = {"X-Rune-Next-Page-Token": "foobar"}
         mock_response1.text = expected_data
 
         mock_response2 = mock.Mock()
@@ -372,18 +339,12 @@ class TestStreamData(TestCase):
         mock_response2.headers = {}
         mock_response2.text = expected_data
 
-        mock_requests.get.side_effect = [
-            mock_response1,
-            mock_response2
-        ]
+        mock_requests.get.side_effect = [mock_response1, mock_response2]
 
         # Must include batch_operation when querying >1 stream
-        with self.assertRaisesRegex(
-            ValueError,
-            "batch_operation must be specified"
-        ):
+        with self.assertRaisesRegex(ValueError, "batch_operation must be specified"):
             get_stream_availability(
-                stream_ids=['test_stream_id1', 'test_stream_id2'],
+                stream_ids=["test_stream_id1", "test_stream_id2"],
                 start_time=123,
                 end_time=345,
                 resolution=300,
@@ -392,7 +353,7 @@ class TestStreamData(TestCase):
             ).__next__()
 
         availability = get_stream_availability(
-            stream_ids=['test_stream_id1', 'test_stream_id2'],
+            stream_ids=["test_stream_id1", "test_stream_id2"],
             start_time=123,
             end_time=345,
             resolution=300,

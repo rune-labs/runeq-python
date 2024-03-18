@@ -1,14 +1,6 @@
 version: 2.1
 
 executors:
-    python3_6:
-        docker:
-            - image: cimg/python:3.6
-
-    python3_7:
-        docker:
-            - image: cimg/python:3.7
-
     python3_8:
         docker:
             - image: cimg/python:3.8
@@ -105,7 +97,7 @@ workflows:
             - test:
                 matrix:
                     parameters:
-                        executor: ["python3_6", "python3_7", "python3_8", "python3_9", "python3_10", "python3_11", "python3_12"]
+                        executor: ["python3_8", "python3_9", "python3_10", "python3_11", "python3_12"]
             - docs:
                 matrix:
                     parameters:

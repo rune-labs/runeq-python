@@ -1,16 +1,16 @@
-from unittest import mock, TestCase
-from typing import List, Dict
+from typing import Dict, List
+from unittest import TestCase, mock
 
 import numpy as np
 
-from runeq import Config, stream, errors
+from runeq import Config, errors, stream
 
 
 def mock_get_json_response(
-        bodies: List[dict],
-        calls: List,
-        status_code=200,
-        headers: List[Dict[str, str]] = None
+    bodies: List[dict],
+    calls: List,
+    status_code=200,
+    headers: List[Dict[str, str]] = None,
 ):
     """Return a function that can be used to mock .get_json_response()
 
@@ -33,7 +33,7 @@ def mock_get_json_response(
         resp = mock.MagicMock()
         resp.headers = headers[num]
         resp.status_code = status_code
-        resp.ok = (status_code < 400)
+        resp.ok = status_code < 400
         resp.json.return_value = bodies[num]
         num += 1
         return resp
@@ -42,10 +42,10 @@ def mock_get_json_response(
 
 
 def mock_get_csv_response(
-        bodies: List[str],
-        calls: List,
-        status_code=200,
-        headers: List[Dict[str, str]] = None
+    bodies: List[str],
+    calls: List,
+    status_code=200,
+    headers: List[Dict[str, str]] = None,
 ):
     """Return a function that can be used to mock .get_csv_response()
 
@@ -68,7 +68,7 @@ def mock_get_csv_response(
         resp = mock.MagicMock()
         resp.headers = headers[num]
         resp.status_code = status_code
-        resp.ok = (status_code < 400)
+        resp.ok = status_code < 400
         resp.text = bodies[num]
         num += 1
         return resp
@@ -88,8 +88,8 @@ class TestStreamV1Client(TestCase):
 
         """
         self.cfg = Config(
-            client_key_id='abc',
-            client_access_key='abc123',
+            client_key_id="abc",
+            client_access_key="abc123",
         )
         self.client = stream.V1Client(self.cfg)
         self.use_np_orig = stream.v1.USE_NUMPY
@@ -102,74 +102,76 @@ class TestStreamV1Client(TestCase):
         """
         stream.v1.USE_NUMPY = self.use_np_orig
 
-    @mock.patch('runeq.stream.v1.requests')
+    @mock.patch("runeq.stream.v1.requests")
     def test_get_json_response(self, requests):
         """
         Test the signature of JSON requests.
 
         """
-        for test_num, case in enumerate((
-                (self.client.Accel, '/v1/accel.json'),
-                (self.client.BandPower, '/v1/band_power.json'),
-                (self.client.Event, '/v1/event.json'),
-                (self.client.HeartRate, '/v1/heartrate.json'),
-                (self.client.LFP, '/v1/lfp.json'),
-                (
-                        self.client.ProbabilitySymptom,
-                        '/v1/probability_symptom.json'
-                ),
-                (self.client.Rotation, '/v1/rotation.json'),
-                (self.client.Span, '/v1/span.json'),
-                (self.client.State, '/v1/state.json'),
-        )):
+        for test_num, case in enumerate(
+            (
+                (self.client.Accel, "/v1/accel.json"),
+                (self.client.BandPower, "/v1/band_power.json"),
+                (self.client.Event, "/v1/event.json"),
+                (self.client.HeartRate, "/v1/heartrate.json"),
+                (self.client.LFP, "/v1/lfp.json"),
+                (self.client.ProbabilitySymptom, "/v1/probability_symptom.json"),
+                (self.client.Rotation, "/v1/rotation.json"),
+                (self.client.Span, "/v1/span.json"),
+                (self.client.State, "/v1/state.json"),
+            )
+        ):
             resource_creator, endpoint = case
-            resource = resource_creator(leslie='knope')
-            resource.get_json_response(ron='swanson', test_num=test_num)
-            requests.get.assert_has_calls([
-                mock.call(
-                    self.cfg.stream_url + endpoint,
-                    headers=self.cfg.auth_headers,
-                    params={
-                        'leslie': 'knope',
-                        'ron': 'swanson',
-                        'test_num': test_num,
-                    }
-                ),
-            ])
+            resource = resource_creator(leslie="knope")
+            resource.get_json_response(ron="swanson", test_num=test_num)
+            requests.get.assert_has_calls(
+                [
+                    mock.call(
+                        self.cfg.stream_url + endpoint,
+                        headers=self.cfg.auth_headers,
+                        params={
+                            "leslie": "knope",
+                            "ron": "swanson",
+                            "test_num": test_num,
+                        },
+                    ),
+                ]
+            )
 
-    @mock.patch('runeq.stream.v1.requests')
+    @mock.patch("runeq.stream.v1.requests")
     def test_get_csv_response(self, requests):
         """
         Test the signature of CSV requests.
 
         """
-        for test_num, case in enumerate((
-                (self.client.Accel, '/v1/accel.csv'),
-                (self.client.BandPower, '/v1/band_power.csv'),
-                (self.client.HeartRate, '/v1/heartrate.csv'),
-                (self.client.LFP, '/v1/lfp.csv'),
-                (
-                        self.client.ProbabilitySymptom,
-                        '/v1/probability_symptom.csv'
-                ),
-                (self.client.Rotation, '/v1/rotation.csv'),
-                (self.client.State, '/v1/state.csv'),
-        )):
+        for test_num, case in enumerate(
+            (
+                (self.client.Accel, "/v1/accel.csv"),
+                (self.client.BandPower, "/v1/band_power.csv"),
+                (self.client.HeartRate, "/v1/heartrate.csv"),
+                (self.client.LFP, "/v1/lfp.csv"),
+                (self.client.ProbabilitySymptom, "/v1/probability_symptom.csv"),
+                (self.client.Rotation, "/v1/rotation.csv"),
+                (self.client.State, "/v1/state.csv"),
+            )
+        ):
             resource_creator, endpoint = case
-            resource = resource_creator(leslie='knope')
-            resource.get_csv_response(ron='swanson', test_num=test_num)
-            requests.get.assert_has_calls([
-                mock.call(
-                    self.cfg.stream_url + endpoint,
-                    stream=True,
-                    headers=self.cfg.auth_headers,
-                    params={
-                        'leslie': 'knope',
-                        'ron': 'swanson',
-                        'test_num': test_num,
-                    }
-                ),
-            ])
+            resource = resource_creator(leslie="knope")
+            resource.get_csv_response(ron="swanson", test_num=test_num)
+            requests.get.assert_has_calls(
+                [
+                    mock.call(
+                        self.cfg.stream_url + endpoint,
+                        stream=True,
+                        headers=self.cfg.auth_headers,
+                        params={
+                            "leslie": "knope",
+                            "ron": "swanson",
+                            "test_num": test_num,
+                        },
+                    ),
+                ]
+            )
 
     def test_iter_json_data_with_token(self):
         """
@@ -177,7 +179,8 @@ class TestStreamV1Client(TestCase):
         token header.
 
         """
-        for test_num, resource_creator in enumerate((
+        for test_num, resource_creator in enumerate(
+            (
                 self.client.Accel,
                 self.client.BandPower,
                 self.client.Event,
@@ -187,12 +190,13 @@ class TestStreamV1Client(TestCase):
                 self.client.Rotation,
                 self.client.Span,
                 self.client.State,
-        )):
+            )
+        ):
             resource = resource_creator()
 
             mock_responses = [
-                {'success': True, 'result': [], 'next_page': 1},
-                {'success': True, 'result': []}
+                {"success": True, "result": [], "next_page": 1},
+                {"success": True, "result": []},
             ]
 
             calls = []
@@ -201,9 +205,9 @@ class TestStreamV1Client(TestCase):
                 calls,
                 200,
                 [
-                    {'X-Rune-Next-Page-Token': 'MTIzNDU2MDAwMA=='},
+                    {"X-Rune-Next-Page-Token": "MTIzNDU2MDAwMA=="},
                     {},
-                ]
+                ],
             )
 
             iterator = resource.iter_json_data(test_num=test_num)
@@ -211,16 +215,13 @@ class TestStreamV1Client(TestCase):
 
             # Check that all parameters were kept the same across calls,
             # except for "next_page_token"
-            self.assertEqual(calls, [
-                ((), {'test_num': test_num}),
-                (
-                    (),
-                    {
-                        'test_num': test_num,
-                        'next_page_token': 'MTIzNDU2MDAwMA=='
-                    }
-                )
-            ])
+            self.assertEqual(
+                calls,
+                [
+                    ((), {"test_num": test_num}),
+                    ((), {"test_num": test_num, "next_page_token": "MTIzNDU2MDAwMA=="}),
+                ],
+            )
 
     def test_iter_json_data(self):
         """
@@ -228,16 +229,14 @@ class TestStreamV1Client(TestCase):
         the page number.
 
         """
-        results = [
-            {'a': 1},
-            {'b': 2}
-        ]
+        results = [{"a": 1}, {"b": 2}]
         mock_responses = [
-            {'success': True, 'result': results[0], 'next_page': 1},
-            {'success': True, 'result': results[1]}
+            {"success": True, "result": results[0], "next_page": 1},
+            {"success": True, "result": results[1]},
         ]
 
-        for test_num, resource_creator in enumerate((
+        for test_num, resource_creator in enumerate(
+            (
                 self.client.Accel,
                 self.client.BandPower,
                 self.client.Event,
@@ -246,17 +245,15 @@ class TestStreamV1Client(TestCase):
                 self.client.ProbabilitySymptom,
                 self.client.Rotation,
                 self.client.State,
-        )):
+            )
+        ):
             resource = resource_creator()
 
             #
             # Successful Requests
             #
             calls = []
-            resource.get_json_response = mock_get_json_response(
-                mock_responses,
-                calls
-            )
+            resource.get_json_response = mock_get_json_response(mock_responses, calls)
 
             # Check the results
             num_results = 0
@@ -269,10 +266,10 @@ class TestStreamV1Client(TestCase):
 
             # Check that all parameters were kept the same across calls,
             # except for "page" (which must be incremented)
-            self.assertEqual(calls, [
-                ((), {'test_num': test_num}),
-                ((), {'test_num': test_num, 'page': 1})
-            ])
+            self.assertEqual(
+                calls,
+                [((), {"test_num": test_num}), ((), {"test_num": test_num, "page": 1})],
+            )
 
             #
             # Request Error
@@ -283,7 +280,7 @@ class TestStreamV1Client(TestCase):
                 "type": "TestError",
             }
             resource.get_json_response = mock_get_json_response(
-                [{'success': False, 'error': err_details}],
+                [{"success": False, "error": err_details}],
                 [],
                 status_code=404,
             )
@@ -301,12 +298,13 @@ class TestStreamV1Client(TestCase):
 
         """
         mock_responses = [
-            'good,better\nskiing,hiking\n',
-            'good,better\ncupcakes,brownies\n',
-            '',
+            "good,better\nskiing,hiking\n",
+            "good,better\ncupcakes,brownies\n",
+            "",
         ]
 
-        for test_num, resource_creator in enumerate((
+        for test_num, resource_creator in enumerate(
+            (
                 self.client.Accel,
                 self.client.BandPower,
                 self.client.HeartRate,
@@ -314,7 +312,8 @@ class TestStreamV1Client(TestCase):
                 self.client.ProbabilitySymptom,
                 self.client.Rotation,
                 self.client.State,
-        )):
+            )
+        ):
             resource = resource_creator()
 
             #
@@ -326,8 +325,8 @@ class TestStreamV1Client(TestCase):
                 calls,
                 200,
                 [
-                    {'X-Rune-Next-Page-Token': 'MTIzNDU2MDAwMA=='},
-                    {'X-Rune-Next-Page-Token': 'MTIzNDU2MDAwMA=='},
+                    {"X-Rune-Next-Page-Token": "MTIzNDU2MDAwMA=="},
+                    {"X-Rune-Next-Page-Token": "MTIzNDU2MDAwMA=="},
                     {},
                 ],
             )
@@ -339,35 +338,27 @@ class TestStreamV1Client(TestCase):
             # Check that all parameters were kept the same across calls,
             # except for "next_page_token" (which will normally be different
             # for each response)
-            self.assertEqual(calls, [
-                ((), {'test_num': test_num}),
-                (
-                    (),
-                    {
-                        'test_num': test_num,
-                        'next_page_token': 'MTIzNDU2MDAwMA=='
-                    }
-                ),
-                (
-                    (),
-                    {
-                        'test_num': test_num,
-                        'next_page_token': 'MTIzNDU2MDAwMA=='
-                    }
-                ),
-            ])
+            self.assertEqual(
+                calls,
+                [
+                    ((), {"test_num": test_num}),
+                    ((), {"test_num": test_num, "next_page_token": "MTIzNDU2MDAwMA=="}),
+                    ((), {"test_num": test_num, "next_page_token": "MTIzNDU2MDAwMA=="}),
+                ],
+            )
 
     def test_iter_csv_data(self):
         """
         Test the iterator over CSV responses, which follows pagination
         """
         mock_responses = [
-            'good,better\nskiing,hiking\n',
-            'good,better\ncupcakes,brownies\n',
-            '',
+            "good,better\nskiing,hiking\n",
+            "good,better\ncupcakes,brownies\n",
+            "",
         ]
 
-        for test_num, resource_creator in enumerate((
+        for test_num, resource_creator in enumerate(
+            (
                 self.client.Accel,
                 self.client.BandPower,
                 self.client.HeartRate,
@@ -375,7 +366,8 @@ class TestStreamV1Client(TestCase):
                 self.client.ProbabilitySymptom,
                 self.client.Rotation,
                 self.client.State,
-        )):
+            )
+        ):
             resource = resource_creator()
 
             #
@@ -400,11 +392,14 @@ class TestStreamV1Client(TestCase):
 
             # Check that all parameters were kept the same across calls,
             # except for "page" (which must be incremented)
-            self.assertEqual(calls, [
-                ((), {'test_num': test_num}),
-                ((), {'test_num': test_num, 'page': 1}),
-                ((), {'test_num': test_num, 'page': 2}),
-            ])
+            self.assertEqual(
+                calls,
+                [
+                    ((), {"test_num": test_num}),
+                    ((), {"test_num": test_num, "page": 1}),
+                    ((), {"test_num": test_num, "page": 2}),
+                ],
+            )
 
             #
             # Request Error
@@ -416,7 +411,7 @@ class TestStreamV1Client(TestCase):
             }
             # note: CSV endpoints return JSON on API errors
             resource.get_csv_response = mock_get_json_response(
-                [{'success': False, 'error': err_details}],
+                [{"success": False, "error": err_details}],
                 [],
                 status_code=404,
             )
@@ -434,17 +429,18 @@ class TestStreamV1Client(TestCase):
 
         """
         mock_responses = [
-            'lower,higher,label\n1,2,ints\n3.5,6.7,floats\n',
-            'lower,higher,label\n,8.9,missing data\n',
-            '',
+            "lower,higher,label\n1,2,ints\n3.5,6.7,floats\n",
+            "lower,higher,label\n,8.9,missing data\n",
+            "",
         ]
         expected = [
-            {'lower': 1, 'higher': 2, 'label': 'ints'},
-            {'lower': 3.5, 'higher': 6.7, 'label': 'floats'},
-            {'lower': None, 'higher': 8.9, 'label': 'missing data'},
+            {"lower": 1, "higher": 2, "label": "ints"},
+            {"lower": 3.5, "higher": 6.7, "label": "floats"},
+            {"lower": None, "higher": 8.9, "label": "missing data"},
         ]
 
-        for test_num, resource_creator in enumerate((
+        for test_num, resource_creator in enumerate(
+            (
                 self.client.Accel,
                 self.client.BandPower,
                 self.client.HeartRate,
@@ -452,7 +448,8 @@ class TestStreamV1Client(TestCase):
                 self.client.ProbabilitySymptom,
                 self.client.Rotation,
                 self.client.State,
-        )):
+            )
+        ):
             resource = resource_creator()
             # replace get_csv_response on the resource
             resource.get_csv_response = mock_get_csv_response(
@@ -473,7 +470,7 @@ class TestStreamV1Client(TestCase):
                 self.assertDictEqual(expected[i], point)
                 # check dtype for "higher", which always has a numeric
                 # value in the test data
-                self.assertNotIsInstance(point['higher'], np.float64)
+                self.assertNotIsInstance(point["higher"], np.float64)
 
     def test_iter_points_numpy(self):
         """
@@ -483,17 +480,18 @@ class TestStreamV1Client(TestCase):
         stream.v1.USE_NUMPY = True
 
         mock_responses = [
-            'lower,higher,label\n1,2,ints\n3.5,6.7,floats\n',
-            'lower,higher,label\n,8.9,missing data\n',
-            '',
+            "lower,higher,label\n1,2,ints\n3.5,6.7,floats\n",
+            "lower,higher,label\n,8.9,missing data\n",
+            "",
         ]
         expected = [
-            {'lower': 1, 'higher': 2, 'label': 'ints'},
-            {'lower': 3.5, 'higher': 6.7, 'label': 'floats'},
-            {'lower': np.NaN, 'higher': 8.9, 'label': 'missing data'},
+            {"lower": 1, "higher": 2, "label": "ints"},
+            {"lower": 3.5, "higher": 6.7, "label": "floats"},
+            {"lower": np.NaN, "higher": 8.9, "label": "missing data"},
         ]
 
-        for test_num, resource_creator in enumerate((
+        for test_num, resource_creator in enumerate(
+            (
                 self.client.Accel,
                 self.client.BandPower,
                 self.client.HeartRate,
@@ -501,7 +499,8 @@ class TestStreamV1Client(TestCase):
                 self.client.ProbabilitySymptom,
                 self.client.Rotation,
                 self.client.State,
-        )):
+            )
+        ):
             resource = resource_creator()
             # replace get_csv_response on the resource
             resource.get_csv_response = mock_get_csv_response(
@@ -513,4 +512,4 @@ class TestStreamV1Client(TestCase):
                 self.assertDictEqual(expected[i], point)
                 # check dtype for "higher", which always has a numeric
                 # value in the test data
-                self.assertIsInstance(point['higher'], np.float64)
+                self.assertIsInstance(point["higher"], np.float64)

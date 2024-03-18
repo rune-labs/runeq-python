@@ -14,6 +14,7 @@ class ItemBase:
     Base class for representing an item.
 
     """
+
     # ID of the Item
     _id: str
 
@@ -67,10 +68,7 @@ class ItemBase:
 
         """
         if hasattr(self, "name"):
-            return (
-                f'{self.__class__.__name__}'
-                f'(id="{self.id}", name="{self.name}")'
-            )
+            return f"{self.__class__.__name__}" f'(id="{self.id}", name="{self.name}")'
         else:
             return f'{self.__class__.__name__}(id="{self.id}")'
 
@@ -156,8 +154,7 @@ class ItemSet(ABC):
         """
         if type(item) is not self._item_class:
             raise TypeError(
-                f'cannot add {str(item)}; must be type '
-                f'{self._item_class.__name__}'
+                f"cannot add {str(item)}; must be type " f"{self._item_class.__name__}"
             )
 
         self._items[item.id] = item
@@ -171,8 +168,8 @@ class ItemSet(ABC):
         for item in items:
             if type(item) is not self._item_class:
                 raise TypeError(
-                    f'cannot update with {str(item)}; all items must be type '
-                    f'{self._item_class.__name__}'
+                    f"cannot update with {str(item)}; all items must be type "
+                    f"{self._item_class.__name__}"
                 )
 
             self._items[item.id] = item
@@ -207,15 +204,13 @@ class ItemSet(ABC):
         item_strs = []
         for i, item in enumerate(self):
             if i > 2:
-                item_strs.append(
-                    f'\t... (and {len(self._items.keys()) - 3} others)\n'
-                )
+                item_strs.append(f"\t... (and {len(self._items.keys()) - 3} others)\n")
                 break
 
-            item_strs.append(f'\t{str(item)}\n')
+            item_strs.append(f"\t{str(item)}\n")
 
-        items_str = ''.join(item_strs)
-        return f'{type(self).__name__} {{\n{items_str}}}'
+        items_str = "".join(item_strs)
+        return f"{type(self).__name__} {{\n{items_str}}}"
 
     def to_list(self) -> List[dict]:
         """

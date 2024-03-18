@@ -4,6 +4,7 @@ Fetch metadata about projects.
 """
 
 from typing import Iterable, Optional, Type
+
 import pandas as pd
 
 from .client import GraphClient, global_graph_client
@@ -17,6 +18,7 @@ class Metric(ItemBase):
     are calculated periodically and updated.
 
     """
+
     def __init__(
         self,
         id: str,
@@ -70,6 +72,7 @@ class MetricSet(ItemSet):
     A collection of Metrics.
 
     """
+
     def __init__(self, items: Iterable[Metric] = ()):
         """
         Initialize with Metrics.
@@ -92,6 +95,7 @@ class ProjectPatientMetadata(ItemBase):
     associated with the project.
 
     """
+
     def __init__(
         self,
         id: str,
@@ -161,12 +165,12 @@ class ProjectPatientMetadata(ItemBase):
 
         return pd.concat(
             [
-                metadata_df.drop('metrics', axis=1),
-                pd.DataFrame(metadata_df['metrics'].tolist()).rename(
+                metadata_df.drop("metrics", axis=1),
+                pd.DataFrame(metadata_df["metrics"].tolist()).rename(
                     columns=column_name_map
-                )
+                ),
             ],
-            axis=1
+            axis=1,
         )
 
 
@@ -175,6 +179,7 @@ class CohortPatientMetadata(ProjectPatientMetadata):
     Cohort related information about a patient contained in a cohort.
 
     """
+
     def __init__(
         self,
         id: str,
@@ -264,6 +269,7 @@ class Cohort(ItemBase):
     A single project can have multiple cohorts.
 
     """
+
     def __init__(
         self,
         id: str,
@@ -336,6 +342,7 @@ class Project(ItemBase):
     on a regular basis for all patients in a project.
 
     """
+
     def __init__(
         self,
         id: str,
@@ -426,9 +433,7 @@ class ProjectSet(ItemSet):
         return Project
 
 
-def get_project(
-    project_id: str, client: Optional[GraphClient] = None
-) -> Project:
+def get_project(project_id: str, client: Optional[GraphClient] = None) -> Project:
     """
     Get the project with the specified ID.
 
@@ -561,9 +566,7 @@ def get_projects(client: Optional[GraphClient] = None) -> ProjectSet:
     return project_set
 
 
-def _parse_patient_metrics(
-    metrics: dict
-) -> MetricSet:
+def _parse_patient_metrics(metrics: dict) -> MetricSet:
     """
     Helper function that intakes a metric dictionary and outputs a metric set.
 
@@ -659,9 +662,7 @@ def get_project_patients(
         if not cursor:
             break
 
-        cursor_input = {
-            "codeNameCursor": cursor
-        }
+        cursor_input = {"codeNameCursor": cursor}
 
     return project_patient_set
 
@@ -740,15 +741,11 @@ def get_cohort_patients(
             patient = CohortPatientMetadata(**patient_attrs)
             cohort_patient_set.add(patient)
 
-        cursor = cohort_patient_list.get("pageInfo", {}).get(
-            "codeNameEndCursor"
-        )
+        cursor = cohort_patient_list.get("pageInfo", {}).get("codeNameEndCursor")
 
         if not cursor:
             break
 
-        cursor_input = {
-            "codeNameCursor": cursor
-        }
+        cursor_input = {"codeNameCursor": cursor}
 
     return cohort_patient_set
