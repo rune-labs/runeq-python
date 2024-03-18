@@ -9,9 +9,13 @@ ignore =
     E126
     E201
     E202
+    # Flake8 is not PEP-8 compliant for slice syntax, but black is.
+    E203
     E303
     E305
     E402
+    # Ignore line length limits as these are handled by black.
+    E501
     W391
     W503
     W504

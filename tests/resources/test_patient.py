@@ -7,8 +7,15 @@ from unittest import TestCase, mock
 from runeq.config import Config
 from runeq.resources.client import GraphClient
 from runeq.resources.patient import (
-    Device, DeviceSet, Patient, PatientSet, get_all_devices, get_all_patients,
-    get_device, get_patient, get_patient_devices
+    Device,
+    DeviceSet,
+    Patient,
+    PatientSet,
+    get_all_devices,
+    get_all_patients,
+    get_device,
+    get_patient,
+    get_patient_devices,
 )
 
 
@@ -24,10 +31,7 @@ class TestPatient(TestCase):
 
         """
         self.mock_client = GraphClient(
-            Config(
-                client_key_id='test',
-                client_access_key='config'
-            )
+            Config(client_key_id="test", client_access_key="config")
         )
 
     def test_attributes(self):
@@ -54,9 +58,9 @@ class TestPatient(TestCase):
                         name="Apple Watch",
                         created_at=1629300943.9179766,
                         device_type_id="dt2",
-                    )
+                    ),
                 ]
-            )
+            ),
         )
 
         self.assertEqual("p1", test_patient.id)
@@ -74,7 +78,7 @@ class TestPatient(TestCase):
                 "created_at": 1629300943.9179766,
                 "device_type_id": "dt1",
             },
-            actual_devices[0]
+            actual_devices[0],
         )
 
         self.assertEqual(
@@ -85,7 +89,7 @@ class TestPatient(TestCase):
                 "created_at": 1629300943.9179766,
                 "device_type_id": "dt2",
             },
-            actual_devices[1]
+            actual_devices[1],
         )
 
         self.assertEqual(
@@ -96,7 +100,7 @@ class TestPatient(TestCase):
                 created_at=1629300943.9179766,
                 device_type_id="dt1",
             ),
-            test_patient.device("d1")
+            test_patient.device("d1"),
         )
 
     def test_repr(self):
@@ -108,12 +112,9 @@ class TestPatient(TestCase):
             id="p1",
             created_at=1629300943.9179766,
             name="Patient 1",
-            devices=DeviceSet()
+            devices=DeviceSet(),
         )
-        self.assertEqual(
-            'Patient(id="p1", name="Patient 1")',
-            repr(test_patient)
-        )
+        self.assertEqual('Patient(id="p1", name="Patient 1")', repr(test_patient))
 
     def test_normalize_id(self):
         """
@@ -122,12 +123,12 @@ class TestPatient(TestCase):
         """
         self.assertEqual(
             "d4b1c627bd464fe0a5ed940cc8e8e485",
-            Patient.normalize_id("patient-d4b1c627bd464fe0a5ed940cc8e8e485")
+            Patient.normalize_id("patient-d4b1c627bd464fe0a5ed940cc8e8e485"),
         )
 
         self.assertEqual(
             "d4b1c627bd464fe0a5ed940cc8e8e485",
-            Patient.normalize_id("d4b1c627bd464fe0a5ed940cc8e8e485")
+            Patient.normalize_id("d4b1c627bd464fe0a5ed940cc8e8e485"),
         )
 
     def test_denormalize_id(self):
@@ -137,12 +138,12 @@ class TestPatient(TestCase):
         """
         self.assertEqual(
             "patient-d4b1c627bd464fe0a5ed940cc8e8e485",
-            Patient.denormalize_id("patient-d4b1c627bd464fe0a5ed940cc8e8e485")
+            Patient.denormalize_id("patient-d4b1c627bd464fe0a5ed940cc8e8e485"),
         )
 
         self.assertEqual(
             "patient-d4b1c627bd464fe0a5ed940cc8e8e485",
-            Patient.denormalize_id("d4b1c627bd464fe0a5ed940cc8e8e485")
+            Patient.denormalize_id("d4b1c627bd464fe0a5ed940cc8e8e485"),
         )
 
     def test_get_patient_basic(self):
@@ -158,48 +159,37 @@ class TestPatient(TestCase):
                     "created_at": 1630515986.9949625,
                     "name": "patient1",
                     "deviceList": {
-                        "pageInfo": {
-                            "endCursor": None
-                        },
+                        "pageInfo": {"endCursor": None},
                         "devices": [
                             {
                                 "id": "d1",
                                 "name": "Percept",
                                 "created_at": 1646685476.1367705,
-                                "device_type": {
-                                    "id": "dt1",
-                                    "name": "percept"
-                                },
+                                "device_type": {"id": "dt1", "name": "percept"},
                                 "disabled": False,
                                 "disabled_at": None,
-                                "updated_at": 1646685485.9403558
+                                "updated_at": 1646685485.9403558,
                             },
                             {
                                 "id": "d2",
                                 "name": "Strive PD",
                                 "created_at": 1646684177.194158,
-                                "device_type": {
-                                    "id": "dt2",
-                                    "name": "strivestudy"
-                                },
+                                "device_type": {"id": "dt2", "name": "strivestudy"},
                                 "disabled": False,
                                 "disabled_at": None,
-                                "updated_at": 1646684177.194158
+                                "updated_at": 1646684177.194158,
                             },
                             {
                                 "id": "d3",
                                 "name": "Apple Watch",
                                 "created_at": 1646684177.1942198,
-                                "device_type": {
-                                    "id": "dt3",
-                                    "name": "watch"
-                                },
+                                "device_type": {"id": "dt3", "name": "watch"},
                                 "disabled": True,
                                 "disabled_at": 1646684178.1942198,
-                                "updated_at": 1646684178.1942198
+                                "updated_at": 1646684178.1942198,
                             },
-                        ]
-                    }
+                        ],
+                    },
                 }
             }
         ]
@@ -220,7 +210,7 @@ class TestPatient(TestCase):
                         "disabled": False,
                         "disabled_at": None,
                         "updated_at": 1646685485.9403558,
-                        "id": "d1"
+                        "id": "d1",
                     },
                     {
                         "patient_id": "p1",
@@ -230,7 +220,7 @@ class TestPatient(TestCase):
                         "disabled": False,
                         "disabled_at": None,
                         "updated_at": 1646684177.194158,
-                        "id": "d2"
+                        "id": "d2",
                     },
                     {
                         "patient_id": "p1",
@@ -240,13 +230,12 @@ class TestPatient(TestCase):
                         "disabled": True,
                         "disabled_at": 1646684178.1942198,
                         "updated_at": 1646684178.1942198,
-                        "id": "d3"
-                    }
-                ]
+                        "id": "d3",
+                    },
+                ],
             },
             test_patient.to_dict(),
         )
-
 
     def test_get_patient_paginated(self):
         """
@@ -262,9 +251,7 @@ class TestPatient(TestCase):
                     "created_at": 1630515986.9949625,
                     "name": "patient1",
                     "deviceList": {
-                        "pageInfo": {
-                            "endCursor": "test_check_next"
-                        },
+                        "pageInfo": {"endCursor": "test_check_next"},
                         "devices": [
                             {
                                 "id": "d1",
@@ -275,10 +262,10 @@ class TestPatient(TestCase):
                                 },
                                 "disabled": False,
                                 "disabled_at": None,
-                                "updated_at": 1646685485.9403558
+                                "updated_at": 1646685485.9403558,
                             }
-                        ]
-                    }
+                        ],
+                    },
                 }
             },
             {
@@ -287,9 +274,7 @@ class TestPatient(TestCase):
                     "created_at": 1630515986.9949625,
                     "name": "patient1",
                     "deviceList": {
-                        "pageInfo": {
-                            "endCursor": None
-                        },
+                        "pageInfo": {"endCursor": None},
                         "devices": [
                             {
                                 "id": "d2",
@@ -300,12 +285,12 @@ class TestPatient(TestCase):
                                 },
                                 "disabled": False,
                                 "disabled_at": None,
-                                "updated_at": 1646684177.194158
+                                "updated_at": 1646684177.194158,
                             }
-                        ]
-                    }
+                        ],
+                    },
                 }
-            }
+            },
         ]
 
         test_patient = get_patient("patient-p1", client=self.mock_client)
@@ -324,7 +309,7 @@ class TestPatient(TestCase):
                         "disabled": False,
                         "disabled_at": None,
                         "updated_at": 1646685485.9403558,
-                        "id": "d1"
+                        "id": "d1",
                     },
                     {
                         "patient_id": "p1",
@@ -334,9 +319,9 @@ class TestPatient(TestCase):
                         "disabled": False,
                         "disabled_at": None,
                         "updated_at": 1646684177.194158,
-                        "id": "d2"
-                    }
-                ]
+                        "id": "d2",
+                    },
+                ],
             },
             test_patient.to_dict(),
         )
@@ -352,9 +337,7 @@ class TestPatient(TestCase):
                 "created_at": 1630515986.9949625,
                 "name": "patient1",
                 "deviceList": {
-                    "pageInfo": {
-                        "endCursor": None
-                    },
+                    "pageInfo": {"endCursor": None},
                     "devices": [
                         {
                             "id": "d1",
@@ -365,10 +348,10 @@ class TestPatient(TestCase):
                             },
                             "disabled": False,
                             "disabled_at": None,
-                            "updated_at": 1646685485.9403558
+                            "updated_at": 1646685485.9403558,
                         }
-                    ]
-                }
+                    ],
+                },
             }
         }
 
@@ -378,9 +361,7 @@ class TestPatient(TestCase):
                 "created_at": 1630515986.9949625,
                 "name": "patient2",
                 "deviceList": {
-                    "pageInfo": {
-                        "endCursor": None
-                    },
+                    "pageInfo": {"endCursor": None},
                     "devices": [
                         {
                             "id": "d1",
@@ -391,26 +372,20 @@ class TestPatient(TestCase):
                             },
                             "disabled": False,
                             "disabled_at": None,
-                            "updated_at": 1646685485.9403558
+                            "updated_at": 1646685485.9403558,
                         }
-                    ]
-                }
+                    ],
+                },
             }
         }
-
 
         self.mock_client.execute = mock.Mock()
         self.mock_client.execute.side_effect = [
             {
                 "org": {
                     "patientAccessList": {
-                        "pageInfo": {
-                            "endCursor": None
-                        },
-                        "patientAccess": [
-                            test_patient1,
-                            test_patient2
-                        ]
+                        "pageInfo": {"endCursor": None},
+                        "patientAccess": [test_patient1, test_patient2],
                     }
                 }
             }
@@ -433,9 +408,9 @@ class TestPatient(TestCase):
                             "disabled": False,
                             "disabled_at": None,
                             "updated_at": 1646685485.9403558,
-                            "id": "d1"
+                            "id": "d1",
                         }
-                    ]
+                    ],
                 },
                 {
                     "id": "p2",
@@ -450,14 +425,13 @@ class TestPatient(TestCase):
                             "disabled": False,
                             "disabled_at": None,
                             "updated_at": 1646685485.9403558,
-                            "id": "d1"
+                            "id": "d1",
                         }
-                    ]
-                }
+                    ],
+                },
             ],
             patients.to_list(),
         )
-
 
     def test_get_all_patients_paginated(self):
         """
@@ -471,9 +445,7 @@ class TestPatient(TestCase):
                 "created_at": 1630515986.9949625,
                 "name": "patient1",
                 "deviceList": {
-                    "pageInfo": {
-                        "endCursor": None
-                    },
+                    "pageInfo": {"endCursor": None},
                     "devices": [
                         {
                             "id": "d1",
@@ -484,10 +456,10 @@ class TestPatient(TestCase):
                             },
                             "disabled": False,
                             "disabled_at": None,
-                            "updated_at": 1646685485.9403558
+                            "updated_at": 1646685485.9403558,
                         }
-                    ]
-                }
+                    ],
+                },
             }
         }
 
@@ -497,9 +469,7 @@ class TestPatient(TestCase):
                 "created_at": 1630515986.9949625,
                 "name": "patient2",
                 "deviceList": {
-                    "pageInfo": {
-                        "endCursor": None
-                    },
+                    "pageInfo": {"endCursor": None},
                     "devices": [
                         {
                             "id": "d1",
@@ -510,40 +480,31 @@ class TestPatient(TestCase):
                             },
                             "disabled": False,
                             "disabled_at": None,
-                            "updated_at": 1646685485.9403558
+                            "updated_at": 1646685485.9403558,
                         }
-                    ]
-                }
+                    ],
+                },
             }
         }
-
 
         self.mock_client.execute = mock.Mock()
         self.mock_client.execute.side_effect = [
             {
                 "org": {
                     "patientAccessList": {
-                        "pageInfo": {
-                            "endCursor": "test_check_next"
-                        },
-                        "patientAccess": [
-                            test_patient1
-                        ]
+                        "pageInfo": {"endCursor": "test_check_next"},
+                        "patientAccess": [test_patient1],
                     }
                 }
             },
             {
                 "org": {
                     "patientAccessList": {
-                        "pageInfo": {
-                            "endCursor": None
-                        },
-                        "patientAccess": [
-                            test_patient2
-                        ]
+                        "pageInfo": {"endCursor": None},
+                        "patientAccess": [test_patient2],
                     }
                 }
-            }
+            },
         ]
 
         patients = get_all_patients(client=self.mock_client)
@@ -563,9 +524,9 @@ class TestPatient(TestCase):
                             "disabled": False,
                             "disabled_at": None,
                             "updated_at": 1646685485.9403558,
-                            "id": "d1"
+                            "id": "d1",
                         }
-                    ]
+                    ],
                 },
                 {
                     "id": "p2",
@@ -580,10 +541,10 @@ class TestPatient(TestCase):
                             "disabled": False,
                             "disabled_at": None,
                             "updated_at": 1646685485.9403558,
-                            "id": "d1"
+                            "id": "d1",
                         }
-                    ]
-                }
+                    ],
+                },
             ],
             patients.to_list(),
         )
@@ -602,10 +563,7 @@ class TestDevice(TestCase):
         """
         self.maxDiff = None
         self.mock_client = GraphClient(
-            Config(
-                client_key_id='test',
-                client_access_key='config'
-            )
+            Config(client_key_id="test", client_access_key="config")
         )
 
     def test_attributes(self):
@@ -640,8 +598,7 @@ class TestDevice(TestCase):
             device_type_id="dt1",
         )
         self.assertEqual(
-            'Device(id="1", name="Percept", patient_id="p1")',
-            repr(test_device)
+            'Device(id="1", name="Percept", patient_id="p1")', repr(test_device)
         )
 
     def test_normalize_id(self):
@@ -651,12 +608,12 @@ class TestDevice(TestCase):
         """
         self.assertEqual(
             "d4b1c627bd464fe0a5ed940cc8e8e485",
-            Device.normalize_id("device-d4b1c627bd464fe0a5ed940cc8e8e485")
+            Device.normalize_id("device-d4b1c627bd464fe0a5ed940cc8e8e485"),
         )
 
         self.assertEqual(
             "d4b1c627bd464fe0a5ed940cc8e8e485",
-            Device.normalize_id("d4b1c627bd464fe0a5ed940cc8e8e485")
+            Device.normalize_id("d4b1c627bd464fe0a5ed940cc8e8e485"),
         )
 
     def test_denormalize_id(self):
@@ -666,36 +623,23 @@ class TestDevice(TestCase):
         """
         self.assertEqual(
             "patient-d4b1c627bd4,device-d4b1c627bd46",
-            Device.denormalize_id(
-                "patient-d4b1c627bd4",
-                "device-d4b1c627bd46"
-            )
+            Device.denormalize_id("patient-d4b1c627bd4", "device-d4b1c627bd46"),
         )
 
         self.assertEqual(
             "patient-d4b1c627bd4,device-d4b1c627bd46",
-            Device.denormalize_id(
-                "patient-d4b1c627bd4",
-                "d4b1c627bd46"
-            )
+            Device.denormalize_id("patient-d4b1c627bd4", "d4b1c627bd46"),
         )
 
         self.assertEqual(
             "patient-d4b1c627bd4,device-d4b1c627bd46",
-            Device.denormalize_id(
-                "d4b1c627bd4",
-                "device-d4b1c627bd46"
-            )
+            Device.denormalize_id("d4b1c627bd4", "device-d4b1c627bd46"),
         )
 
         self.assertEqual(
             "patient-d4b1c627bd4,device-d4b1c627bd46",
-            Device.denormalize_id(
-                "d4b1c627bd4",
-                "d4b1c627bd46"
-            )
+            Device.denormalize_id("d4b1c627bd4", "d4b1c627bd46"),
         )
-
 
     def test_get_device(self):
         """
@@ -714,17 +658,10 @@ class TestDevice(TestCase):
             id="p1",
             created_at=1629300943.9179766,
             name="patient1",
-            devices=DeviceSet(
-                [
-                    test_device
-                ]
-            )
+            devices=DeviceSet([test_device]),
         )
 
-        act_device = get_device(
-            patient=test_patient,
-            device_id="device-1"
-        )
+        act_device = get_device(patient=test_patient, device_id="device-1")
         self.assertEqual(test_device.to_dict(), act_device.to_dict())
 
     def test_get_patient_devices(self):
@@ -752,23 +689,14 @@ class TestDevice(TestCase):
             id="p1",
             created_at=1629300943.9179766,
             name="patient1",
-            devices=DeviceSet(
-                [
-                    test_device_1,
-                    test_device_2
-                ]
-            )
+            devices=DeviceSet([test_device_1, test_device_2]),
         )
 
         act_devices = get_patient_devices(
             patient=test_patient,
         )
         self.assertEqual(
-            [
-                test_device_1.to_dict(),
-                test_device_2.to_dict()
-            ],
-            act_devices.to_list()
+            [test_device_1.to_dict(), test_device_2.to_dict()], act_devices.to_list()
         )
 
     def test_get_all_devices(self):
@@ -788,7 +716,7 @@ class TestDevice(TestCase):
             id="p1",
             created_at=1629300943.9179766,
             name="patient1",
-            devices=DeviceSet([test_device_1])
+            devices=DeviceSet([test_device_1]),
         )
 
         test_device_2 = Device(
@@ -803,16 +731,12 @@ class TestDevice(TestCase):
             id="p2",
             created_at=1629300943.9179766,
             name="patient2",
-            devices=DeviceSet([test_device_2])
+            devices=DeviceSet([test_device_2]),
         )
 
         patients = PatientSet([test_patient_1, test_patient_2])
 
         act_devices = get_all_devices(patients=patients)
         self.assertEqual(
-            [
-                test_device_1.to_dict(),
-                test_device_2.to_dict()
-            ],
-            act_devices.to_list()
+            [test_device_1.to_dict(), test_device_2.to_dict()], act_devices.to_list()
         )

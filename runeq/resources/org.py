@@ -16,12 +16,7 @@ class Org(ItemBase):
     """
 
     def __init__(
-        self,
-        id: str,
-        name: str,
-        created_at: float,
-        tags: Iterable = (),
-        **attributes
+        self, id: str, name: str, created_at: float, tags: Iterable = (), **attributes
     ):
         """
         Initialize with metadata.
@@ -77,10 +72,10 @@ class Org(ItemBase):
 
         """
         if not org_id.startswith("org-"):
-            org_id = f'org-{org_id}'
+            org_id = f"org-{org_id}"
 
         if not org_id.endswith(",org"):
-            org_id = f'{org_id},org'
+            org_id = f"{org_id},org"
 
         return org_id
 
@@ -114,7 +109,7 @@ def _iter_all_orgs(client: Optional[GraphClient] = None):
 
     """
     client = client or global_graph_client()
-    query = '''
+    query = """
         query getOrgMemberships($cursor: Cursor) {
             user {
                 membershipList(cursor: $cursor) {
@@ -132,17 +127,14 @@ def _iter_all_orgs(client: Optional[GraphClient] = None):
                 }
             }
         }
-    '''
+    """
 
     next_cursor = None
 
     # Use cursor to page through all orgs that the user is a member of. Yield
     # each one as an Org
     while True:
-        result = client.execute(
-            statement=query,
-            cursor=next_cursor
-        )
+        result = client.execute(statement=query, cursor=next_cursor)
 
         membership_list = result.get("user", {}).get("membershipList", {})
 
@@ -195,10 +187,7 @@ def get_orgs(client: Optional[GraphClient] = None) -> OrgSet:
     return org_set
 
 
-def set_active_org(
-    org: Union[str, Org],
-    client: Optional[GraphClient] = None
-) -> Org:
+def set_active_org(org: Union[str, Org], client: Optional[GraphClient] = None) -> Org:
     """
     Set the active organization for the current user.
 
@@ -214,7 +203,7 @@ def set_active_org(
     client = client or global_graph_client()
     org_id = org.id if isinstance(org, Org) else org
 
-    statement = '''
+    statement = """
     mutation updateDefaultMembership($input: UpdateDefaultMembershipInput!) {
         updateDefaultMembership(input: $input) {
             user {
@@ -229,7 +218,7 @@ def set_active_org(
             }
         }
     }
-    '''
+    """
 
     result = client.execute(statement=statement, input={"orgId": org_id})
 

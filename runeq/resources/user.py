@@ -78,7 +78,7 @@ def get_current_user(client: Optional[GraphClient] = None) -> User:
             API. Otherwise, the global GraphClient is used.
     """
     client = client or global_graph_client()
-    query = '''
+    query = """
         query getUser {
             user {
                 id
@@ -93,7 +93,7 @@ def get_current_user(client: Optional[GraphClient] = None) -> User:
                 email
             }
         }
-    '''
+    """
 
     result = client.execute(statement=query)
 
@@ -107,5 +107,5 @@ def get_current_user(client: Optional[GraphClient] = None) -> User:
         created_at=user_attrs.get("created_at"),
         active_org_id=org.get("id"),
         active_org_name=org.get("name"),
-        email=user_attrs.get("email")
+        email=user_attrs.get("email"),
     )

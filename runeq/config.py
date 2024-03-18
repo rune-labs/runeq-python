@@ -3,36 +3,35 @@ Configuration for accessing Rune APIs.
 
 """
 import os
-import yaml
 
 import boto3
+import yaml
 
-
-AUTH_METHOD_CLIENT_KEYS = 'client_keys'
+AUTH_METHOD_CLIENT_KEYS = "client_keys"
 """
 Auth method to use a Client Key pair for authentication.
 
 """
 
-AUTH_METHOD_JWT = 'jwt'
+AUTH_METHOD_JWT = "jwt"
 """
 Auth method to use a JWT for authentication.
 
 """
 
-AUTH_METHOD_COGNITO_REFRESH = 'cognito_refresh'
+AUTH_METHOD_COGNITO_REFRESH = "cognito_refresh"
 """
 Auth method to use a Cognito refresh token for authentication.
 
 """
 
-AUTH_METHOD_ACCESS_TOKEN = 'access_token'
+AUTH_METHOD_ACCESS_TOKEN = "access_token"
 """
 Auth method to use a user access token for authentication.
 
 """
 
-DEFAULT_CONFIG_YAML = '~/.rune/config'
+DEFAULT_CONFIG_YAML = "~/.rune/config"
 """
 Default path for the config file (yaml formatted)
 
@@ -70,8 +69,8 @@ class Config:
             # user access token.
 
         """
-        self.graph_url = 'https://graph.runelabs.io'
-        self.stream_url = 'https://stream.runelabs.io'
+        self.graph_url = "https://graph.runelabs.io"
+        self.stream_url = "https://stream.runelabs.io"
         self.auth_method = None
 
         self._access_token_id = None
@@ -84,14 +83,15 @@ class Config:
 
         if args and kwargs:
             raise TypeError(
-                '__init__() cannot accept both positional arguments and '
-                'keyword arguments'
+                "__init__() cannot accept both positional arguments and "
+                "keyword arguments"
             )
         elif args:
             if len(args) > 1:
                 raise TypeError(
-                    '__init__() takes at most 1 positional argument but '
-                    f'{len(args)} were given')
+                    "__init__() takes at most 1 positional argument but "
+                    f"{len(args)} were given"
+                )
 
             self.load_yaml(args[0])
         elif not kwargs:
@@ -122,7 +122,7 @@ class Config:
         jwt=None,
         cognito_client_id=None,
         cognito_refresh_token=None,
-        cognito_region_name='us-west-2',
+        cognito_region_name="us-west-2",
         stream_url=None,
         graph_url=None,
         **kwargs,
@@ -152,17 +152,19 @@ class Config:
             self.graph_url = graph_url
 
         if auth_method is None:
-            num_auth_methods_set = sum([
-                bool(access_token_id or access_token_secret),
-                bool(client_access_key or client_key_id),
-                bool(jwt),
-                bool(cognito_refresh_token and cognito_client_id),
-            ])
+            num_auth_methods_set = sum(
+                [
+                    bool(access_token_id or access_token_secret),
+                    bool(client_access_key or client_key_id),
+                    bool(jwt),
+                    bool(cognito_refresh_token and cognito_client_id),
+                ]
+            )
 
             if num_auth_methods_set > 1:
                 raise ValueError(
-                    'Cannot infer auth method: multiple credentials were '
-                    'provided. Specify auth_method kwarg to disambiguate.'
+                    "Cannot infer auth method: multiple credentials were "
+                    "provided. Specify auth_method kwarg to disambiguate."
                 )
             elif access_token_id and access_token_secret:
                 auth_method = AUTH_METHOD_ACCESS_TOKEN
@@ -174,8 +176,8 @@ class Config:
                 auth_method = AUTH_METHOD_COGNITO_REFRESH
             else:
                 raise ValueError(
-                    'Cannot infer auth method: a complete set of credentials '
-                    'was not provided.'
+                    "Cannot infer auth method: a complete set of credentials "
+                    "was not provided."
                 )
 
         self.auth_method = auth_method
@@ -216,13 +218,13 @@ class Config:
 
         """
         if not self._client_access_key:
-            raise ValueError('Client access key is not set')
+            raise ValueError("Client access key is not set")
         if not self._client_key_id:
-            raise ValueError('Client key id is not set')
+            raise ValueError("Client key id is not set")
 
         return {
-            'X-Rune-Client-Key-ID': self._client_key_id,
-            'X-Rune-Client-Access-Key': self._client_access_key,
+            "X-Rune-Client-Key-ID": self._client_key_id,
+            "X-Rune-Client-Access-Key": self._client_access_key,
         }
 
     @property
@@ -233,10 +235,10 @@ class Config:
         """
         if not self._jwt:
             if not self.refresh_auth():
-                raise ValueError('JWT is not set')
+                raise ValueError("JWT is not set")
 
         return {
-            'X-Rune-User-Access-Token': self._jwt,
+            "X-Rune-User-Access-Token": self._jwt,
         }
 
     def refresh_auth(self) -> bool:
@@ -254,13 +256,13 @@ class Config:
             return False
 
         response = self._cognito_client.initiate_auth(
-            AuthFlow='REFRESH_TOKEN_AUTH',
+            AuthFlow="REFRESH_TOKEN_AUTH",
             AuthParameters={
-                'REFRESH_TOKEN': self._cognito_refresh_token,
+                "REFRESH_TOKEN": self._cognito_refresh_token,
             },
-            ClientId=self._cognito_client_id
+            ClientId=self._cognito_client_id,
         )
-        self._jwt = response['AuthenticationResult']['AccessToken']
+        self._jwt = response["AuthenticationResult"]["AccessToken"]
         return True
 
     @property
@@ -270,14 +272,14 @@ class Config:
 
         """
         if not self._access_token_id:
-            raise ValueError('Access token id is not set')
+            raise ValueError("Access token id is not set")
 
         if not self._access_token_secret:
-            raise ValueError('Access token secret is not set')
+            raise ValueError("Access token secret is not set")
 
         return {
-            'X-Rune-User-Access-Token-Id': self._access_token_id,
-            'X-Rune-User-Access-Token-Secret': self._access_token_secret
+            "X-Rune-User-Access-Token-Id": self._access_token_id,
+            "X-Rune-User-Access-Token-Secret": self._access_token_secret,
         }
 
     @property
@@ -297,8 +299,8 @@ class Config:
         else:
             raise ValueError(
                 f'Invalid auth_method "{self.auth_method}": expected one of '
-                f'({AUTH_METHOD_ACCESS_TOKEN}, '
-                f'{AUTH_METHOD_CLIENT_KEYS}, '
-                f'{AUTH_METHOD_JWT}, '
-                f'{AUTH_METHOD_COGNITO_REFRESH})'
+                f"({AUTH_METHOD_ACCESS_TOKEN}, "
+                f"{AUTH_METHOD_CLIENT_KEYS}, "
+                f"{AUTH_METHOD_JWT}, "
+                f"{AUTH_METHOD_COGNITO_REFRESH})"
             )

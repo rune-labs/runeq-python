@@ -21,10 +21,7 @@ class TestUser(TestCase):
 
         """
         self.mock_client = GraphClient(
-            Config(
-                client_key_id='test',
-                client_access_key='config'
-            )
+            Config(client_key_id="test", client_access_key="config")
         )
 
     def test_attributes(self):
@@ -59,10 +56,7 @@ class TestUser(TestCase):
             active_org_name="Org 1",
         )
 
-        self.assertEqual(
-            'User(id="user1-id", name="User 1")',
-            repr(test_user)
-        )
+        self.assertEqual('User(id="user1-id", name="User 1")', repr(test_user))
 
     def test_normalize_id(self):
         """
@@ -71,22 +65,22 @@ class TestUser(TestCase):
         """
         self.assertEqual(
             "d4b1c627bd464fe0a5ed940cc8e8e485",
-            User.normalize_id("user-d4b1c627bd464fe0a5ed940cc8e8e485,user")
+            User.normalize_id("user-d4b1c627bd464fe0a5ed940cc8e8e485,user"),
         )
 
         self.assertEqual(
             "d4b1c627bd464fe0a5ed940cc8e8e485",
-            User.normalize_id("d4b1c627bd464fe0a5ed940cc8e8e485,user")
+            User.normalize_id("d4b1c627bd464fe0a5ed940cc8e8e485,user"),
         )
 
         self.assertEqual(
             "d4b1c627bd464fe0a5ed940cc8e8e485",
-            User.normalize_id("user-d4b1c627bd464fe0a5ed940cc8e8e485")
+            User.normalize_id("user-d4b1c627bd464fe0a5ed940cc8e8e485"),
         )
 
         self.assertEqual(
             "d4b1c627bd464fe0a5ed940cc8e8e485",
-            User.normalize_id("d4b1c627bd464fe0a5ed940cc8e8e485")
+            User.normalize_id("d4b1c627bd464fe0a5ed940cc8e8e485"),
         )
 
     def test_get_user(self):
@@ -101,12 +95,7 @@ class TestUser(TestCase):
                     "id": "user1-id",
                     "created_at": 1629300943.9179766,
                     "name": "user1",
-                    "defaultMembership": {
-                        "org": {
-                            "id": "org1-id",
-                            "name": "org1"
-                        }
-                    },
+                    "defaultMembership": {"org": {"id": "org1-id", "name": "org1"}},
                     "email": "user1@email.com",
                 }
             }

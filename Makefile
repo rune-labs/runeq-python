@@ -20,8 +20,30 @@ init: $(VENV_NAME)
 	. $(VENV_ACTIVATE) && pip install -r requirements/dev.txt
 
 .PHONY: lint
-lint:
+lint: black-check isort-check flake8
+
+.PHONY: flake8
+flake8:
 	. $(VENV_ACTIVATE) && flake8 .
+
+.PHONY: black-check
+black-check:
+	. $(VENV_ACTIVATE) && black --check .
+
+.PHONY: black-format
+black-format:
+	. $(VENV_ACTIVATE) && black .
+
+.PHONY: isort-check
+isort-check:
+	. $(VENV_ACTIVATE) && isort --check .
+
+.PHONY: isort-format
+isort-format:
+	. $(VENV_ACTIVATE) && isort .
+
+.PHONY: format
+format: black-format isort-format ## format code and sort imports
 
 .PHONY: test
 test:

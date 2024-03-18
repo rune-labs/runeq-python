@@ -5,7 +5,7 @@ Query data from the Rune Labs Stream API (V1).
 import csv
 from logging import getLogger
 from typing import Iterator, Union
-from urllib.parse import urljoin, urlencode
+from urllib.parse import urlencode, urljoin
 
 import requests
 
@@ -14,6 +14,7 @@ from runeq.errors import APIError
 
 try:
     import numpy as np
+
     USE_NUMPY = True
 except ImportError:
     USE_NUMPY = False
@@ -53,8 +54,8 @@ def _check_response(r: requests.Response) -> None:
         r.raise_for_status()
         return
 
-    if 'error' in data:
-        raise APIError(r.status_code, data['error'])
+    if "error" in data:
+        raise APIError(r.status_code, data["error"])
 
 
 class StreamV1Base:
@@ -108,11 +109,8 @@ class StreamV1Base:
         """
         self._update_params(params)
 
-        url = urljoin(
-            self.config.stream_url,
-            '/v1/{}.json'.format(self._resource)
-        )
-        log.debug(f'GET {url}?{urlencode(params)}')
+        url = urljoin(self.config.stream_url, "/v1/{}.json".format(self._resource))
+        log.debug(f"GET {url}?{urlencode(params)}")
         return requests.get(
             url,
             headers=self.config.auth_headers,
@@ -143,18 +141,18 @@ class StreamV1Base:
             _check_response(r)
             data = r.json()
 
-            next_page = data.get('next_page')
-            next_page_token = r.headers.get('X-Rune-Next-Page-Token')
-            has_next = (next_page or next_page_token)
+            next_page = data.get("next_page")
+            next_page_token = r.headers.get("X-Rune-Next-Page-Token")
+            has_next = next_page or next_page_token
 
             if next_page_token is not None:
-                params['next_page_token'] = next_page_token
-                params.pop('page', None)
+                params["next_page_token"] = next_page_token
+                params.pop("page", None)
             else:
-                params['page'] = next_page
-                params.pop('next_page_token', None)
+                params["page"] = next_page
+                params.pop("next_page_token", None)
 
-            yield data['result']
+            yield data["result"]
 
     @property
     def expr_availability(self):
@@ -167,8 +165,9 @@ class StreamV1Base:
 
         """
         if not self._availability:
-            raise NotImplementedError(f'{self.__class__.__name__} does not '
-                                      f'support an availability query')
+            raise NotImplementedError(
+                f"{self.__class__.__name__} does not " f"support an availability query"
+            )
 
         return self._availability
 
@@ -188,7 +187,7 @@ class StreamV1Base:
             NotImplementedError: if the resource doesn't support an
                 availability query expression.
         """
-        params['expression'] = self.expr_availability
+        params["expression"] = self.expr_availability
         yield from self.iter_json_data(**params)
 
 
@@ -212,12 +211,9 @@ class StreamV1CSVBase(StreamV1Base):
         """
         self._update_params(params)
 
-        url = urljoin(
-            self.config.stream_url,
-            '/v1/{}.csv'.format(self._resource)
-        )
+        url = urljoin(self.config.stream_url, "/v1/{}.csv".format(self._resource))
 
-        log.debug(f'GET {url}?{urlencode(params)}')
+        log.debug(f"GET {url}?{urlencode(params)}")
         return requests.get(
             url,
             headers=self.config.auth_headers,
@@ -251,8 +247,8 @@ class StreamV1CSVBase(StreamV1Base):
         # the next page token header field is absent from the response.
         page = 0
 
-        if 'page' in params:
-            page = params['page']
+        if "page" in params:
+            page = params["page"]
 
         while True:
             r = self.get_csv_response(**params)
@@ -263,14 +259,14 @@ class StreamV1CSVBase(StreamV1Base):
             yield r.text
 
             page += 1
-            next_page_token = r.headers.get('X-Rune-Next-Page-Token')
+            next_page_token = r.headers.get("X-Rune-Next-Page-Token")
 
             if next_page_token is not None:
-                params['next_page_token'] = next_page_token
-                params.pop('page', None)
+                params["next_page_token"] = next_page_token
+                params.pop("page", None)
             else:
-                params['page'] = page
-                params.pop('next_page_token', None)
+                params["page"] = page
+                params.pop("next_page_token", None)
 
     def iter_csv_availability(self, **params) -> Iterator[dict]:
         """
@@ -288,7 +284,7 @@ class StreamV1CSVBase(StreamV1Base):
             NotImplementedError: if the resource doesn't support an
                 availability query expression.
         """
-        params['expression'] = self.expr_availability
+        params["expression"] = self.expr_availability
         yield from self.iter_csv_text(**params)
 
     def points(self, **params) -> Iterator[dict]:
@@ -322,9 +318,9 @@ class StreamV1CSVBase(StreamV1Base):
                         # DictReader adds the overflow to a None key. This is
                         # unexpected behavior from the v1 API; log a warning,
                         # but return the data anyway (unconverted).
-                        log.warning('Data row had too many values')
+                        log.warning("Data row had too many values")
                     else:
-                        if point[k] == '':
+                        if point[k] == "":
                             point[k] = restval
                         else:
                             point[k] = _str2float(point[k])
@@ -347,13 +343,15 @@ class StreamV1CSVBase(StreamV1Base):
 # V1 API Resources #
 ####################
 
+
 class Accel(StreamV1CSVBase):
     """
     Query accelerometry data streams.
 
     """
-    _resource = 'accel'
-    _availability = 'availability(accel)'
+
+    _resource = "accel"
+    _availability = "availability(accel)"
 
 
 class BandPower(StreamV1CSVBase):
@@ -361,8 +359,9 @@ class BandPower(StreamV1CSVBase):
     Query band power data streams.
 
     """
-    _resource = 'band_power'
-    _availability = 'availability(power)'
+
+    _resource = "band_power"
+    _availability = "availability(power)"
 
 
 class Event(StreamV1Base):
@@ -370,7 +369,8 @@ class Event(StreamV1Base):
     Query patient events.
 
     """
-    _resource = 'event'
+
+    _resource = "event"
 
 
 class HeartRate(StreamV1CSVBase):
@@ -378,8 +378,9 @@ class HeartRate(StreamV1CSVBase):
     Query heart rate data streams.
 
     """
-    _resource = 'heartrate'
-    _availability = 'availability(bpm)'
+
+    _resource = "heartrate"
+    _availability = "availability(bpm)"
 
 
 class LFP(StreamV1CSVBase):
@@ -387,8 +388,9 @@ class LFP(StreamV1CSVBase):
     Query local field potential (LFP) data streams.
 
     """
-    _resource = 'lfp'
-    _availability = 'availability(lfp)'
+
+    _resource = "lfp"
+    _availability = "availability(lfp)"
 
 
 class ProbabilitySymptom(StreamV1CSVBase):
@@ -396,8 +398,9 @@ class ProbabilitySymptom(StreamV1CSVBase):
     Query the probability of a symptom.
 
     """
-    _resource = 'probability_symptom'
-    _availability = 'availability(probability)'
+
+    _resource = "probability_symptom"
+    _availability = "availability(probability)"
 
 
 class Rotation(StreamV1CSVBase):
@@ -405,8 +408,9 @@ class Rotation(StreamV1CSVBase):
     Query rotation data streams.
 
     """
-    _resource = 'rotation'
-    _availability = 'availability(rotation)'
+
+    _resource = "rotation"
+    _availability = "availability(rotation)"
 
 
 class Span(StreamV1Base):
@@ -415,7 +419,7 @@ class Span(StreamV1Base):
 
     """
 
-    _resource = 'span'
+    _resource = "span"
 
     def iter_json_data(self, **params) -> Iterator[dict]:
         """
@@ -440,11 +444,11 @@ class Span(StreamV1Base):
             _check_response(r)
             data = r.json()
 
-            next_page_token = r.headers.get('X-Rune-Next-Page-Token')
+            next_page_token = r.headers.get("X-Rune-Next-Page-Token")
             if next_page_token is not None:
-                params['next_page_token'] = next_page_token
+                params["next_page_token"] = next_page_token
 
-            yield data['result']
+            yield data["result"]
 
 
 class State(StreamV1CSVBase):
@@ -452,8 +456,9 @@ class State(StreamV1CSVBase):
     Query device state.
 
     """
-    _resource = 'state'
-    _availability = 'availability(state)'
+
+    _resource = "state"
+    _availability = "availability(state)"
 
 
 ####################

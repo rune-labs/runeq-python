@@ -9,10 +9,15 @@ from unittest import TestCase, mock
 from runeq.config import Config
 from runeq.resources.client import GraphClient, StreamClient
 from runeq.resources.stream_metadata import (
-    Dimension, StreamMetadata, StreamMetadataSet, StreamType,
-    get_patient_stream_metadata, get_all_stream_types,
-    get_stream_availability_dataframe, get_stream_dataframe,
-    get_stream_metadata
+    Dimension,
+    StreamMetadata,
+    StreamMetadataSet,
+    StreamType,
+    get_all_stream_types,
+    get_patient_stream_metadata,
+    get_stream_availability_dataframe,
+    get_stream_dataframe,
+    get_stream_metadata,
 )
 
 
@@ -54,10 +59,7 @@ class TestStreamType(TestCase):
 
         """
         self.mock_client = GraphClient(
-            Config(
-                client_key_id='test',
-                client_access_key='config'
-            )
+            Config(client_key_id="test", client_access_key="config")
         )
 
     def test_attributes(self):
@@ -69,14 +71,14 @@ class TestStreamType(TestCase):
             id="rotation",
             name="Rotation",
             description="Rotation rate (velocity) sampled in the time-domain.",
-            dimensions=[]
+            dimensions=[],
         )
 
         self.assertEqual("rotation", test_stream_type.id)
         self.assertEqual("Rotation", test_stream_type.name)
         self.assertEqual(
             "Rotation rate (velocity) sampled in the time-domain.",
-            test_stream_type.description
+            test_stream_type.description,
         )
         self.assertEqual([], test_stream_type.dimensions)
 
@@ -89,11 +91,10 @@ class TestStreamType(TestCase):
             id="rotation",
             name="Rotation",
             description="Rotation rate (velocity) sampled in the time-domain.",
-            dimensions=[]
+            dimensions=[],
         )
         self.assertEqual(
-            'StreamType(id="rotation", name="Rotation")',
-            repr(test_stream_type)
+            'StreamType(id="rotation", name="Rotation")', repr(test_stream_type)
         )
 
     def test_get_all_stream_types(self):
@@ -118,7 +119,7 @@ class TestStreamType(TestCase):
                                         "quantity_name": "Time",
                                         "quantity_abbrev": "t",
                                         "unit_name": "Nanoseconds",
-                                        "unit_abbrev": "ns"
+                                        "unit_abbrev": "ns",
                                     },
                                     {
                                         "id": "rotation",
@@ -126,10 +127,10 @@ class TestStreamType(TestCase):
                                         "quantity_name": "Angular Velocity",
                                         "quantity_abbrev": "Rotation",
                                         "unit_name": "Radians per second",
-                                        "unit_abbrev": "rps"
-                                    }
+                                        "unit_abbrev": "rps",
+                                    },
                                 ]
-                            }
+                            },
                         },
                         {
                             "id": "current",
@@ -143,7 +144,7 @@ class TestStreamType(TestCase):
                                         "quantity_name": "Time",
                                         "quantity_abbrev": "t",
                                         "unit_name": "Nanoseconds",
-                                        "unit_abbrev": "ns"
+                                        "unit_abbrev": "ns",
                                     },
                                     {
                                         "id": "current",
@@ -151,11 +152,11 @@ class TestStreamType(TestCase):
                                         "quantity_name": "Current",
                                         "quantity_abbrev": "I",
                                         "unit_name": "Amps",
-                                        "unit_abbrev": "A"
-                                    }
+                                        "unit_abbrev": "A",
+                                    },
                                 ]
-                            }
-                        }
+                            },
+                        },
                     ]
                 }
             }
@@ -176,7 +177,7 @@ class TestStreamType(TestCase):
                             "quantity_name": "Time",
                             "quantity_abbrev": "t",
                             "unit_name": "Nanoseconds",
-                            "unit_abbrev": "ns"
+                            "unit_abbrev": "ns",
                         },
                         {
                             "id": "rotation",
@@ -184,9 +185,9 @@ class TestStreamType(TestCase):
                             "quantity_name": "Angular Velocity",
                             "quantity_abbrev": "Rotation",
                             "unit_name": "Radians per second",
-                            "unit_abbrev": "rps"
-                        }
-                    ]
+                            "unit_abbrev": "rps",
+                        },
+                    ],
                 },
                 {
                     "id": "current",
@@ -199,7 +200,7 @@ class TestStreamType(TestCase):
                             "quantity_name": "Time",
                             "quantity_abbrev": "t",
                             "unit_name": "Nanoseconds",
-                            "unit_abbrev": "ns"
+                            "unit_abbrev": "ns",
                         },
                         {
                             "id": "current",
@@ -207,10 +208,10 @@ class TestStreamType(TestCase):
                             "quantity_name": "Current",
                             "quantity_abbrev": "I",
                             "unit_name": "Amps",
-                            "unit_abbrev": "A"
-                        }
-                    ]
-                }
+                            "unit_abbrev": "A",
+                        },
+                    ],
+                },
             ],
             stream_types.to_list(),
         )
@@ -228,17 +229,11 @@ class TestStreamMetadata(TestCase):
 
         """
         self.mock_graph_client = GraphClient(
-            Config(
-                client_key_id='test',
-                client_access_key='config'
-            )
+            Config(client_key_id="test", client_access_key="config")
         )
 
         self.mock_stream_client = StreamClient(
-            Config(
-                client_key_id='test',
-                client_access_key='config'
-            )
+            Config(client_key_id="test", client_access_key="config")
         )
 
         self.maxDiff = None
@@ -264,7 +259,7 @@ class TestStreamMetadata(TestCase):
             stream_type=test_stream_type,
             min_time=1648231560,
             max_time=1648234860,
-            parameters={"category": "vitals"}
+            parameters={"category": "vitals"},
         )
 
         self.assertEqual("s1", test_stream.id)
@@ -291,12 +286,9 @@ class TestStreamMetadata(TestCase):
             stream_type=None,
             min_time=1648231560,
             max_time=1648234860,
-            parameters={"category": "vitals"}
+            parameters={"category": "vitals"},
         )
-        self.assertEqual(
-            'StreamMetadata(id="s1")',
-            repr(test_stream)
-        )
+        self.assertEqual('StreamMetadata(id="s1")', repr(test_stream))
 
     def test_get_stream_metadata(self):
         """
@@ -307,9 +299,7 @@ class TestStreamMetadata(TestCase):
         self.mock_graph_client.execute.side_effect = [
             {
                 "streamListByIds": {
-                    "pageInfo": {
-                        "endCursor": None
-                    },
+                    "pageInfo": {"endCursor": None},
                     "streams": [
                         {
                             "id": "s1",
@@ -329,7 +319,7 @@ class TestStreamMetadata(TestCase):
                                             "quantity_name": "Time",
                                             "quantity_abbrev": "t",
                                             "unit_name": "Seconds",
-                                            "unit_abbrev": "s"
+                                            "unit_abbrev": "s",
                                         },
                                         {
                                             "id": "duration",
@@ -337,13 +327,13 @@ class TestStreamMetadata(TestCase):
                                             "quantity_name": "Duration",
                                             "quantity_abbrev": "Duration",
                                             "unit_name": "Seconds",
-                                            "unit_abbrev": "s"
-                                        }
+                                            "unit_abbrev": "s",
+                                        },
                                     ]
-                                }
+                                },
                             },
                             "min_time": 1648231560,
-                            "max_time": 1648234860
+                            "max_time": 1648234860,
                         },
                         {
                             "id": "s2",
@@ -363,7 +353,7 @@ class TestStreamMetadata(TestCase):
                                             "quantity_name": "Time",
                                             "quantity_abbrev": "t",
                                             "unit_name": "Seconds",
-                                            "unit_abbrev": "s"
+                                            "unit_abbrev": "s",
                                         },
                                         {
                                             "id": "duration",
@@ -371,22 +361,21 @@ class TestStreamMetadata(TestCase):
                                             "quantity_name": "Duration",
                                             "quantity_abbrev": "Duration",
                                             "unit_name": "Seconds",
-                                            "unit_abbrev": "s"
-                                        }
+                                            "unit_abbrev": "s",
+                                        },
                                     ]
-                                }
+                                },
                             },
                             "min_time": 1648231560,
-                            "max_time": 1648234860
-                        }
-                    ]
+                            "max_time": 1648234860,
+                        },
+                    ],
                 }
             }
         ]
 
         streams = get_stream_metadata(
-            stream_ids=["s1", "s2"],
-            client=self.mock_graph_client
+            stream_ids=["s1", "s2"], client=self.mock_graph_client
         )
 
         self.assertEqual(
@@ -406,7 +395,7 @@ class TestStreamMetadata(TestCase):
                                 "unit_name": "Seconds",
                                 "quantity_abbrev": "t",
                                 "unit_abbrev": "s",
-                                "id": "time"
+                                "id": "time",
                             },
                             {
                                 "data_type": "sfloat",
@@ -414,15 +403,15 @@ class TestStreamMetadata(TestCase):
                                 "unit_name": "Seconds",
                                 "quantity_abbrev": "Duration",
                                 "unit_abbrev": "s",
-                                "id": "duration"
-                            }
+                                "id": "duration",
+                            },
                         ],
-                        "id": "duration"
+                        "id": "duration",
                     },
-                    'parameters': {},
+                    "parameters": {},
                     "min_time": 1648231560,
                     "max_time": 1648234860,
-                    "id": "s1"
+                    "id": "s1",
                 },
                 {
                     "created_at": 1655226140.501,
@@ -439,7 +428,7 @@ class TestStreamMetadata(TestCase):
                                 "unit_name": "Seconds",
                                 "quantity_abbrev": "t",
                                 "unit_abbrev": "s",
-                                "id": "time"
+                                "id": "time",
                             },
                             {
                                 "data_type": "sfloat",
@@ -447,16 +436,16 @@ class TestStreamMetadata(TestCase):
                                 "unit_name": "Seconds",
                                 "quantity_abbrev": "Duration",
                                 "unit_abbrev": "s",
-                                "id": "duration"
-                            }
+                                "id": "duration",
+                            },
                         ],
-                        "id": "duration"
+                        "id": "duration",
                     },
-                    'parameters': {},
+                    "parameters": {},
                     "min_time": 1648231560,
                     "max_time": 1648234860,
-                    "id": "s2"
-                }
+                    "id": "s2",
+                },
             ],
             streams.to_list(),
         )
@@ -486,7 +475,7 @@ class TestStreamMetadata(TestCase):
                             "quantity_name": "Time",
                             "quantity_abbrev": "t",
                             "unit_name": "Seconds",
-                            "unit_abbrev": "s"
+                            "unit_abbrev": "s",
                         },
                         {
                             "id": "duration",
@@ -494,13 +483,13 @@ class TestStreamMetadata(TestCase):
                             "quantity_name": "Duration",
                             "quantity_abbrev": "Duration",
                             "unit_name": "Seconds",
-                            "unit_abbrev": "s"
-                        }
+                            "unit_abbrev": "s",
+                        },
                     ]
-                }
+                },
             },
             "min_time": 1648231560,
-            "max_time": 1648234860
+            "max_time": 1648234860,
         }
 
         first_hundred_streams = []
@@ -518,25 +507,20 @@ class TestStreamMetadata(TestCase):
         self.mock_graph_client.execute.side_effect = [
             {
                 "streamListByIds": {
-                    "pageInfo": {
-                        "endCursor": None
-                    },
-                    "streams": first_hundred_streams
+                    "pageInfo": {"endCursor": None},
+                    "streams": first_hundred_streams,
                 }
             },
             {
                 "streamListByIds": {
-                    "pageInfo": {
-                        "endCursor": None
-                    },
-                    "streams": next_fifty_streams
+                    "pageInfo": {"endCursor": None},
+                    "streams": next_fifty_streams,
                 }
             },
         ]
 
         streams = get_stream_metadata(
-            stream_ids=[str(i) for i in range(150)],
-            client=self.mock_graph_client
+            stream_ids=[str(i) for i in range(150)], client=self.mock_graph_client
         )
 
         self.assertEqual(150, len(streams.to_list()))
@@ -550,12 +534,9 @@ class TestStreamMetadata(TestCase):
         get_patient.side_effect = Exception("NotFoundError")
 
         with self.assertRaises(Exception) as context:
-            get_patient_stream_metadata(
-                patient_id='foo',
-                client=self.mock_graph_client
-            )
+            get_patient_stream_metadata(patient_id="foo", client=self.mock_graph_client)
 
-        self.assertTrue('NotFoundError' in str(context.exception))
+        self.assertTrue("NotFoundError" in str(context.exception))
 
     @mock.patch("runeq.resources.stream_metadata.get_patient")
     def test_get_patient_streams_basic(self, _):
@@ -567,9 +548,7 @@ class TestStreamMetadata(TestCase):
         self.mock_graph_client.execute.side_effect = [
             {
                 "streamList": {
-                    "pageInfo": {
-                        "endCursor": None
-                    },
+                    "pageInfo": {"endCursor": None},
                     "streams": [
                         {
                             "id": "s1",
@@ -589,7 +568,7 @@ class TestStreamMetadata(TestCase):
                                             "quantity_name": "Time",
                                             "quantity_abbrev": "t",
                                             "unit_name": "Seconds",
-                                            "unit_abbrev": "s"
+                                            "unit_abbrev": "s",
                                         },
                                         {
                                             "id": "duration",
@@ -597,23 +576,17 @@ class TestStreamMetadata(TestCase):
                                             "quantity_name": "Duration",
                                             "quantity_abbrev": "Duration",
                                             "unit_name": "Seconds",
-                                            "unit_abbrev": "s"
-                                        }
+                                            "unit_abbrev": "s",
+                                        },
                                     ]
-                                }
+                                },
                             },
                             "parameters": [
-                                {
-                                    "key": "category",
-                                    "value": "motion"
-                                },
-                                {
-                                    "key": "measurement",
-                                    "value": "walking"
-                                }
+                                {"key": "category", "value": "motion"},
+                                {"key": "measurement", "value": "walking"},
                             ],
                             "min_time": 1648231560,
-                            "max_time": 1648234860
+                            "max_time": 1648234860,
                         },
                         {
                             "id": "s2",
@@ -633,7 +606,7 @@ class TestStreamMetadata(TestCase):
                                             "quantity_name": "Time",
                                             "quantity_abbrev": "t",
                                             "unit_name": "Seconds",
-                                            "unit_abbrev": "s"
+                                            "unit_abbrev": "s",
                                         },
                                         {
                                             "id": "duration",
@@ -641,22 +614,21 @@ class TestStreamMetadata(TestCase):
                                             "quantity_name": "Duration",
                                             "quantity_abbrev": "Duration",
                                             "unit_name": "Seconds",
-                                            "unit_abbrev": "s"
-                                        }
+                                            "unit_abbrev": "s",
+                                        },
                                     ]
-                                }
+                                },
                             },
                             "min_time": 1648231560,
-                            "max_time": 1648234860
-                        }
-                    ]
+                            "max_time": 1648234860,
+                        },
+                    ],
                 }
             }
         ]
 
         streams = get_patient_stream_metadata(
-            patient_id="p1",
-            client=self.mock_graph_client
+            patient_id="p1", client=self.mock_graph_client
         )
 
         self.assertEqual(
@@ -676,7 +648,7 @@ class TestStreamMetadata(TestCase):
                                 "unit_name": "Seconds",
                                 "quantity_abbrev": "t",
                                 "unit_abbrev": "s",
-                                "id": "time"
+                                "id": "time",
                             },
                             {
                                 "data_type": "sfloat",
@@ -684,20 +656,17 @@ class TestStreamMetadata(TestCase):
                                 "unit_name": "Seconds",
                                 "quantity_abbrev": "Duration",
                                 "unit_abbrev": "s",
-                                "id": "duration"
-                            }
+                                "id": "duration",
+                            },
                         ],
-                        "id": "duration"
+                        "id": "duration",
                     },
                     "category": "motion",
                     "measurement": "walking",
-                    'parameters': {
-                        'category': 'motion',
-                        'measurement': 'walking'
-                    },
+                    "parameters": {"category": "motion", "measurement": "walking"},
                     "min_time": 1648231560,
                     "max_time": 1648234860,
-                    "id": "s1"
+                    "id": "s1",
                 },
                 {
                     "created_at": 1655226140.501,
@@ -714,7 +683,7 @@ class TestStreamMetadata(TestCase):
                                 "unit_name": "Seconds",
                                 "quantity_abbrev": "t",
                                 "unit_abbrev": "s",
-                                "id": "time"
+                                "id": "time",
                             },
                             {
                                 "data_type": "sfloat",
@@ -722,16 +691,16 @@ class TestStreamMetadata(TestCase):
                                 "unit_name": "Seconds",
                                 "quantity_abbrev": "Duration",
                                 "unit_abbrev": "s",
-                                "id": "duration"
-                            }
+                                "id": "duration",
+                            },
                         ],
-                        "id": "duration"
+                        "id": "duration",
                     },
-                    'parameters': {},
+                    "parameters": {},
                     "min_time": 1648231560,
                     "max_time": 1648234860,
-                    "id": "s2"
-                }
+                    "id": "s2",
+                },
             ],
             streams.to_list(),
         )
@@ -747,9 +716,7 @@ class TestStreamMetadata(TestCase):
         self.mock_graph_client.execute.side_effect = [
             {
                 "streamList": {
-                    "pageInfo": {
-                        "endCursor": "test_check_next"
-                    },
+                    "pageInfo": {"endCursor": "test_check_next"},
                     "streams": [
                         {
                             "id": "s1",
@@ -769,7 +736,7 @@ class TestStreamMetadata(TestCase):
                                             "quantity_name": "Time",
                                             "quantity_abbrev": "t",
                                             "unit_name": "Seconds",
-                                            "unit_abbrev": "s"
+                                            "unit_abbrev": "s",
                                         },
                                         {
                                             "id": "duration",
@@ -777,22 +744,20 @@ class TestStreamMetadata(TestCase):
                                             "quantity_name": "Duration",
                                             "quantity_abbrev": "Duration",
                                             "unit_name": "Seconds",
-                                            "unit_abbrev": "s"
-                                        }
+                                            "unit_abbrev": "s",
+                                        },
                                     ]
-                                }
+                                },
                             },
                             "min_time": 1648231560,
-                            "max_time": 1648234860
+                            "max_time": 1648234860,
                         },
-                    ]
+                    ],
                 }
             },
             {
                 "streamList": {
-                    "pageInfo": {
-                        "endCursor": None
-                    },
+                    "pageInfo": {"endCursor": None},
                     "streams": [
                         {
                             "id": "s2",
@@ -812,7 +777,7 @@ class TestStreamMetadata(TestCase):
                                             "quantity_name": "Time",
                                             "quantity_abbrev": "t",
                                             "unit_name": "Seconds",
-                                            "unit_abbrev": "s"
+                                            "unit_abbrev": "s",
                                         },
                                         {
                                             "id": "duration",
@@ -820,22 +785,21 @@ class TestStreamMetadata(TestCase):
                                             "quantity_name": "Duration",
                                             "quantity_abbrev": "Duration",
                                             "unit_name": "Seconds",
-                                            "unit_abbrev": "s"
-                                        }
+                                            "unit_abbrev": "s",
+                                        },
                                     ]
-                                }
+                                },
                             },
                             "min_time": 1648231560,
-                            "max_time": 1648234860
+                            "max_time": 1648234860,
                         }
-                    ]
+                    ],
                 }
-            }
+            },
         ]
 
         streams = get_patient_stream_metadata(
-            patient_id="p1",
-            client=self.mock_graph_client
+            patient_id="p1", client=self.mock_graph_client
         )
 
         self.assertEqual(
@@ -855,7 +819,7 @@ class TestStreamMetadata(TestCase):
                                 "unit_name": "Seconds",
                                 "quantity_abbrev": "t",
                                 "unit_abbrev": "s",
-                                "id": "time"
+                                "id": "time",
                             },
                             {
                                 "data_type": "sfloat",
@@ -863,15 +827,15 @@ class TestStreamMetadata(TestCase):
                                 "unit_name": "Seconds",
                                 "quantity_abbrev": "Duration",
                                 "unit_abbrev": "s",
-                                "id": "duration"
-                            }
+                                "id": "duration",
+                            },
                         ],
-                        "id": "duration"
+                        "id": "duration",
                     },
-                    'parameters': {},
+                    "parameters": {},
                     "min_time": 1648231560,
                     "max_time": 1648234860,
-                    "id": "s1"
+                    "id": "s1",
                 },
                 {
                     "created_at": 1655226140.501,
@@ -888,7 +852,7 @@ class TestStreamMetadata(TestCase):
                                 "unit_name": "Seconds",
                                 "quantity_abbrev": "t",
                                 "unit_abbrev": "s",
-                                "id": "time"
+                                "id": "time",
                             },
                             {
                                 "data_type": "sfloat",
@@ -896,16 +860,16 @@ class TestStreamMetadata(TestCase):
                                 "unit_name": "Seconds",
                                 "quantity_abbrev": "Duration",
                                 "unit_abbrev": "s",
-                                "id": "duration"
-                            }
+                                "id": "duration",
+                            },
                         ],
-                        "id": "duration"
+                        "id": "duration",
                     },
-                    'parameters': {},
+                    "parameters": {},
                     "min_time": 1648231560,
                     "max_time": 1648234860,
-                    "id": "s2"
-                }
+                    "id": "s2",
+                },
             ],
             streams.to_list(),
         )
@@ -927,11 +891,11 @@ class TestStreamMetadata(TestCase):
                         id="acceleration",
                         name="Acceleration",
                         description="Acceleration rate",
-                        dimensions=[]
+                        dimensions=[],
                     ),
                     min_time=10,
                     max_time=100,
-                    parameters={}
+                    parameters={},
                 ),
                 StreamMetadata(
                     id="stream2",
@@ -943,11 +907,11 @@ class TestStreamMetadata(TestCase):
                         id="acceleration",
                         name="Acceleration",
                         description="Acceleration rate",
-                        dimensions=[]
+                        dimensions=[],
                     ),
                     min_time=10,
                     max_time=100,
-                    parameters={}
+                    parameters={},
                 ),
                 StreamMetadata(
                     id="stream3",
@@ -959,26 +923,21 @@ class TestStreamMetadata(TestCase):
                         id="motion",
                         name="Motion",
                         description="Motion movement",
-                        dimensions=[]
+                        dimensions=[],
                     ),
                     min_time=10,
                     max_time=100,
-                    parameters={}
+                    parameters={},
                 ),
             ]
         )
 
-        device_streams = stream_set.filter(
-            patient_id="p1",
-            device_id="d1"
-        )
+        device_streams = stream_set.filter(patient_id="p1", device_id="d1")
         self.assertEqual(2, len(device_streams))
         self.assertIsNotNone(device_streams.get("stream1"))
         self.assertIsNotNone(device_streams.get("stream3"))
 
-        motion_streams = device_streams.filter(
-            stream_type_id="motion"
-        )
+        motion_streams = device_streams.filter(stream_type_id="motion")
         self.assertEqual(1, len(motion_streams))
         self.assertIsNotNone(motion_streams.get("stream3"))
 
@@ -1011,9 +970,7 @@ class TestStreamMetadata(TestCase):
         self.mock_graph_client.execute.side_effect = [
             {
                 "streamListByIds": {
-                    "pageInfo": {
-                        "endCursor": None
-                    },
+                    "pageInfo": {"endCursor": None},
                     "streams": [
                         {
                             "id": "s1",
@@ -1033,7 +990,7 @@ class TestStreamMetadata(TestCase):
                                             "quantity_name": "Time",
                                             "quantity_abbrev": "t",
                                             "unit_name": "Seconds",
-                                            "unit_abbrev": "s"
+                                            "unit_abbrev": "s",
                                         },
                                         {
                                             "id": "duration",
@@ -1041,15 +998,15 @@ class TestStreamMetadata(TestCase):
                                             "quantity_name": "Duration",
                                             "quantity_abbrev": "Duration",
                                             "unit_name": "Seconds",
-                                            "unit_abbrev": "s"
-                                        }
+                                            "unit_abbrev": "s",
+                                        },
                                     ]
-                                }
+                                },
                             },
                             "min_time": 1648231560,
-                            "max_time": 1648234860
+                            "max_time": 1648234860,
                         }
-                    ]
+                    ],
                 }
             }
         ]
@@ -1057,7 +1014,7 @@ class TestStreamMetadata(TestCase):
         stream_df = get_stream_dataframe(
             stream_ids="s1",
             stream_client=self.mock_stream_client,
-            graph_client=self.mock_graph_client
+            graph_client=self.mock_graph_client,
         )
 
         self.assertEqual(
@@ -1069,7 +1026,7 @@ class TestStreamMetadata(TestCase):
                     "3": "2022-07-28T14:26:45.3618588Z",
                     "4": "2022-07-28T14:26:45.3620749Z",
                     "5": "2022-07-28T14:26:45.362149Z",
-                    "6": "2022-07-28T14:26:45.36221Z"
+                    "6": "2022-07-28T14:26:45.36221Z",
                 },
                 "acceleration": {
                     "0": 0.0205251388,
@@ -1078,7 +1035,7 @@ class TestStreamMetadata(TestCase):
                     "3": 0.022172993,
                     "4": 0.0235602502,
                     "5": 0.0248600878,
-                    "6": 0.0260727517
+                    "6": 0.0260727517,
                 },
                 "measurement_duration_ns": {
                     "0": 20000000,
@@ -1087,7 +1044,7 @@ class TestStreamMetadata(TestCase):
                     "3": 20000000,
                     "4": 20000000,
                     "5": 20000000,
-                    "6": 20000000
+                    "6": 20000000,
                 },
                 "algorithm": {
                     "0": "a1",
@@ -1096,7 +1053,7 @@ class TestStreamMetadata(TestCase):
                     "3": "a1",
                     "4": "a1",
                     "5": "a1",
-                    "6": "a1"
+                    "6": "a1",
                 },
                 "device_id": {
                     "0": "d1",
@@ -1105,7 +1062,7 @@ class TestStreamMetadata(TestCase):
                     "3": "d1",
                     "4": "d1",
                     "5": "d1",
-                    "6": "d1"
+                    "6": "d1",
                 },
                 "patient_id": {
                     "0": "p1",
@@ -1114,7 +1071,7 @@ class TestStreamMetadata(TestCase):
                     "3": "p1",
                     "4": "p1",
                     "5": "p1",
-                    "6": "p1"
+                    "6": "p1",
                 },
                 "stream_type_id": {
                     "0": "duration",
@@ -1132,10 +1089,10 @@ class TestStreamMetadata(TestCase):
                     "3": "s1",
                     "4": "s1",
                     "5": "s1",
-                    "6": "s1"
-                }
+                    "6": "s1",
+                },
             },
-            json.loads(stream_df.to_json())
+            json.loads(stream_df.to_json()),
         )
 
     def test_get_stream_dataframe_dicts(self):
@@ -1147,9 +1104,9 @@ class TestStreamMetadata(TestCase):
         self.mock_stream_client.get_data = mock.Mock()
         self.mock_stream_client.get_data.return_value = iter(
             [
-                '''time,event,measurement_duration_ns
+                """time,event,measurement_duration_ns
 1648231560.000000,"{""hello"":""world""}",0
-1648231565.000000,"{""rune"":""labs""}",0'''
+1648231565.000000,"{""rune"":""labs""}",0"""
             ]
         )
 
@@ -1157,9 +1114,7 @@ class TestStreamMetadata(TestCase):
         self.mock_graph_client.execute.side_effect = [
             {
                 "streamListByIds": {
-                    "pageInfo": {
-                        "endCursor": None
-                    },
+                    "pageInfo": {"endCursor": None},
                     "streams": [
                         {
                             "id": "s1",
@@ -1179,23 +1134,23 @@ class TestStreamMetadata(TestCase):
                                             "quantity_name": "Time",
                                             "quantity_abbrev": "t",
                                             "unit_name": "Seconds",
-                                            "unit_abbrev": "s"
+                                            "unit_abbrev": "s",
                                         },
                                         {
-                                            'data_type': 'dict',
-                                            'quantity_name': 'Payload',
-                                            'unit_name': '',
-                                            'quantity_abbrev': 'Payload',
-                                            'unit_abbrev': '',
-                                            'id': 'event'
-                                        }
+                                            "data_type": "dict",
+                                            "quantity_name": "Payload",
+                                            "unit_name": "",
+                                            "quantity_abbrev": "Payload",
+                                            "unit_abbrev": "",
+                                            "id": "event",
+                                        },
                                     ]
-                                }
+                                },
                             },
                             "min_time": 1648231560,
-                            "max_time": 1648231565
+                            "max_time": 1648231565,
                         }
-                    ]
+                    ],
                 }
             }
         ]
@@ -1203,7 +1158,7 @@ class TestStreamMetadata(TestCase):
         stream_df = get_stream_dataframe(
             stream_ids="s1",
             stream_client=self.mock_stream_client,
-            graph_client=self.mock_graph_client
+            graph_client=self.mock_graph_client,
         )
 
         self.assertEqual(
@@ -1212,14 +1167,8 @@ class TestStreamMetadata(TestCase):
                     "0": 1648231560.0,
                     "1": 1648231565.0,
                 },
-                "event": {
-                    "0": {"hello": "world"},
-                    "1": {"rune": "labs"}
-                },
-                "measurement_duration_ns": {
-                    "0": 0,
-                    "1": 0
-                },
+                "event": {"0": {"hello": "world"}, "1": {"rune": "labs"}},
+                "measurement_duration_ns": {"0": 0, "1": 0},
                 "algorithm": {
                     "0": "a1",
                     "1": "a1",
@@ -1239,9 +1188,9 @@ class TestStreamMetadata(TestCase):
                 "stream_id": {
                     "0": "s1",
                     "1": "s1",
-                }
+                },
             },
-            json.loads(stream_df.to_json())
+            json.loads(stream_df.to_json()),
         )
 
     def test_get_multiple_stream_dataframe(self):
@@ -1251,27 +1200,33 @@ class TestStreamMetadata(TestCase):
         """
         self.mock_stream_client.get_data = mock.Mock()
         self.mock_stream_client.get_data.side_effect = [
-            iter(["""time,acceleration,measurement_duration_ns
+            iter(
+                [
+                    """time,acceleration,measurement_duration_ns
 2022-07-28T14:26:45.167568Z,0.014469802379608154,20000000
 2022-07-28T14:26:45.361596Z,0.03278458118438721,20000000
 2022-07-28T14:26:45.361796Z,0.03711885213851929,20000000
 2022-07-28T14:26:45.3618588Z,0.02531599998474121,20000000
-2022-07-28T14:26:45.3620749Z,0.03168576955795288,20000000"""]),
-            iter(["""time,acceleration,measurement_duration_ns
+2022-07-28T14:26:45.3620749Z,0.03168576955795288,20000000"""
+                ]
+            ),
+            iter(
+                [
+                    """time,acceleration,measurement_duration_ns
 2022-07-28T14:26:45.167568Z,0.020525138825178146,20000000
 2022-07-28T14:26:45.361596Z,0.020834974944591522,20000000
 2022-07-28T14:26:45.361796Z,0.021182861179113388,20000000
 2022-07-28T14:26:45.3618588Z,0.022172993049025536,20000000
-2022-07-28T14:26:45.3620749Z,0.02356025017797947,20000000"""])
+2022-07-28T14:26:45.3620749Z,0.02356025017797947,20000000"""
+                ]
+            ),
         ]
 
         self.mock_graph_client.execute = mock.Mock()
         self.mock_graph_client.execute.side_effect = [
             {
                 "streamListByIds": {
-                    "pageInfo": {
-                        "endCursor": "None"
-                    },
+                    "pageInfo": {"endCursor": "None"},
                     "streams": [
                         {
                             "id": "s1",
@@ -1291,7 +1246,7 @@ class TestStreamMetadata(TestCase):
                                             "quantity_name": "Time",
                                             "quantity_abbrev": "t",
                                             "unit_name": "Nanoseconds",
-                                            "unit_abbrev": "ns"
+                                            "unit_abbrev": "ns",
                                         },
                                         {
                                             "id": "acceleration",
@@ -1299,27 +1254,18 @@ class TestStreamMetadata(TestCase):
                                             "quantity_name": "Acceleration",
                                             "quantity_abbrev": "Accel",
                                             "unit_name": "Gs",
-                                            "unit_abbrev": "G"
-                                        }
+                                            "unit_abbrev": "G",
+                                        },
                                     ]
-                                }
+                                },
                             },
                             "parameters": [
-                                {
-                                    "key": "axis",
-                                    "value": "z"
-                                },
-                                {
-                                    "key": "category",
-                                    "value": "motion"
-                                },
-                                {
-                                    "key": "measurement",
-                                    "value": "user"
-                                }
+                                {"key": "axis", "value": "z"},
+                                {"key": "category", "value": "motion"},
+                                {"key": "measurement", "value": "user"},
                             ],
                             "min_time": 1659018405.167568,
-                            "max_time": 1659027683.492028
+                            "max_time": 1659027683.492028,
                         },
                         {
                             "id": "s2",
@@ -1339,7 +1285,7 @@ class TestStreamMetadata(TestCase):
                                             "quantity_name": "Time",
                                             "quantity_abbrev": "t",
                                             "unit_name": "Nanoseconds",
-                                            "unit_abbrev": "ns"
+                                            "unit_abbrev": "ns",
                                         },
                                         {
                                             "id": "acceleration",
@@ -1347,29 +1293,20 @@ class TestStreamMetadata(TestCase):
                                             "quantity_name": "Acceleration",
                                             "quantity_abbrev": "Accel",
                                             "unit_name": "Gs",
-                                            "unit_abbrev": "G"
-                                        }
+                                            "unit_abbrev": "G",
+                                        },
                                     ]
-                                }
+                                },
                             },
                             "parameters": [
-                                {
-                                    "key": "axis",
-                                    "value": "x"
-                                },
-                                {
-                                    "key": "category",
-                                    "value": "motion"
-                                },
-                                {
-                                    "key": "measurement",
-                                    "value": "gravity"
-                                }
+                                {"key": "axis", "value": "x"},
+                                {"key": "category", "value": "motion"},
+                                {"key": "measurement", "value": "gravity"},
                             ],
                             "min_time": 1659018405.167568,
-                            "max_time": 1659027683.492028
-                        }
-                    ]
+                            "max_time": 1659027683.492028,
+                        },
+                    ],
                 }
             }
         ]
@@ -1377,7 +1314,7 @@ class TestStreamMetadata(TestCase):
         stream_df = get_stream_dataframe(
             stream_ids=["s1", "s2"],
             stream_client=self.mock_stream_client,
-            graph_client=self.mock_graph_client
+            graph_client=self.mock_graph_client,
         )
 
         self.assertEqual(
@@ -1392,7 +1329,7 @@ class TestStreamMetadata(TestCase):
                     "6": "2022-07-28T14:26:45.361596Z",
                     "7": "2022-07-28T14:26:45.361796Z",
                     "8": "2022-07-28T14:26:45.3618588Z",
-                    "9": "2022-07-28T14:26:45.3620749Z"
+                    "9": "2022-07-28T14:26:45.3620749Z",
                 },
                 "acceleration": {
                     "0": 0.0144698024,
@@ -1404,7 +1341,7 @@ class TestStreamMetadata(TestCase):
                     "6": 0.0208349749,
                     "7": 0.0211828612,
                     "8": 0.0221729930,
-                    "9": 0.0235602502
+                    "9": 0.0235602502,
                 },
                 "measurement_duration_ns": {
                     "0": 20000000,
@@ -1416,7 +1353,7 @@ class TestStreamMetadata(TestCase):
                     "6": 20000000,
                     "7": 20000000,
                     "8": 20000000,
-                    "9": 20000000
+                    "9": 20000000,
                 },
                 "algorithm": {
                     "0": "a1",
@@ -1428,7 +1365,7 @@ class TestStreamMetadata(TestCase):
                     "6": "a1",
                     "7": "a1",
                     "8": "a1",
-                    "9": "a1"
+                    "9": "a1",
                 },
                 "device_id": {
                     "0": "d1",
@@ -1440,7 +1377,7 @@ class TestStreamMetadata(TestCase):
                     "6": "d1",
                     "7": "d1",
                     "8": "d1",
-                    "9": "d1"
+                    "9": "d1",
                 },
                 "patient_id": {
                     "0": "p1",
@@ -1452,7 +1389,7 @@ class TestStreamMetadata(TestCase):
                     "6": "p1",
                     "7": "p1",
                     "8": "p1",
-                    "9": "p1"
+                    "9": "p1",
                 },
                 "axis": {
                     "0": "z",
@@ -1464,7 +1401,7 @@ class TestStreamMetadata(TestCase):
                     "6": "x",
                     "7": "x",
                     "8": "x",
-                    "9": "x"
+                    "9": "x",
                 },
                 "category": {
                     "0": "motion",
@@ -1476,7 +1413,7 @@ class TestStreamMetadata(TestCase):
                     "6": "motion",
                     "7": "motion",
                     "8": "motion",
-                    "9": "motion"
+                    "9": "motion",
                 },
                 "measurement": {
                     "0": "user",
@@ -1488,7 +1425,7 @@ class TestStreamMetadata(TestCase):
                     "6": "gravity",
                     "7": "gravity",
                     "8": "gravity",
-                    "9": "gravity"
+                    "9": "gravity",
                 },
                 "stream_type_id": {
                     "0": "acceleration",
@@ -1500,7 +1437,7 @@ class TestStreamMetadata(TestCase):
                     "6": "acceleration",
                     "7": "acceleration",
                     "8": "acceleration",
-                    "9": "acceleration"
+                    "9": "acceleration",
                 },
                 "stream_id": {
                     "0": "s1",
@@ -1512,10 +1449,10 @@ class TestStreamMetadata(TestCase):
                     "6": "s2",
                     "7": "s2",
                     "8": "s2",
-                    "9": "s2"
-                }
+                    "9": "s2",
+                },
             },
-            json.loads(stream_df.to_json())
+            json.loads(stream_df.to_json()),
         )
 
     def test_get_stream_availability_dataframe(self):
@@ -1542,9 +1479,7 @@ class TestStreamMetadata(TestCase):
         self.mock_graph_client.execute.side_effect = [
             {
                 "streamListByIds": {
-                    "pageInfo": {
-                        "endCursor": None
-                    },
+                    "pageInfo": {"endCursor": None},
                     "streams": [
                         {
                             "id": "s1",
@@ -1564,7 +1499,7 @@ class TestStreamMetadata(TestCase):
                                             "quantity_name": "Time",
                                             "quantity_abbrev": "t",
                                             "unit_name": "Seconds",
-                                            "unit_abbrev": "s"
+                                            "unit_abbrev": "s",
                                         },
                                         {
                                             "id": "duration",
@@ -1572,15 +1507,15 @@ class TestStreamMetadata(TestCase):
                                             "quantity_name": "Duration",
                                             "quantity_abbrev": "Duration",
                                             "unit_name": "Seconds",
-                                            "unit_abbrev": "s"
-                                        }
+                                            "unit_abbrev": "s",
+                                        },
                                     ]
-                                }
+                                },
                             },
                             "min_time": 1648231560,
-                            "max_time": 1648234860
+                            "max_time": 1648234860,
                         }
-                    ]
+                    ],
                 }
             }
         ]
@@ -1591,7 +1526,7 @@ class TestStreamMetadata(TestCase):
             end_time=345,
             resolution=300,
             stream_client=self.mock_stream_client,
-            graph_client=self.mock_graph_client
+            graph_client=self.mock_graph_client,
         )
 
         self.assertEqual(
@@ -1603,7 +1538,7 @@ class TestStreamMetadata(TestCase):
                     "3": "2022-07-28T14:26:45.3618588Z",
                     "4": "2022-07-28T14:26:45.3620749Z",
                     "5": "2022-07-28T14:26:45.362149Z",
-                    "6": "2022-07-28T14:26:45.36221Z"
+                    "6": "2022-07-28T14:26:45.36221Z",
                 },
                 "availability": {
                     "0": 1,
@@ -1612,7 +1547,7 @@ class TestStreamMetadata(TestCase):
                     "3": 0,
                     "4": 0,
                     "5": 1,
-                    "6": 1
+                    "6": 1,
                 },
                 "algorithm": {
                     "0": "a1",
@@ -1621,7 +1556,7 @@ class TestStreamMetadata(TestCase):
                     "3": "a1",
                     "4": "a1",
                     "5": "a1",
-                    "6": "a1"
+                    "6": "a1",
                 },
                 "device_id": {
                     "0": "d1",
@@ -1630,7 +1565,7 @@ class TestStreamMetadata(TestCase):
                     "3": "d1",
                     "4": "d1",
                     "5": "d1",
-                    "6": "d1"
+                    "6": "d1",
                 },
                 "patient_id": {
                     "0": "p1",
@@ -1639,7 +1574,7 @@ class TestStreamMetadata(TestCase):
                     "3": "p1",
                     "4": "p1",
                     "5": "p1",
-                    "6": "p1"
+                    "6": "p1",
                 },
                 "stream_type_id": {
                     "0": "duration",
@@ -1657,10 +1592,10 @@ class TestStreamMetadata(TestCase):
                     "3": "s1",
                     "4": "s1",
                     "5": "s1",
-                    "6": "s1"
-                }
+                    "6": "s1",
+                },
             },
-            json.loads(stream_df.to_json())
+            json.loads(stream_df.to_json()),
         )
 
     def test_get_batch_stream_availability_dataframe(self):
@@ -1690,7 +1625,7 @@ class TestStreamMetadata(TestCase):
             end_time=345,
             resolution=300,
             batch_operation="all",
-            stream_client=self.mock_stream_client
+            stream_client=self.mock_stream_client,
         )
 
         self.assertEqual(
@@ -1702,7 +1637,7 @@ class TestStreamMetadata(TestCase):
                     "3": "2022-07-28T14:26:45.3618588Z",
                     "4": "2022-07-28T14:26:45.3620749Z",
                     "5": "2022-07-28T14:26:45.362149Z",
-                    "6": "2022-07-28T14:26:45.36221Z"
+                    "6": "2022-07-28T14:26:45.36221Z",
                 },
                 "availability": {
                     "0": 1,
@@ -1711,8 +1646,8 @@ class TestStreamMetadata(TestCase):
                     "3": 0,
                     "4": 0,
                     "5": 1,
-                    "6": 1
+                    "6": 1,
                 },
             },
-            json.loads(stream_df.to_json())
+            json.loads(stream_df.to_json()),
         )
