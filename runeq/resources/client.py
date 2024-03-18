@@ -3,7 +3,6 @@ Clients for Rune's GraphQL API and V2 Stream API.
 
 """
 
-from functools import wraps
 import time
 import urllib.parse
 from functools import wraps
@@ -14,9 +13,8 @@ from gql import Client as GQLClient
 from gql import gql
 from gql.transport.requests import RequestsHTTPTransport
 
-from runeq.config import BaseConfig, Config
 from runeq import errors
-from runeq.config import Config
+from runeq.config import BaseConfig, Config
 
 # Error when a client is not initialized
 INITIALIZATION_ERROR = errors.InitializationError(

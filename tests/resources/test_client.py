@@ -3,17 +3,17 @@ Tests for the V2 SDK Client.
 
 """
 
-from unittest import mock, TestCase
+from unittest import TestCase, mock
 
 from runeq import errors
 from runeq.config import BaseConfig
 from runeq.resources.client import (
-    initialize,
-    initialize_with_config,
-    global_graph_client,
-    global_stream_client,
     GraphClient,
     StreamClient,
+    global_graph_client,
+    global_stream_client,
+    initialize,
+    initialize_with_config,
 )
 from runeq.resources.stream import get_stream_data
 
