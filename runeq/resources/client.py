@@ -2,6 +2,8 @@
 Clients for Rune's GraphQL API and V2 Stream API.
 
 """
+
+from functools import wraps
 import time
 import urllib.parse
 from functools import wraps
@@ -12,6 +14,7 @@ from gql import Client as GQLClient
 from gql import gql
 from gql.transport.requests import RequestsHTTPTransport
 
+from runeq.config import BaseConfig, Config
 from runeq import errors
 from runeq.config import Config
 
@@ -66,12 +69,12 @@ class GraphClient:
     """
 
     # Configuration details for the graph client.
-    config: Config = None
+    config: BaseConfig = None
 
     # The GraphQL client.
     _gql_client: GQLClient
 
-    def __init__(self, config: Config):
+    def __init__(self, config: BaseConfig):
         """
         Initialize the Graph API Client.
 
@@ -131,9 +134,9 @@ class StreamClient:
     HEADER_NEXT_PAGE = "X-Rune-Next-Page-Token"
 
     # Configuration details for the stream client.
-    config: Config = None
+    config: BaseConfig = None
 
-    def __init__(self, config: Config):
+    def __init__(self, config: BaseConfig):
         """
         Initialize the Stream API Client.
 
@@ -247,7 +250,14 @@ def initialize(*args, **kwargs):
 
     """
     config = Config(*args, **kwargs)
+    initialize_with_config(config)
 
+
+def initialize_with_config(config: BaseConfig):
+    """Initializes the library using a config object, setting global clients
+    for requests to the GraphQL API and the V2 Stream API.
+
+    """
     global _graph_client, _stream_client
     _graph_client = GraphClient(config)
     _stream_client = StreamClient(config)

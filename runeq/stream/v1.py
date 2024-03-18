@@ -2,6 +2,7 @@
 Query data from the Rune Labs Stream API (V1).
 
 """
+
 import csv
 from logging import getLogger
 from typing import Iterator, Union
@@ -71,7 +72,7 @@ class StreamV1Base:
     # Not supported for all resources.
     _availability = None
 
-    def __init__(self, cfg: config.Config, **defaults):
+    def __init__(self, cfg: config.BaseConfig, **defaults):
         """
         Initialize with a Config and default query parameters.
 
