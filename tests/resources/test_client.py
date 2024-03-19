@@ -2,10 +2,19 @@
 Tests for the V2 SDK Client.
 
 """
+
 from unittest import TestCase, mock
 
 from runeq import errors
-from runeq.resources.client import GraphClient, StreamClient, initialize
+from runeq.config import BaseConfig
+from runeq.resources.client import (
+    GraphClient,
+    StreamClient,
+    global_graph_client,
+    global_stream_client,
+    initialize,
+    initialize_with_config,
+)
 from runeq.resources.stream import get_stream_data
 
 
@@ -49,6 +58,24 @@ class TestInitialize(TestCase):
         with self.assertRaisesRegex(errors.APIError, "401 InvalidAuthentication"):
             get_stream_data("stream_id").__next__()
 
+    def test_initialize_with_config(self):
+        """
+        Test initializing with a config object.
+
+        """
+        config = mock.Mock(spec=BaseConfig)
+        config.graph_url = "graph-url"
+        config.stream_url = "stream-url"
+        config.auth_headers = {"hello": "world"}
+
+        initialize_with_config(config)
+
+        graph_client = global_graph_client()
+        stream_client = global_stream_client()
+
+        self.assertIs(graph_client.config, config)
+        self.assertIs(stream_client.config, config)
+
 
 class TestStreamClient(TestCase):
     """
@@ -67,7 +94,7 @@ class TestStreamClient(TestCase):
     @mock.patch("runeq.resources.client.requests.get")
     def test_refresh_auth_on_4xx(self, mock_get):
         """If a request fails with a 4xx status code, refresh auth and retry"""
-        config = mock.Mock()
+        config = mock.Mock(spec=BaseConfig)
         config.stream_url = ""
         config.refresh_auth.return_value = True
 
@@ -85,7 +112,7 @@ class TestStreamClient(TestCase):
     @mock.patch("runeq.resources.client.requests.get")
     def test_no_retry_on_5xx(self, mock_get):
         """If a request fails with a 5xx status code, do not retry"""
-        config = mock.Mock()
+        config = mock.Mock(spec=BaseConfig)
         config.stream_url = ""
         config.refresh_auth.return_value = True
 
@@ -110,7 +137,7 @@ class TestGraphClient(TestCase):
     @mock.patch("runeq.resources.client.GQLClient")
     def test_refresh_auth_on_error(self, mock_client_cls):
         """If a request fails with any error, refresh auth and retry"""
-        config = mock.Mock()
+        config = mock.Mock(spec=BaseConfig)
         config.graph_url = ""
         config.auth_headers = {"hello": "world"}
 

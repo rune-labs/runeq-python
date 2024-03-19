@@ -2,6 +2,7 @@
 Configuration for accessing Rune APIs.
 
 """
+
 import os
 
 import boto3
@@ -38,9 +39,39 @@ Default path for the config file (yaml formatted)
 """
 
 
-class Config:
+class BaseConfig:
+    """Base class to hold configuration for accessing Rune APIs."""
+
+    graph_url: str
+    stream_url: str
+
+    def refresh_auth(self) -> bool:
+        """
+        Refresh authentication credentials if possible, returning a bool
+        indicating if the refresh occurred.
+
+        This is specific to the authentication style: e.g. it may
+        be implemented to refresh a JWT. By default, it is a no-op.
+
+        The API clients contain logic to catch possible authentication
+        errors, invoke this method, and retry the request (if credentials
+        are successfully refreshed).
+
+        """
+        return False
+
+    @property
+    def auth_headers(self) -> dict:
+        """
+        Authentication headers for HTTP requests to Rune APIs.
+
+        """
+        raise NotImplementedError("auth_headers must be implemented by a subclass")
+
+
+class Config(BaseConfig):
     """
-    Holds configuration (e.g. auth credentials, URLs, etc)
+    Holds configuration for Rune API usage (e.g. auth credentials, URLs, etc)
 
     """
 

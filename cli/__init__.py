@@ -114,7 +114,7 @@ def setup(access_token_id, access_token_secret):
 
 @configure.command()
 @click.option(
-    "--key", "-k", default="", multiple=True, required=False, help="1+ keys to fetch"
+    "--key", "-k", default=[], multiple=True, required=False, help="1+ keys to fetch"
 )
 def get(key):
     """
