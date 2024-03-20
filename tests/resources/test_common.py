@@ -43,6 +43,7 @@ class PatientItemSet(ItemSet):
     Test ItemSet class that represents a Patient
 
     """
+
     def __init__(self, items: List[PatientItem] = []):
         """
         Initializes PatientItemSet
@@ -111,16 +112,14 @@ class TestItemBase(TestCase):
         # Class that has a name attribute
         patient = PatientItem(id="patient_id1", name="Patient 1", key1="val1")
         self.assertEqual(
-            'PatientItem(id="patient_id1", name="Patient 1")',
-            repr(patient)
+            'PatientItem(id="patient_id1", name="Patient 1")', repr(patient)
         )
 
         # Class that doesn't have a name attribute
-        stream = StreamItem(id="stream-123", )
-        self.assertEqual(
-            'StreamItem(id="stream-123")',
-            repr(stream)
+        stream = StreamItem(
+            id="stream-123",
         )
+        self.assertEqual('StreamItem(id="stream-123")', repr(stream))
 
     def test_to_dict(self):
         """
@@ -130,20 +129,10 @@ class TestItemBase(TestCase):
         patient1 = PatientItem(id="patient_id")
         self.assertEqual({"id": "patient_id", "name": ""}, patient1.to_dict())
 
-        patient2 = PatientItem(
-            id="patient_id",
-            name='Patient 2',
-            key1="val1",
-            key2=2
-        )
+        patient2 = PatientItem(id="patient_id", name="Patient 2", key1="val1", key2=2)
         self.assertEqual(
-            {
-                "id": "patient_id",
-                "name": "Patient 2",
-                "key1": "val1",
-                "key2": 2
-            },
-            patient2.to_dict()
+            {"id": "patient_id", "name": "Patient 2", "key1": "val1", "key2": 2},
+            patient2.to_dict(),
         )
 
 
@@ -171,7 +160,7 @@ class TestItemSet(TestCase):
         Test __iter__
 
         """
-        exp_patient_ids = ['patient1_id', 'patient2_id', 'patient3_id']
+        exp_patient_ids = ["patient1_id", "patient2_id", "patient3_id"]
         for patient in self.test_patient_set:
             self.assertIn(patient.id, exp_patient_ids)
             exp_patient_ids.remove(patient.id)
@@ -193,14 +182,13 @@ class TestItemSet(TestCase):
         """
         # __getitem__
         self.assertEqual(
-            PatientItem(id="patient1_id"),
-            self.test_patient_set["patient1_id"]
+            PatientItem(id="patient1_id"), self.test_patient_set["patient1_id"]
         )
 
         # get
         self.assertEqual(
             PatientItem(id="patient2_id", key1="val1"),
-            self.test_patient_set.get("patient2_id")
+            self.test_patient_set.get("patient2_id"),
         )
 
     def test_add(self):
@@ -217,8 +205,7 @@ class TestItemSet(TestCase):
 
         patient_set.add(patient2)
         self.assertEqual(2, len(patient_set))
-        self.assertEqual({"patient1_id", "patient2_id"},
-                         set(patient_set.ids()))
+        self.assertEqual({"patient1_id", "patient2_id"}, set(patient_set.ids()))
 
         # Test raises TypeError when adding item with a different
         # type to the set.
@@ -256,10 +243,7 @@ class TestItemSet(TestCase):
         self.assertEqual(1, len(patient_set2))
 
         # Test raises TypeError when adding ItemSets with different types
-        with self.assertRaisesRegex(
-            TypeError,
-            "cannot update with PatientItem"
-        ):
+        with self.assertRaisesRegex(TypeError, "cannot update with PatientItem"):
             OrgSet().update(patient_set)
 
     def test_remove(self):
@@ -301,14 +285,11 @@ class TestItemSet(TestCase):
         Test ids
 
         """
-        self.assertEqual(
-            [],
-            list(PatientItemSet().ids())
-        )
+        self.assertEqual([], list(PatientItemSet().ids()))
 
         self.assertEqual(
             ["patient1_id", "patient2_id", "patient3_id"],
-            list(self.test_patient_set.ids())
+            list(self.test_patient_set.ids()),
         )
 
     def test_repr(self):
@@ -319,7 +300,7 @@ class TestItemSet(TestCase):
         self.assertEqual(
             """PatientItemSet {
 }""",
-            repr(PatientItemSet())
+            repr(PatientItemSet()),
         )
 
         patient_set = PatientItemSet(
@@ -334,16 +315,15 @@ class TestItemSet(TestCase):
 
         self.assertEqual(
             (
-                'PatientItemSet {\n'
+                "PatientItemSet {\n"
                 '	PatientItem(id="patient1_id", name="")\n'
                 '	PatientItem(id="patient2_id", name="Patient 2")\n'
                 '	PatientItem(id="patient3_id", name="Patient 3")\n'
-                '	... (and 2 others)\n'
-                '}'
+                "	... (and 2 others)\n"
+                "}"
             ),
-            str(patient_set)
+            str(patient_set),
         )
-
 
     def test_to_list(self):
         """
@@ -353,10 +333,9 @@ class TestItemSet(TestCase):
         self.assertEqual([], PatientItemSet().to_list())
         self.assertEqual(
             [
-                {'id': 'patient1_id', 'name': 'Patient 1'},
-                {'id': 'patient2_id', 'key1': 'val1', 'name': ''},
-                {'id': 'patient3_id', 'key1': 1, 'key2': 'val2', 'name': ''},
+                {"id": "patient1_id", "name": "Patient 1"},
+                {"id": "patient2_id", "key1": "val1", "name": ""},
+                {"id": "patient3_id", "key1": 1, "key2": "val2", "name": ""},
             ],
-            self.test_patient_set.to_list()
+            self.test_patient_set.to_list(),
         )
-

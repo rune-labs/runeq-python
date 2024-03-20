@@ -32,8 +32,8 @@ class APIError(RuneError):
         self.status_code = status_code
         self.details = details
 
-        err_type = 'Error'
-        if isinstance(details, dict) and 'type' in details:
-            err_type = details['type']
+        err_type = "Error"
+        if isinstance(details, dict) and "type" in details:
+            err_type = details["type"]
 
-        super().__init__(f'{status_code} {err_type}: {details}')
+        super().__init__(f"{status_code} {err_type}: {details}")

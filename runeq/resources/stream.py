@@ -2,12 +2,11 @@
 Query data directly from the V2 Stream API.
 
 """
-from datetime import date, datetime
 import time
+from datetime import date, datetime
 from typing import Iterable, Iterator, Optional, Union
 
 from .client import StreamClient, global_stream_client
-
 
 _time_type = Union[int, float, date, datetime]
 
@@ -35,7 +34,7 @@ def get_stream_data(
     timezone: Optional[int] = None,
     timezone_name: Optional[str] = None,
     translate_enums: Optional[bool] = True,
-    client: Optional[StreamClient] = None
+    client: Optional[StreamClient] = None,
 ) -> Iterator[Union[str, dict]]:
     """
     Fetch raw data for a stream.
@@ -81,14 +80,10 @@ def get_stream_data(
 
     """
     if start_time and start_time_ns:
-        raise ValueError(
-            "only start_time or start_time_ns can be defined, not both."
-        )
+        raise ValueError("only start_time or start_time_ns can be defined, not both.")
 
     if end_time and end_time_ns:
-        raise ValueError(
-            "only end_time or end_time_ns can be defined, not both."
-        )
+        raise ValueError("only end_time or end_time_ns can be defined, not both.")
 
     start_time = _time_type_to_unix_secs(start_time)
     end_time = _time_type_to_unix_secs(end_time)
@@ -118,13 +113,13 @@ def get_stream_availability(
     end_time: _time_type,
     resolution: int,
     batch_operation: Optional[str] = None,
-    format: Optional[str] = 'csv',
+    format: Optional[str] = "csv",
     limit: Optional[int] = None,
     page_token: Optional[str] = None,
-    timestamp: Optional[str] = 'iso',
+    timestamp: Optional[str] = "iso",
     timezone: Optional[int] = None,
     timezone_name: Optional[str] = None,
-    client: Optional[StreamClient] = None
+    client: Optional[StreamClient] = None,
 ) -> Iterator[Union[str, dict]]:
     """
     Fetch the availability of 1 or multiple streams. When multiple stream
@@ -178,16 +173,16 @@ def get_stream_availability(
 
     """
     params = {
-        'start_time': _time_type_to_unix_secs(start_time),
-        'end_time': _time_type_to_unix_secs(end_time),
-        'resolution': resolution,
-        'batch_operation': batch_operation,
-        'format': format,
-        'limit': limit,
-        'page_token': page_token,
-        'timestamp': timestamp,
-        'timezone': timezone,
-        'timezone_name': timezone_name,
+        "start_time": _time_type_to_unix_secs(start_time),
+        "end_time": _time_type_to_unix_secs(end_time),
+        "resolution": resolution,
+        "batch_operation": batch_operation,
+        "format": format,
+        "limit": limit,
+        "page_token": page_token,
+        "timestamp": timestamp,
+        "timezone": timezone,
+        "timezone_name": timezone_name,
     }
 
     client = client or global_stream_client()

@@ -26,7 +26,7 @@ class Device(ItemBase):
         name: str,
         created_at: float,
         device_type_id: str,
-        **attributes
+        **attributes,
     ):
         """
         Initialize with metadata.
@@ -84,7 +84,7 @@ class Device(ItemBase):
         norm_patient_id = Patient.normalize_id(patient_id)
         norm_device_id = Device.normalize_id(device_id)
 
-        return f'patient-{norm_patient_id},device-{norm_device_id}'
+        return f"patient-{norm_patient_id},device-{norm_device_id}"
 
     def __repr__(self):
         """
@@ -131,12 +131,7 @@ class Patient(ItemBase):
     """
 
     def __init__(
-        self,
-        id: str,
-        name: str,
-        created_at: float,
-        devices: DeviceSet,
-        **attributes
+        self, id: str, name: str, created_at: float, devices: DeviceSet, **attributes
     ):
         """
         Initialize with metadata.
@@ -187,7 +182,7 @@ class Patient(ItemBase):
 
         """
         if not patient_id.startswith("patient-"):
-            patient_id = f'patient-{patient_id}'
+            patient_id = f"patient-{patient_id}"
 
         return patient_id
 
@@ -255,10 +250,7 @@ class PatientSet(ItemSet):
         return all_devices
 
 
-def get_patient(
-    patient_id: str,
-    client: Optional[GraphClient] = None
-) -> Patient:
+def get_patient(patient_id: str, client: Optional[GraphClient] = None) -> Patient:
     """
     Get the patient with the specified patient ID.
 
@@ -269,7 +261,7 @@ def get_patient(
 
     """
     client = client or global_graph_client()
-    query = '''
+    query = """
         query getPatient($patient_id: ID!, $cursor: Cursor) {
             patient(id: $patient_id) {
                 id
@@ -293,7 +285,7 @@ def get_patient(
                 }
             }
         }
-    '''
+    """
 
     patient_id = Patient.normalize_id(patient_id)
     patient_attrs = {}
@@ -304,9 +296,7 @@ def get_patient(
     # Use cursor to page through all patient devices
     while True:
         result = client.execute(
-            statement=query,
-            patient_id=patient_id,
-            cursor=next_cursor
+            statement=query, patient_id=patient_id, cursor=next_cursor
         )
 
         patient_attrs = result["patient"]
@@ -314,14 +304,11 @@ def get_patient(
         # Add the patient's devices to device_set
         device_list = patient_attrs.get("deviceList", {})
         for device_attrs in device_list.get("devices", []):
-            device_type = device_attrs['device_type']
-            device_attrs['device_type_id'] = device_type['id']
-            del device_attrs['device_type']
+            device_type = device_attrs["device_type"]
+            device_attrs["device_type_id"] = device_type["id"]
+            del device_attrs["device_type"]
 
-            device = Device(
-                patient_id=patient_id,
-                **device_attrs
-            )
+            device = Device(patient_id=patient_id, **device_attrs)
             device_set.add(device)
 
         # next_cursor is None when there are no more devices for this patient
@@ -343,7 +330,7 @@ def get_all_patients(client: Optional[GraphClient] = None) -> PatientSet:
 
     """
     client = client or global_graph_client()
-    patients_query = '''
+    patients_query = """
         query getPatientList($patient_cursor: Cursor, $device_cursor: Cursor) {
             org {
                 patientAccessList(cursor: $patient_cursor) {
@@ -376,7 +363,7 @@ def get_all_patients(client: Optional[GraphClient] = None) -> PatientSet:
                 }
             }
         }
-    '''
+    """
 
     patient_cursor = None
     patient_set = PatientSet()
@@ -399,14 +386,11 @@ def get_all_patients(client: Optional[GraphClient] = None) -> PatientSet:
             device_set = DeviceSet()
             device_list = patient_attrs.get("deviceList", {})
             for device_attrs in device_list.get("devices", []):
-                device_type = device_attrs['device_type']
-                device_attrs['device_type_id'] = device_type['id']
-                del device_attrs['device_type']
+                device_type = device_attrs["device_type"]
+                device_attrs["device_type_id"] = device_type["id"]
+                del device_attrs["device_type"]
 
-                device = Device(
-                    patient_id=patient_id,
-                    **device_attrs
-                )
+                device = Device(patient_id=patient_id, **device_attrs)
                 device_set.add(device)
 
             device_cursor = device_list.get("pageInfo", {}).get("endCursor")

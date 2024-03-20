@@ -2,23 +2,24 @@
 Clients for Rune's GraphQL API and V2 Stream API.
 
 """
-from functools import wraps
-import time
-from typing import Dict, Iterator, Union
-import urllib.parse
 
+import time
+import urllib.parse
+from functools import wraps
+from typing import Dict, Iterator, Union
+
+import requests
 from gql import Client as GQLClient
 from gql import gql
 from gql.transport.requests import RequestsHTTPTransport
-import requests
 
-from runeq.config import Config
 from runeq import errors
+from runeq.config import BaseConfig, Config
 
 # Error when a client is not initialized
 INITIALIZATION_ERROR = errors.InitializationError(
-    'runeq must be initialized by calling'
-    '`initialize` before this function can be used'
+    "runeq must be initialized by calling"
+    "`initialize` before this function can be used"
 )
 
 # Rune GraphQL Client to query stream metadata.
@@ -48,7 +49,7 @@ def _retry(exceptions, max_attempts=3, max_sleep_secs=0):
                     if attempt == max_attempts - 1:
                         raise
 
-                wait_secs = 2 ** attempt
+                wait_secs = 2**attempt
                 if max_sleep_secs > 0:
                     wait_secs = min(wait_secs, max_sleep_secs)
 
@@ -66,12 +67,12 @@ class GraphClient:
     """
 
     # Configuration details for the graph client.
-    config: Config = None
+    config: BaseConfig = None
 
     # The GraphQL client.
     _gql_client: GQLClient
 
-    def __init__(self, config: Config):
+    def __init__(self, config: BaseConfig):
         """
         Initialize the Graph API Client.
 
@@ -90,10 +91,7 @@ class GraphClient:
             retries=3,
             url=f"{self.config.graph_url}/graphql",
             use_json=True,
-            headers={
-                "Content-Type": "application/json",
-                **self.config.auth_headers
-            },
+            headers={"Content-Type": "application/json", **self.config.auth_headers},
         )
         self._gql_client = GQLClient(transport=transport)
 
@@ -134,9 +132,9 @@ class StreamClient:
     HEADER_NEXT_PAGE = "X-Rune-Next-Page-Token"
 
     # Configuration details for the stream client.
-    config: Config = None
+    config: BaseConfig = None
 
-    def __init__(self, config: Config):
+    def __init__(self, config: BaseConfig):
         """
         Initialize the Stream API Client.
 
@@ -191,11 +189,7 @@ class StreamClient:
         again (if refresh was successful).
         """
         for i in range(2):
-            r = requests.get(
-                url,
-                headers=self.config.auth_headers,
-                params=params
-            )
+            r = requests.get(url, headers=self.config.auth_headers, params=params)
 
             if r.ok:
                 return r
@@ -254,7 +248,14 @@ def initialize(*args, **kwargs):
 
     """
     config = Config(*args, **kwargs)
+    initialize_with_config(config)
 
+
+def initialize_with_config(config: BaseConfig):
+    """Initializes the library using a config object, setting global clients
+    for requests to the GraphQL API and the V2 Stream API.
+
+    """
     global _graph_client, _stream_client
     _graph_client = GraphClient(config)
     _stream_client = StreamClient(config)

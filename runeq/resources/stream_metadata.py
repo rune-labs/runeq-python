@@ -3,17 +3,18 @@ Fetch metadata about streams, including stream types.
 
 """
 import datetime
-from io import StringIO
 import json
+from io import StringIO
 from typing import Callable, Iterable, Iterator, List, Optional, Type, Union
 
 import pandas as pd
 
+from runeq.errors import RuneError
+
 from .client import GraphClient, StreamClient, global_graph_client
 from .common import ItemBase, ItemSet
 from .patient import Device, Patient, get_patient
-from .stream import get_stream_availability, get_stream_data, _time_type
-from runeq.errors import RuneError
+from .stream import _time_type, get_stream_availability, get_stream_data
 
 
 class Dimension(ItemBase):
@@ -22,13 +23,9 @@ class Dimension(ItemBase):
     where each value in the timeseries is a row.
 
     """
+
     def __init__(
-        self,
-        id: str,
-        data_type: str,
-        quantity_name: str,
-        unit_name: str,
-        **attributes
+        self, id: str, data_type: str, quantity_name: str, unit_name: str, **attributes
     ):
         """
         Initialize with metadata.
@@ -69,7 +66,7 @@ class StreamType(ItemBase):
         name: str,
         description: str,
         dimensions: List[Dimension],
-        **attributes
+        **attributes,
     ):
         """
         Initialize with metadata.
@@ -125,9 +122,7 @@ class StreamTypeSet(ItemSet):
         return StreamType
 
 
-def get_all_stream_types(
-    client: Optional[GraphClient] = None
-) -> StreamTypeSet:
+def get_all_stream_types(client: Optional[GraphClient] = None) -> StreamTypeSet:
     """
     Get all stream types.
 
@@ -137,7 +132,7 @@ def get_all_stream_types(
 
     """
     client = client or global_graph_client()
-    query = '''
+    query = """
         query getStreamTypes {
             streamTypeList {
                 streamTypes {
@@ -157,7 +152,7 @@ def get_all_stream_types(
                 }
             }
         }
-    '''
+    """
 
     stream_type_set = StreamTypeSet()
     result = client.execute(statement=query)
@@ -184,16 +179,11 @@ def _parse_stream_type(stream_type_attrs: dict) -> StreamType:
     # Create a dimension set from the stream's dimensions
     dimensions = []
     for dimension_attrs in stream_type_attrs["shape"].get("dimensions", []):
-        dimensions.append(
-            Dimension(**dimension_attrs)
-        )
+        dimensions.append(Dimension(**dimension_attrs))
 
     del stream_type_attrs["shape"]
 
-    return StreamType(
-        dimensions=dimensions,
-        **stream_type_attrs
-    )
+    return StreamType(dimensions=dimensions, **stream_type_attrs)
 
 
 class StreamMetadata(ItemBase):
@@ -214,7 +204,7 @@ class StreamMetadata(ItemBase):
         min_time: float,
         max_time: float,
         parameters: dict,
-        **attributes
+        **attributes,
     ):
         """
         Initialize with metadata.
@@ -254,7 +244,7 @@ class StreamMetadata(ItemBase):
             min_time=min_time,
             max_time=max_time,
             parameters=parameters,
-            **attributes
+            **attributes,
         )
 
     def to_dict(self) -> dict:
@@ -278,7 +268,7 @@ class StreamMetadata(ItemBase):
         timestamp: Optional[str] = "iso",
         timezone: Optional[int] = None,
         translate_enums: Optional[bool] = True,
-        client: Optional[StreamClient] = None
+        client: Optional[StreamClient] = None,
     ) -> Iterator[Union[str, dict]]:
         """
         Iterate over CSV-formatted data for this stream.
@@ -360,7 +350,7 @@ class StreamMetadata(ItemBase):
         timestamp: Optional[str] = "iso",
         timezone: Optional[int] = None,
         translate_enums: Optional[bool] = True,
-        stream_client: Optional[StreamClient] = None
+        stream_client: Optional[StreamClient] = None,
     ) -> pd.DataFrame:
         """
         Get stream data as an enriched Pandas dataframe. In addition to the raw
@@ -398,17 +388,17 @@ class StreamMetadata(ItemBase):
 
         """
         params = {
-            'stream_id': self.id,
-            'start_time': start_time,
-            'start_time_ns': start_time_ns,
-            'end_time': end_time,
-            'end_time_ns': end_time_ns,
-            'format': 'csv',
-            'limit': limit,
-            'page_token': page_token,
-            'timestamp': timestamp,
-            'timezone': timezone,
-            'translate_enums': translate_enums,
+            "stream_id": self.id,
+            "start_time": start_time,
+            "start_time_ns": start_time_ns,
+            "end_time": end_time,
+            "end_time_ns": end_time_ns,
+            "format": "csv",
+            "limit": limit,
+            "page_token": page_token,
+            "timestamp": timestamp,
+            "timezone": timezone,
+            "translate_enums": translate_enums,
         }
 
         all_stream_dfs = []
@@ -419,7 +409,7 @@ class StreamMetadata(ItemBase):
 
         # Convert "dict" dimensions to native dicts (from strings)
         for dim in self.stream_type.dimensions:
-            if dim.data_type == 'dict':
+            if dim.data_type == "dict":
                 stream_df[dim.id] = stream_df[dim.id].apply(json.loads)
 
         # Add metadata before returning the dataframe
@@ -432,9 +422,9 @@ class StreamMetadata(ItemBase):
         resolution: int,
         limit: Optional[int] = None,
         page_token: Optional[str] = None,
-        timestamp: Optional[str] = 'iso',
+        timestamp: Optional[str] = "iso",
         timezone: Optional[int] = None,
-        stream_client: Optional[StreamClient] = None
+        stream_client: Optional[StreamClient] = None,
     ) -> pd.DataFrame:
         """
         Get stream availability as an enriched Pandas dataframe. The dataframe
@@ -468,7 +458,7 @@ class StreamMetadata(ItemBase):
             start_time=start_time,
             end_time=end_time,
             resolution=resolution,
-            format='csv',
+            format="csv",
             limit=limit,
             page_token=page_token,
             timestamp=timestamp,
@@ -516,8 +506,8 @@ class StreamMetadataSet(ItemSet):
         category: Optional[str] = None,
         measurement: Optional[str] = None,
         filter_function: Optional[Callable[[StreamMetadata], bool]] = None,
-        **parameters
-    ) -> 'StreamMetadataSet':
+        **parameters,
+    ) -> "StreamMetadataSet":
         """
         Filters streams for those that match ALL optional filter parameters.
         Returns a new StreamMetadataSet.
@@ -542,24 +532,18 @@ class StreamMetadataSet(ItemSet):
 
         for stream in self._items.values():
             if (
-                (not stream_id or stream.id == stream_id) and
-                (not patient_id or stream.patient_id == patient_id) and
-                (not device_id or stream.device_id == device_id) and
-                (
-                    not stream_type_id or
-                    stream.stream_type.id == stream_type_id
-                ) and
-                (not algorithm or stream.algorithm == algorithm) and
-                (not category or stream.get("category") == category) and
-                (
-                    not measurement or
-                    stream.get("measurement") == measurement
-                ) and
-                all(
+                (not stream_id or stream.id == stream_id)
+                and (not patient_id or stream.patient_id == patient_id)
+                and (not device_id or stream.device_id == device_id)
+                and (not stream_type_id or stream.stream_type.id == stream_type_id)
+                and (not algorithm or stream.algorithm == algorithm)
+                and (not category or stream.get("category") == category)
+                and (not measurement or stream.get("measurement") == measurement)
+                and all(
                     stream.get(param_name) == param
                     for param_name, param in parameters.items()
-                ) and
-                (not filter_function or filter_function(stream))
+                )
+                and (not filter_function or filter_function(stream))
             ):
                 new_stream_set.add(stream)
 
@@ -576,7 +560,7 @@ class StreamMetadataSet(ItemSet):
         timestamp: Optional[str] = "iso",
         timezone: Optional[int] = None,
         translate_enums: Optional[bool] = True,
-        stream_client: Optional[StreamClient] = None
+        stream_client: Optional[StreamClient] = None,
     ) -> pd.DataFrame:
         """
         Get raw data for all streams in the collection, as an enriched Pandas
@@ -638,9 +622,9 @@ class StreamMetadataSet(ItemSet):
         batch_operation: Optional[str] = None,
         limit: Optional[int] = None,
         page_token: Optional[str] = None,
-        timestamp: Optional[str] = 'iso',
+        timestamp: Optional[str] = "iso",
         timezone: Optional[int] = None,
-        stream_client: Optional[StreamClient] = None
+        stream_client: Optional[StreamClient] = None,
     ) -> pd.DataFrame:
         """
         Get stream availability data as a Pandas dataframe. Depending on the
@@ -683,7 +667,7 @@ class StreamMetadataSet(ItemSet):
             end_time=end_time,
             resolution=resolution,
             batch_operation=batch_operation,
-            format='csv',
+            format="csv",
             limit=limit,
             page_token=page_token,
             timestamp=timestamp,
@@ -701,8 +685,7 @@ class StreamMetadataSet(ItemSet):
 
 
 def get_stream_metadata(
-    stream_ids: Union[str, Iterable[str]],
-    client: Optional[GraphClient] = None
+    stream_ids: Union[str, Iterable[str]], client: Optional[GraphClient] = None
 ) -> Union[StreamMetadata, StreamMetadataSet]:
     """
     Get stream metadata for the specified stream_id(s).
@@ -721,7 +704,7 @@ def get_stream_metadata(
 
     """
     client = client or global_graph_client()
-    query = '''
+    query = """
         query getStreamListByIds($stream_ids: [String]) {
             streamListByIds(streamIds: $stream_ids) {
               pageInfo {
@@ -757,7 +740,7 @@ def get_stream_metadata(
               }
             }
         }
-    '''
+    """
     stream_set = StreamMetadataSet()
 
     if type(stream_ids) is str:
@@ -771,7 +754,7 @@ def get_stream_metadata(
     for start in range(0, len(stream_ids), 100):
         result = client.execute(
             statement=query,
-            stream_ids=stream_ids[start:start + 100],
+            stream_ids=stream_ids[start : start + 100],
         )
         stream_list_results.append(result)
 
@@ -788,15 +771,13 @@ def get_stream_metadata(
             # Add query parameters to stream attributes
             params = {}
             if stream_attrs.get("parameters"):
-                for param in stream_attrs['parameters']:
+                for param in stream_attrs["parameters"]:
                     stream_attrs[param["key"]] = param["value"]
                     params[param["key"]] = param["value"]
-                del stream_attrs['parameters']
+                del stream_attrs["parameters"]
 
             stream = StreamMetadata(
-                stream_type=stream_type,
-                parameters=params,
-                **stream_attrs
+                stream_type=stream_type, parameters=params, **stream_attrs
             )
             stream_set.add(stream)
 
@@ -806,9 +787,7 @@ def get_stream_metadata(
                 pass
 
     if len(seen_stream_ids) > 0:
-        raise RuneError(
-            f"1+ stream ID(s) not found: {','.join(seen_stream_ids)}"
-        )
+        raise RuneError(f"1+ stream ID(s) not found: {','.join(seen_stream_ids)}")
 
     if len(stream_set) == 1:
         return list(stream_set)[0]
@@ -824,7 +803,7 @@ def get_patient_stream_metadata(
     category: Optional[str] = None,
     measurement: Optional[str] = None,
     client: Optional[GraphClient] = None,
-    **parameters
+    **parameters,
 ) -> StreamMetadataSet:
     """
     Get stream metadata for a patient's streams, matching ALL filter
@@ -852,7 +831,7 @@ def get_patient_stream_metadata(
     get_patient(patient_id=patient_id, client=client)
 
     client = client or global_graph_client()
-    query = '''
+    query = """
         query getStreamList($cursor: Cursor, $filters: StreamQueryFilters) {
             streamList(filters: $filters, cursor: $cursor) {
                 pageInfo {
@@ -888,7 +867,7 @@ def get_patient_stream_metadata(
                 }
             }
         }
-    '''
+    """
     patient_id = Patient.normalize_id(patient_id)
 
     if device_id:
@@ -916,7 +895,7 @@ def get_patient_stream_metadata(
         "deviceId": device_id,
         "streamTypeId": stream_type_id,
         "algorithm": algorithm,
-        "parameters": params
+        "parameters": params,
     }
 
     next_cursor = None
@@ -924,11 +903,7 @@ def get_patient_stream_metadata(
 
     # Use cursor to page through all filtered streams
     while True:
-        result = client.execute(
-            statement=query,
-            filters=filters,
-            cursor=next_cursor
-        )
+        result = client.execute(statement=query, filters=filters, cursor=next_cursor)
 
         stream_list = result.get("streamList", {})
         for stream_attrs in stream_list.get("streams", []):
@@ -941,15 +916,13 @@ def get_patient_stream_metadata(
             # Add query parameters to stream attributes
             params = {}
             if stream_attrs.get("parameters"):
-                for param in stream_attrs['parameters']:
+                for param in stream_attrs["parameters"]:
                     stream_attrs[param["key"]] = param["value"]
                     params[param["key"]] = param["value"]
-                del stream_attrs['parameters']
+                del stream_attrs["parameters"]
 
             stream = StreamMetadata(
-                stream_type=stream_type,
-                parameters=params,
-                **stream_attrs
+                stream_type=stream_type, parameters=params, **stream_attrs
             )
             stream_set.add(stream)
 
@@ -973,7 +946,7 @@ def get_stream_dataframe(
     timezone: Optional[int] = None,
     translate_enums: Optional[bool] = True,
     stream_client: Optional[StreamClient] = None,
-    graph_client: Optional[GraphClient] = None
+    graph_client: Optional[GraphClient] = None,
 ) -> pd.DataFrame:
     """
     Get stream(s) as enriched dataframe with stream data and metadata.
@@ -1012,10 +985,7 @@ def get_stream_dataframe(
         RuneError: if any of the stream IDs is not found.
 
     """
-    stream_meta_set = get_stream_metadata(
-        stream_ids=stream_ids,
-        client=graph_client
-    )
+    stream_meta_set = get_stream_metadata(stream_ids=stream_ids, client=graph_client)
 
     return stream_meta_set.get_stream_dataframe(
         start_time=start_time,
@@ -1039,10 +1009,10 @@ def get_stream_availability_dataframe(
     batch_operation: Optional[str] = None,
     limit: Optional[int] = None,
     page_token: Optional[str] = None,
-    timestamp: Optional[str] = 'iso',
+    timestamp: Optional[str] = "iso",
     timezone: Optional[int] = None,
     stream_client: Optional[StreamClient] = None,
-    graph_client: Optional[GraphClient] = None
+    graph_client: Optional[GraphClient] = None,
 ) -> pd.DataFrame:
     """
     Get stream availability data as a dataframe. If a single stream_id is
@@ -1096,7 +1066,7 @@ def get_stream_availability_dataframe(
             end_time=end_time,
             resolution=resolution,
             batch_operation=batch_operation,
-            format='csv',
+            format="csv",
             limit=limit,
             page_token=page_token,
             timestamp=timestamp,
@@ -1114,10 +1084,7 @@ def get_stream_availability_dataframe(
 
     # Since there is only one stream id, we can enrich the dataframe with
     # metadata
-    stream_meta = get_stream_metadata(
-        stream_ids=stream_ids,
-        client=graph_client
-    )
+    stream_meta = get_stream_metadata(stream_ids=stream_ids, client=graph_client)
 
     return stream_meta.get_stream_availability_dataframe(
         start_time=start_time,

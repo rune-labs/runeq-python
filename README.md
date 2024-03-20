@@ -16,7 +16,7 @@ Python 3 Standard Development Kit (SDK) for Rune Lab's Query API: `runeq`
 
 ## Installation
 
-Python 3.6+ is required.
+Python 3.8+ is required.
 
 To install the library using pip:
 
