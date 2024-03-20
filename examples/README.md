@@ -14,7 +14,7 @@ The Rune Labs software development kit (SDK), called `runeq`, is a set of tools 
 For detailed information:
 * [Rune Labs API documentation](https://docs.runelabs.io/stream/v2/)
 * [Rune Labs SDK documentation](https://runeq.readthedocs.io/en/latest/)
-* [Rune Labs open source code respository](https://github.com/rune-labs/opensource)
+* [Rune Labs open source code respository](https://github.com/rune-labs/runeq-python/tree/main/examples)
 
 ---
 
