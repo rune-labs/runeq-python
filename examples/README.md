@@ -6,7 +6,7 @@ This data is acquired from a growing number of sources, including:
 * The StrivePD app for the iPhone and Apple Watch
 * Apple's movement disorder kit (MM4PD, tremor and dyskinesia metrics)
 * Apple's Health ecosystem
-* Deep brain stimulation devices, such as the Medtronic Percept PC+S
+* Deep brain stimulation devices
 * etc.
 
 The Rune Labs software development kit (SDK), called `runeq`, is a set of tools intended to simplify usage of our API. These tools are currently available in the Python programming language.
