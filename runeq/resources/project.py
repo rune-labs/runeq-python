@@ -5,8 +5,6 @@ Fetch metadata about projects.
 
 from typing import Iterable, Optional, Type
 
-import pandas as pd
-
 from .client import GraphClient, global_graph_client
 from .common import ItemBase, ItemSet
 
