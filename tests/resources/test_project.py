@@ -2,6 +2,7 @@
 Tests for fetching project data.
 
 """
+
 from unittest import TestCase, mock
 
 from runeq.config import Config
@@ -10,8 +11,6 @@ from runeq.resources.project import (
     Cohort,
     CohortPatientMetadata,
     CohortSet,
-    Metric,
-    MetricSet,
     Project,
     ProjectPatientMetadata,
     get_cohort_patients,
@@ -367,19 +366,6 @@ class TestProject(TestCase):
         Test attributes for an initialized Project Patient.
 
         """
-        example_metrics = MetricSet(
-            [
-                Metric(
-                    type="LAST_UPLOAD",
-                    data_type="APPLEWATCH_TREMOR",
-                    value=1648235452.965804,
-                    time_interval="FOURTEEN_DAYS",
-                    created_at=1673467628.837126,
-                    updated_at=1673467628.837126,
-                    id="1bfcf11f-8d5c-4714-b774-6b47e03c5900",
-                ),
-            ]
-        )
         test_project = ProjectPatientMetadata(
             id="proj-patient-id",
             created_at=1630515986.9949625,
@@ -387,7 +373,6 @@ class TestProject(TestCase):
             created_by="user-1",
             updated_by="user-1",
             started_at=1630515986.9949625,
-            metrics=example_metrics,
         )
 
         self.assertEqual("proj-patient-id", test_project.id)
@@ -395,7 +380,6 @@ class TestProject(TestCase):
         self.assertEqual(1630515986.9949625, test_project.updated_at)
         self.assertEqual("user-1", test_project.created_by)
         self.assertEqual("user-1", test_project.updated_by)
-        self.assertEqual(example_metrics, test_project.metrics)
 
     def test_cohort_attributes(self):
         """
@@ -424,19 +408,6 @@ class TestProject(TestCase):
         Test attributes for an initialized Cohort Patient.
 
         """
-        example_metrics = MetricSet(
-            [
-                Metric(
-                    type="LAST_UPLOAD",
-                    data_type="APPLEWATCH_TREMOR",
-                    value=1648235452.965804,
-                    time_interval="FOURTEEN_DAYS",
-                    created_at=1673467628.837126,
-                    updated_at=1673467628.837126,
-                    id="1bfcf11f-8d5c-4714-b774-6b47e03c5900",
-                ),
-            ]
-        )
         test_project = CohortPatientMetadata(
             id="cohort-patient-id",
             created_at=1630515986.9949625,
@@ -444,7 +415,6 @@ class TestProject(TestCase):
             created_by="user-1",
             updated_by="user-1",
             started_at=1630515986.9949625,
-            metrics=example_metrics,
         )
 
         self.assertEqual("cohort-patient-id", test_project.id)
@@ -452,7 +422,6 @@ class TestProject(TestCase):
         self.assertEqual(1630515986.9949625, test_project.updated_at)
         self.assertEqual("user-1", test_project.created_by)
         self.assertEqual("user-1", test_project.updated_by)
-        self.assertEqual(example_metrics, test_project.metrics)
 
     def test_get_project_patients_basic(self):
         """
@@ -463,17 +432,6 @@ class TestProject(TestCase):
         project_patients_expected = [
             {
                 "id": "patient-1",
-                "metrics": [
-                    {
-                        "id": "metric-1",
-                        "updated_at": 1673467628.837126,
-                        "created_at": 1673467628.837126,
-                        "type": "LAST_UPLOAD",
-                        "data_type": "APPLEWATCH_TREMOR",
-                        "value": 1648235452.965804,
-                        "time_interval": "FOURTEEN_DAYS",
-                    },
-                ],
                 "code_name": "code name 1",
                 "created_at": 1673467625.063822,
                 "updated_at": 1673467625.063822,
@@ -482,17 +440,6 @@ class TestProject(TestCase):
             },
             {
                 "id": "patient-2",
-                "metrics": [
-                    {
-                        "id": "metric-2",
-                        "updated_at": 1673467628.837126,
-                        "created_at": 1673467628.837126,
-                        "type": "LAST_UPLOAD",
-                        "data_type": "APPLEWATCH_TREMOR",
-                        "value": 1648235452.965804,
-                        "time_interval": "FOURTEEN_DAYS",
-                    },
-                ],
                 "code_name": "code name 2",
                 "created_at": 1673467625.063822,
                 "updated_at": 1673467625.063822,
@@ -507,19 +454,6 @@ class TestProject(TestCase):
                     "projectPatients": [
                         {
                             "patient": {"id": "patient-1"},
-                            "metricList": {
-                                "metrics": [
-                                    {
-                                        "id": "metric-1",
-                                        "updated_at": 1673467628.837126,
-                                        "created_at": 1673467628.837126,
-                                        "type": "LAST_UPLOAD",
-                                        "data_type": "APPLEWATCH_TREMOR",
-                                        "value": 1648235452.965804,
-                                        "time_interval": "FOURTEEN_DAYS",
-                                    },
-                                ]
-                            },
                             "code_name": "code name 1",
                             "created_at": 1673467625.063822,
                             "updated_at": 1673467625.063822,
@@ -528,19 +462,6 @@ class TestProject(TestCase):
                         },
                         {
                             "patient": {"id": "patient-2"},
-                            "metricList": {
-                                "metrics": [
-                                    {
-                                        "id": "metric-2",
-                                        "updated_at": 1673467628.837126,
-                                        "created_at": 1673467628.837126,
-                                        "type": "LAST_UPLOAD",
-                                        "data_type": "APPLEWATCH_TREMOR",
-                                        "value": 1648235452.965804,
-                                        "time_interval": "FOURTEEN_DAYS",
-                                    },
-                                ]
-                            },
                             "code_name": "code name 2",
                             "created_at": 1673467625.063822,
                             "updated_at": 1673467625.063822,
@@ -571,17 +492,6 @@ class TestProject(TestCase):
         project_patients_expected = [
             {
                 "id": "patient-1",
-                "metrics": [
-                    {
-                        "id": "metric-1",
-                        "updated_at": 1673467628.837126,
-                        "created_at": 1673467628.837126,
-                        "type": "LAST_UPLOAD",
-                        "data_type": "APPLEWATCH_TREMOR",
-                        "value": 1648235452.965804,
-                        "time_interval": "FOURTEEN_DAYS",
-                    },
-                ],
                 "code_name": "code name 1",
                 "created_at": 1673467625.063822,
                 "updated_at": 1673467625.063822,
@@ -590,17 +500,6 @@ class TestProject(TestCase):
             },
             {
                 "id": "patient-2",
-                "metrics": [
-                    {
-                        "id": "metric-2",
-                        "updated_at": 1673467628.837126,
-                        "created_at": 1673467628.837126,
-                        "type": "LAST_UPLOAD",
-                        "data_type": "APPLEWATCH_TREMOR",
-                        "value": 1648235452.965804,
-                        "time_interval": "FOURTEEN_DAYS",
-                    },
-                ],
                 "code_name": "code name 2",
                 "created_at": 1673467625.063822,
                 "updated_at": 1673467625.063822,
@@ -616,19 +515,6 @@ class TestProject(TestCase):
                         "projectPatients": [
                             {
                                 "patient": {"id": "patient-1"},
-                                "metricList": {
-                                    "metrics": [
-                                        {
-                                            "id": "metric-1",
-                                            "updated_at": 1673467628.837126,
-                                            "created_at": 1673467628.837126,
-                                            "type": "LAST_UPLOAD",
-                                            "data_type": "APPLEWATCH_TREMOR",
-                                            "value": 1648235452.965804,
-                                            "time_interval": "FOURTEEN_DAYS",
-                                        },
-                                    ]
-                                },
                                 "code_name": "code name 1",
                                 "created_at": 1673467625.063822,
                                 "updated_at": 1673467625.063822,
@@ -646,19 +532,6 @@ class TestProject(TestCase):
                         "projectPatients": [
                             {
                                 "patient": {"id": "patient-2"},
-                                "metricList": {
-                                    "metrics": [
-                                        {
-                                            "id": "metric-2",
-                                            "updated_at": 1673467628.837126,
-                                            "created_at": 1673467628.837126,
-                                            "type": "LAST_UPLOAD",
-                                            "data_type": "APPLEWATCH_TREMOR",
-                                            "value": 1648235452.965804,
-                                            "time_interval": "FOURTEEN_DAYS",
-                                        },
-                                    ]
-                                },
                                 "code_name": "code name 2",
                                 "created_at": 1673467625.063822,
                                 "updated_at": 1673467625.063822,
@@ -690,17 +563,6 @@ class TestProject(TestCase):
         cohort_patients_expected = [
             {
                 "id": "patient-1",
-                "metrics": [
-                    {
-                        "id": "metric-1",
-                        "updated_at": 1673467628.837126,
-                        "created_at": 1673467628.837126,
-                        "type": "LAST_UPLOAD",
-                        "data_type": "APPLEWATCH_TREMOR",
-                        "value": 1648235452.965804,
-                        "time_interval": "FOURTEEN_DAYS",
-                    },
-                ],
                 "code_name": "code name 1",
                 "created_at": 1673467625.063822,
                 "updated_at": 1673467625.063822,
@@ -709,17 +571,6 @@ class TestProject(TestCase):
             },
             {
                 "id": "patient-2",
-                "metrics": [
-                    {
-                        "id": "metric-2",
-                        "updated_at": 1673467628.837126,
-                        "created_at": 1673467628.837126,
-                        "type": "LAST_UPLOAD",
-                        "data_type": "APPLEWATCH_TREMOR",
-                        "value": 1648235452.965804,
-                        "time_interval": "FOURTEEN_DAYS",
-                    },
-                ],
                 "code_name": "code name 2",
                 "created_at": 1673467625.063822,
                 "updated_at": 1673467625.063822,
@@ -734,19 +585,6 @@ class TestProject(TestCase):
                     "cohortPatients": [
                         {
                             "patient": {"id": "patient-1"},
-                            "metricList": {
-                                "metrics": [
-                                    {
-                                        "id": "metric-1",
-                                        "updated_at": 1673467628.837126,
-                                        "created_at": 1673467628.837126,
-                                        "type": "LAST_UPLOAD",
-                                        "data_type": "APPLEWATCH_TREMOR",
-                                        "value": 1648235452.965804,
-                                        "time_interval": "FOURTEEN_DAYS",
-                                    },
-                                ]
-                            },
                             "code_name": "code name 1",
                             "created_at": 1673467625.063822,
                             "updated_at": 1673467625.063822,
@@ -755,19 +593,6 @@ class TestProject(TestCase):
                         },
                         {
                             "patient": {"id": "patient-2"},
-                            "metricList": {
-                                "metrics": [
-                                    {
-                                        "id": "metric-2",
-                                        "updated_at": 1673467628.837126,
-                                        "created_at": 1673467628.837126,
-                                        "type": "LAST_UPLOAD",
-                                        "data_type": "APPLEWATCH_TREMOR",
-                                        "value": 1648235452.965804,
-                                        "time_interval": "FOURTEEN_DAYS",
-                                    },
-                                ]
-                            },
                             "code_name": "code name 2",
                             "created_at": 1673467625.063822,
                             "updated_at": 1673467625.063822,
@@ -798,17 +623,6 @@ class TestProject(TestCase):
         cohort_patients_expected = [
             {
                 "id": "patient-1",
-                "metrics": [
-                    {
-                        "id": "metric-1",
-                        "updated_at": 1673467628.837126,
-                        "created_at": 1673467628.837126,
-                        "type": "LAST_UPLOAD",
-                        "data_type": "APPLEWATCH_TREMOR",
-                        "value": 1648235452.965804,
-                        "time_interval": "FOURTEEN_DAYS",
-                    },
-                ],
                 "code_name": "code name 1",
                 "created_at": 1673467625.063822,
                 "updated_at": 1673467625.063822,
@@ -817,17 +631,6 @@ class TestProject(TestCase):
             },
             {
                 "id": "patient-2",
-                "metrics": [
-                    {
-                        "id": "metric-2",
-                        "updated_at": 1673467628.837126,
-                        "created_at": 1673467628.837126,
-                        "type": "LAST_UPLOAD",
-                        "data_type": "APPLEWATCH_TREMOR",
-                        "value": 1648235452.965804,
-                        "time_interval": "FOURTEEN_DAYS",
-                    },
-                ],
                 "code_name": "code name 2",
                 "created_at": 1673467625.063822,
                 "updated_at": 1673467625.063822,
@@ -843,19 +646,6 @@ class TestProject(TestCase):
                         "cohortPatients": [
                             {
                                 "patient": {"id": "patient-1"},
-                                "metricList": {
-                                    "metrics": [
-                                        {
-                                            "id": "metric-1",
-                                            "updated_at": 1673467628.837126,
-                                            "created_at": 1673467628.837126,
-                                            "type": "LAST_UPLOAD",
-                                            "data_type": "APPLEWATCH_TREMOR",
-                                            "value": 1648235452.965804,
-                                            "time_interval": "FOURTEEN_DAYS",
-                                        },
-                                    ]
-                                },
                                 "code_name": "code name 1",
                                 "created_at": 1673467625.063822,
                                 "updated_at": 1673467625.063822,
@@ -873,19 +663,6 @@ class TestProject(TestCase):
                         "cohortPatients": [
                             {
                                 "patient": {"id": "patient-2"},
-                                "metricList": {
-                                    "metrics": [
-                                        {
-                                            "id": "metric-2",
-                                            "updated_at": 1673467628.837126,
-                                            "created_at": 1673467628.837126,
-                                            "type": "LAST_UPLOAD",
-                                            "data_type": "APPLEWATCH_TREMOR",
-                                            "value": 1648235452.965804,
-                                            "time_interval": "FOURTEEN_DAYS",
-                                        },
-                                    ]
-                                },
                                 "code_name": "code name 2",
                                 "created_at": 1673467625.063822,
                                 "updated_at": 1673467625.063822,

@@ -172,26 +172,16 @@ You can find information about a single project:
 
 .. code-block:: python
 
-    from runeq.resources.project import get_project
+    from runeq.resources.project import get_project, get_project_patients
 
     project = get_project(project_id="example_id")
     print(project.to_dict())
-
-To view all the patients in a project, and their related project metrics you can use the
-following example:
-
-.. code-block:: python
-
-    from runeq.resources.project import get_project_patients
 
     project_patients = get_project_patients(project_id="example_id")
 
     for project_patient in project_patients:
         print(project_patient)
-        for metric in project_patient.metrics:
-            print(' ', metric)
 
-        print('')
 
 It may be easier to view a single project patient in a dataframe which you can do by:
 
@@ -203,8 +193,6 @@ It may be easier to view a single project patient in a dataframe which you can d
     target_patient_id = "patient_id_example"
 
     df = project_patients[target_patient_id].get_patient_metadata_dataframe()
-
-    df
 
 
 Fetch Timeseries Data
