@@ -306,7 +306,7 @@ class StreamV1CSVBase(StreamV1Base):
 
         """
         if USE_NUMPY:
-            restval = np.NaN
+            restval = np.nan
         else:
             restval = None
 

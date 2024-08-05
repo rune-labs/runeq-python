@@ -487,7 +487,7 @@ class TestStreamV1Client(TestCase):
         expected = [
             {"lower": 1, "higher": 2, "label": "ints"},
             {"lower": 3.5, "higher": 6.7, "label": "floats"},
-            {"lower": np.NaN, "higher": 8.9, "label": "missing data"},
+            {"lower": np.nan, "higher": 8.9, "label": "missing data"},
         ]
 
         for test_num, resource_creator in enumerate(
