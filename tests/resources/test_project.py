@@ -9,7 +9,6 @@ from runeq.config import Config
 from runeq.resources.client import GraphClient
 from runeq.resources.project import (
     Cohort,
-    CohortPatientMetadata,
     CohortSet,
     Project,
     ProjectPatientMetadata,
@@ -368,6 +367,7 @@ class TestProject(TestCase):
         """
         test_project = ProjectPatientMetadata(
             id="proj-patient-id",
+            project_code_name="Code Name",
             created_at=1630515986.9949625,
             updated_at=1630515986.9949625,
             created_by="user-1",
@@ -376,6 +376,7 @@ class TestProject(TestCase):
         )
 
         self.assertEqual("proj-patient-id", test_project.id)
+        self.assertEqual("Code Name", test_project.project_code_name)
         self.assertEqual(1630515986.9949625, test_project.created_at)
         self.assertEqual(1630515986.9949625, test_project.updated_at)
         self.assertEqual("user-1", test_project.created_by)
@@ -403,26 +404,6 @@ class TestProject(TestCase):
         self.assertEqual("user-1", test_cohort.created_by)
         self.assertEqual("user-1", test_cohort.updated_by)
 
-    def test_cohort_patient_attributes(self):
-        """
-        Test attributes for an initialized Cohort Patient.
-
-        """
-        test_project = CohortPatientMetadata(
-            id="cohort-patient-id",
-            created_at=1630515986.9949625,
-            updated_at=1630515986.9949625,
-            created_by="user-1",
-            updated_by="user-1",
-            started_at=1630515986.9949625,
-        )
-
-        self.assertEqual("cohort-patient-id", test_project.id)
-        self.assertEqual(1630515986.9949625, test_project.created_at)
-        self.assertEqual(1630515986.9949625, test_project.updated_at)
-        self.assertEqual("user-1", test_project.created_by)
-        self.assertEqual("user-1", test_project.updated_by)
-
     def test_get_project_patients_basic(self):
         """
         Test get project patients for the initialized user.
@@ -432,7 +413,7 @@ class TestProject(TestCase):
         project_patients_expected = [
             {
                 "id": "patient-1",
-                "code_name": "code name 1",
+                "project_code_name": "code name 1",
                 "created_at": 1673467625.063822,
                 "updated_at": 1673467625.063822,
                 "created_by": "user 1",
@@ -440,7 +421,7 @@ class TestProject(TestCase):
             },
             {
                 "id": "patient-2",
-                "code_name": "code name 2",
+                "project_code_name": "code name 2",
                 "created_at": 1673467625.063822,
                 "updated_at": 1673467625.063822,
                 "created_by": "user 2",
@@ -454,7 +435,7 @@ class TestProject(TestCase):
                     "projectPatients": [
                         {
                             "patient": {"id": "patient-1"},
-                            "code_name": "code name 1",
+                            "project_code_name": "code name 1",
                             "created_at": 1673467625.063822,
                             "updated_at": 1673467625.063822,
                             "created_by": "user 1",
@@ -462,7 +443,7 @@ class TestProject(TestCase):
                         },
                         {
                             "patient": {"id": "patient-2"},
-                            "code_name": "code name 2",
+                            "project_code_name": "code name 2",
                             "created_at": 1673467625.063822,
                             "updated_at": 1673467625.063822,
                             "created_by": "user 2",
@@ -492,7 +473,7 @@ class TestProject(TestCase):
         project_patients_expected = [
             {
                 "id": "patient-1",
-                "code_name": "code name 1",
+                "project_code_name": "code name 1",
                 "created_at": 1673467625.063822,
                 "updated_at": 1673467625.063822,
                 "created_by": "user 1",
@@ -500,7 +481,7 @@ class TestProject(TestCase):
             },
             {
                 "id": "patient-2",
-                "code_name": "code name 2",
+                "project_code_name": "code name 2",
                 "created_at": 1673467625.063822,
                 "updated_at": 1673467625.063822,
                 "created_by": "user 2",
@@ -515,7 +496,7 @@ class TestProject(TestCase):
                         "projectPatients": [
                             {
                                 "patient": {"id": "patient-1"},
-                                "code_name": "code name 1",
+                                "project_code_name": "code name 1",
                                 "created_at": 1673467625.063822,
                                 "updated_at": 1673467625.063822,
                                 "created_by": "user 1",
@@ -532,7 +513,7 @@ class TestProject(TestCase):
                         "projectPatients": [
                             {
                                 "patient": {"id": "patient-2"},
-                                "code_name": "code name 2",
+                                "project_code_name": "code name 2",
                                 "created_at": 1673467625.063822,
                                 "updated_at": 1673467625.063822,
                                 "created_by": "user 2",
@@ -563,7 +544,7 @@ class TestProject(TestCase):
         cohort_patients_expected = [
             {
                 "id": "patient-1",
-                "code_name": "code name 1",
+                "project_code_name": "code name 1",
                 "created_at": 1673467625.063822,
                 "updated_at": 1673467625.063822,
                 "created_by": "user 1",
@@ -571,7 +552,7 @@ class TestProject(TestCase):
             },
             {
                 "id": "patient-2",
-                "code_name": "code name 2",
+                "project_code_name": "code name 2",
                 "created_at": 1673467625.063822,
                 "updated_at": 1673467625.063822,
                 "created_by": "user 2",
@@ -585,7 +566,7 @@ class TestProject(TestCase):
                     "cohortPatients": [
                         {
                             "patient": {"id": "patient-1"},
-                            "code_name": "code name 1",
+                            "project_code_name": "code name 1",
                             "created_at": 1673467625.063822,
                             "updated_at": 1673467625.063822,
                             "created_by": "user 1",
@@ -593,7 +574,7 @@ class TestProject(TestCase):
                         },
                         {
                             "patient": {"id": "patient-2"},
-                            "code_name": "code name 2",
+                            "project_code_name": "code name 2",
                             "created_at": 1673467625.063822,
                             "updated_at": 1673467625.063822,
                             "created_by": "user 2",
@@ -623,7 +604,7 @@ class TestProject(TestCase):
         cohort_patients_expected = [
             {
                 "id": "patient-1",
-                "code_name": "code name 1",
+                "project_code_name": "code name 1",
                 "created_at": 1673467625.063822,
                 "updated_at": 1673467625.063822,
                 "created_by": "user 1",
@@ -631,7 +612,7 @@ class TestProject(TestCase):
             },
             {
                 "id": "patient-2",
-                "code_name": "code name 2",
+                "project_code_name": "code name 2",
                 "created_at": 1673467625.063822,
                 "updated_at": 1673467625.063822,
                 "created_by": "user 2",
@@ -646,7 +627,7 @@ class TestProject(TestCase):
                         "cohortPatients": [
                             {
                                 "patient": {"id": "patient-1"},
-                                "code_name": "code name 1",
+                                "project_code_name": "code name 1",
                                 "created_at": 1673467625.063822,
                                 "updated_at": 1673467625.063822,
                                 "created_by": "user 1",
@@ -663,7 +644,7 @@ class TestProject(TestCase):
                         "cohortPatients": [
                             {
                                 "patient": {"id": "patient-2"},
-                                "code_name": "code name 2",
+                                "project_code_name": "code name 2",
                                 "created_at": 1673467625.063822,
                                 "updated_at": 1673467625.063822,
                                 "created_by": "user 2",

@@ -174,11 +174,3 @@ Cohorts
    :special-members: __init__
    :members:
    :inherited-members:
-.. autoclass:: CohortPatientMetadata
-   :special-members: __init__
-   :members:
-   :inherited-members:
-.. autoclass:: CohortPatientMetadataSet
-   :special-members: __init__
-   :members:
-   :inherited-members:
