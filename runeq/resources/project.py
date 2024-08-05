@@ -26,7 +26,7 @@ class ProjectPatientMetadata(ItemBase):
         created_at: float,
         created_by: str,
         updated_by: str,
-        **attributes
+        **attributes,
     ):
         """
         Initialize with data.
@@ -57,6 +57,16 @@ class ProjectPatientMetadata(ItemBase):
             **attributes,
         )
 
+    def __repr__(self):
+        """
+        Override the  the item representation.
+
+        """
+        return (
+            f"{self.__class__.__name__}"
+            f'(patient_id="{self.id}", project_code_name="{self.project_code_name}")'
+        )
+
     def to_dict(self) -> dict:
         """
         Dictionary representation of the Project Patient attributes.
@@ -64,18 +74,6 @@ class ProjectPatientMetadata(ItemBase):
         """
         attrs = self._attributes.copy()
         return attrs
-
-    def get_patient_metadata_dataframe(self) -> pd.DataFrame:
-        """
-        Returns a new dataframe displaying the patient's metadata.
-
-        """
-        metadata_obj = self.to_dict()
-        metadata_df = pd.DataFrame(metadata_obj).rename(
-            columns={"code_name": "project_patient_code_name"}
-        )
-
-        return metadata_df
 
 
 class ProjectPatientMetadataSet(ItemSet):
@@ -116,7 +114,7 @@ class Cohort(ItemBase):
         created_at: float,
         created_by: str,
         updated_by: str,
-        **attributes
+        **attributes,
     ):
         """
         Initialize with data.
@@ -146,6 +144,13 @@ class Cohort(ItemBase):
             updated_by=updated_by,
             **attributes,
         )
+
+    def __repr__(self):
+        """
+        Override the  the item representation.
+
+        """
+        return f"{self.__class__.__name__}" f'(id="{self.id}", title="{self.title}")'
 
 
 class CohortSet(ItemSet):
@@ -192,7 +197,7 @@ class Project(ItemBase):
         created_by: str,
         updated_by: str,
         cohorts: CohortSet,
-        **attributes
+        **attributes,
     ):
         """
         Initialize with data.
@@ -236,6 +241,13 @@ class Project(ItemBase):
             cohorts=cohorts,
             **attributes,
         )
+
+    def __repr__(self):
+        """
+        Override the  the item representation.
+
+        """
+        return f"{self.__class__.__name__}" f'(id="{self.id}", title="{self.title}")'
 
     def to_dict(self) -> dict:
         """
