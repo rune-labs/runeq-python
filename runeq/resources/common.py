@@ -2,6 +2,7 @@
 Common utilities and base classes.
 
 """
+
 from abc import ABC, abstractmethod
 from collections import OrderedDict
 from typing import Any, Dict, Iterable, Iterator, List, Type, Union
