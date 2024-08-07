@@ -57,7 +57,7 @@ class ProjectPatientMetadata(ItemBase):
 
     def __repr__(self):
         """
-        Override the  the item representation.
+        Override the item representation.
 
         """
         return (
@@ -145,7 +145,7 @@ class Cohort(ItemBase):
 
     def __repr__(self):
         """
-        Override the  the item representation.
+        Override the item representation.
 
         """
         return f"{self.__class__.__name__}" f'(id="{self.id}", title="{self.title}")'
@@ -242,7 +242,7 @@ class Project(ItemBase):
 
     def __repr__(self):
         """
-        Override the  the item representation.
+        Override the item representation.
 
         """
         return f"{self.__class__.__name__}" f'(id="{self.id}", title="{self.title}")'
