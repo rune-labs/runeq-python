@@ -103,7 +103,6 @@ class GraphClient:
         """
         for i in range(2):
             try:
-                # TODO: add warning log about errors
                 return self._gql_client.execute(
                     gql(statement),
                     variable_values=variables,

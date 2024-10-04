@@ -10,9 +10,9 @@ from runeq.resources.client import GraphClient
 from runeq.resources.event import (
     Event,
     _reformat_event,
-    get_events,
     get_activity_events,
     get_medication_events,
+    get_patient_events,
     get_wellbeing_events,
 )
 
@@ -192,9 +192,9 @@ class TestEvent(TestCase):
                 },
             )
 
-    def test_get_events(self):
+    def test_get_patient_events(self):
         """
-        Test get_events
+        Test get_patient_events
 
         """
         self.mock_client.execute = mock.Mock(
@@ -266,7 +266,7 @@ class TestEvent(TestCase):
             ]
         )
 
-        events = get_events(patient_id="abc", client=self.mock_client)
+        events = get_patient_events(patient_id="abc", client=self.mock_client)
 
         expected = [
             {

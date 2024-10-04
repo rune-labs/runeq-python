@@ -9,8 +9,10 @@ many different categories, including:
     - etc.
 
 Some utility functions are provided to fetch events of specific types.
-Other event categories may exist: use the get_events function to 
+Other event categories may exist: use the get_patient_events function to 
 fetch events of any type.
+
+TODO: touch up function docstrings
 
 """
 
@@ -47,7 +49,7 @@ class Event(ItemBase):
             start_time: start time of the event
             end_time: end time of the event
             payload: event payload
-            attributes: additional metadata
+            attributes: additional event metadata
 
         """
         self.patient_id = patient_id
@@ -210,7 +212,7 @@ def _reformat_event(event: dict):
     event["payload"] = json.loads(payload)
 
 
-def get_events(
+def get_patient_events(
     patient_id: str,
     start_time: Optional[float] = None,
     end_time: Optional[float] = None,
@@ -229,7 +231,7 @@ def get_events(
     return EventSet(events)
 
 
-def get_activity_events(
+def get_patient_activity_events(
     patient_id: str,
     start_time: Optional[float] = None,
     end_time: Optional[float] = None,
@@ -243,7 +245,7 @@ def get_activity_events(
             "enum": "*",
         }
     ]
-    return get_events(
+    return get_patient_events(
         patient_id=patient_id,
         start_time=start_time,
         end_time=end_time,
@@ -252,7 +254,7 @@ def get_activity_events(
     )
 
 
-def get_medication_events(
+def get_patient_medication_events(
     patient_id: str,
     start_time: Optional[float] = None,
     end_time: Optional[float] = None,
@@ -266,7 +268,7 @@ def get_medication_events(
             "enum": "*",
         },
     ]
-    return get_events(
+    return get_patient_events(
         patient_id=patient_id,
         start_time=start_time,
         end_time=end_time,
@@ -275,7 +277,7 @@ def get_medication_events(
     )
 
 
-def get_wellbeing_events(
+def get_patient_wellbeing_events(
     patient_id: str,
     start_time: Optional[float] = None,
     end_time: Optional[float] = None,
@@ -289,7 +291,7 @@ def get_wellbeing_events(
             "enum": "*",
         }
     ]
-    return get_events(
+    return get_patient_events(
         patient_id=patient_id,
         start_time=start_time,
         end_time=end_time,

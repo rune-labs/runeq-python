@@ -80,6 +80,26 @@ Organization Metadata
    :inherited-members:
 
 
+Patient Events
+---------------
+
+.. automodule:: runeq.resources.event
+
+.. autofunction:: get_patient_events
+.. autofunction:: get_patient_activity_events
+.. autofunction:: get_patient_medication_events
+.. autofunction:: get_patient_wellbeing_events
+
+.. autoclass:: Event
+   :special-members: __init__
+   :members:
+   :inherited-members:
+.. autoclass:: EventSet
+   :special-members: __init__
+   :members:
+   :inherited-members:
+
+
 Stream Metadata
 ---------------
 
