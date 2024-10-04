@@ -286,6 +286,7 @@ class Config(BaseConfig):
         if not self._cognito_refresh_token:
             return False
 
+        # TODO: add a debug log here...
         response = self._cognito_client.initiate_auth(
             AuthFlow="REFRESH_TOKEN_AUTH",
             AuthParameters={
