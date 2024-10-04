@@ -10,10 +10,10 @@ from runeq.resources.client import GraphClient
 from runeq.resources.event import (
     Event,
     _reformat_event,
-    get_activity_events,
-    get_medication_events,
+    get_patient_activity_events,
     get_patient_events,
-    get_wellbeing_events,
+    get_patient_medication_events,
+    get_patient_wellbeing_events,
 )
 
 

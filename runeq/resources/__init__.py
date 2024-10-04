@@ -13,6 +13,16 @@ from the `V2 Stream API <https://docs.runelabs.io/stream/v2/index.html>`_,
 using a :class:`~runeq.resources.client.StreamClient`.
 
 """
-from . import client, common, org, patient, stream, stream_metadata, user
 
-__all__ = ["client", "common", "org", "patient", "stream_metadata", "stream", "user"]
+from . import client, common, event, org, patient, stream, stream_metadata, user
+
+__all__ = [
+    "client",
+    "common",
+    "event",
+    "org",
+    "patient",
+    "stream_metadata",
+    "stream",
+    "user",
+]
