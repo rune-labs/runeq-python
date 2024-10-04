@@ -7,14 +7,7 @@ from unittest import TestCase, mock
 
 from runeq.config import Config
 from runeq.resources.client import GraphClient
-from runeq.resources.event import (
-    Event,
-    _reformat_event,
-    get_patient_activity_events,
-    get_patient_events,
-    get_patient_medication_events,
-    get_patient_wellbeing_events,
-)
+from runeq.resources.event import Event, _reformat_event, get_patient_events
 
 
 class TestEvent(TestCase):

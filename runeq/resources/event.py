@@ -9,10 +9,10 @@ many different categories, including:
     - etc.
 
 Some utility functions are provided to fetch events of specific types.
-Other event categories may exist: use the get_patient_events function to 
+Other event categories may exist: use the get_patient_events function to
 fetch events of any type.
 
-TODO: touch up function docstrings
+TODO: touch up function docstrings; add tests for utils.
 
 """
 
