@@ -103,12 +103,12 @@ class TestEvent(TestCase):
                 "id": "id1",
                 "patient_id": "abc",
                 "display_name": "Sleep",
-                "customDetail": None,
+                "custom_detail": None,
                 "payload": '{"hello": "world"}',
                 "duration": {
-                    "startTime": 42.1,
-                    "endTime": 99,
-                    "endTimeMax": None,
+                    "start_time": 42.1,
+                    "end_time": 99,
+                    "end_time_max": None,
                 },
                 "method": "manual",
             }
@@ -132,12 +132,12 @@ class TestEvent(TestCase):
                 "id": "id1",
                 "patient_id": "abc",
                 "display_name": "Sleep",
-                "customDetail": {"displayName": ""},
+                "custom_detail": {"display_name": ""},
                 "payload": '{"hello": "world"}',
                 "duration": {
-                    "startTime": 42.1,
-                    "endTime": 99,
-                    "endTimeMax": 100,
+                    "start_time": 42.1,
+                    "end_time": 99,
+                    "end_time_max": 100,
                 },
                 "method": "manual",
             }
@@ -161,12 +161,12 @@ class TestEvent(TestCase):
                 "id": "id1",
                 "patient_id": "abc",
                 "display_name": "Custom Event",
-                "customDetail": {"displayName": "Spoonful of Sugar"},
+                "custom_detail": {"display_name": "Spoonful of Sugar"},
                 "payload": '{"hello": "world"}',
                 "duration": {
-                    "startTime": 42.1,
-                    "endTime": None,
-                    "endTimeMax": None,
+                    "start_time": 42.1,
+                    "end_time": None,
+                    "end_time_max": None,
                 },
                 "method": "manual",
             }
@@ -199,11 +199,11 @@ class TestEvent(TestCase):
                                 {
                                     "id": "event1",
                                     "display_name": "Running",
-                                    "customDetail": None,
+                                    "custom_detail": None,
                                     "duration": {
-                                        "startTime": 1671267538,
-                                        "endTime": 1671268000,
-                                        "endTimeMax": None,
+                                        "start_time": 1671267538,
+                                        "end_time": 1671268000,
+                                        "end_time_max": None,
                                     },
                                     "payload": "",
                                     "classification": {
@@ -233,13 +233,13 @@ class TestEvent(TestCase):
                                 {
                                     "id": "event2",
                                     "display_name": "Custom Event",
-                                    "customDetail": {
-                                        "displayName": "Spoonful of Sugar"
+                                    "custom_detail": {
+                                        "display_name": "Spoonful of Sugar"
                                     },
                                     "duration": {
-                                        "startTime": 1731267538.123,
-                                        "endTime": None,
-                                        "endTimeMax": None,
+                                        "start_time": 1731267538.123,
+                                        "end_time": None,
+                                        "end_time_max": None,
                                     },
                                     "payload": '{"dosage": 1.0, "failed_dose": false}',
                                     "classification": {

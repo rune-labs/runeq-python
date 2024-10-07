@@ -121,13 +121,13 @@ query getEventList(
             events {
                 id
                 display_name: displayName
-                customDetail {
-                    displayName
+                custom_detail: customDetail {
+                    display_name: displayName
                 }
                 duration {
-                    startTime
-                    endTime
-                    endTimeMax
+                    start_time: startTime
+                    end_time: endTime
+                    end_time_max: endTimeMax
                 }
                 payload
                 classification {
@@ -192,18 +192,18 @@ def _reformat_event(event: dict):
     """Reformat event in place, so it can be passed as kwargs to initialize Event."""
     # replace duration with start and end time
     duration = event.pop("duration") or {}
-    event["start_time"] = duration.get("startTime")
+    event["start_time"] = duration.get("start_time")
 
-    end_time = duration["endTime"]
-    end_time_max = duration["endTimeMax"]
+    end_time = duration["end_time"]
+    end_time_max = duration["end_time_max"]
     if end_time_max is not None:
         end_time = end_time_max
 
     event["end_time"] = end_time
 
-    # set a single display name, using customDetail if available
-    custom_detail = event.pop("customDetail") or {}
-    custom_name = custom_detail.get("displayName")
+    # set a single display name, using custom_detail if available
+    custom_detail = event.pop("custom_detail") or {}
+    custom_name = custom_detail.get("display_name")
     if custom_name:
         event["display_name"] = custom_name
 
