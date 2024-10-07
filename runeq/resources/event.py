@@ -149,7 +149,6 @@ query getEventList(
             endTime: $end_time,
             cursor: $cursor,
             includeFilters: $include_filters,
-            excludeFilters: $exclude_filters,
         ) {
             events {
                 id
@@ -187,8 +186,8 @@ query getEventList(
 
 def _iter_events(
     patient_id: str,
-    start_time: Optional[float] = None,
-    end_time: Optional[float] = None,
+    start_time: float,
+    end_time: float,
     include_filters: Optional[list] = None,
     client: Optional[GraphClient] = None,
 ):
@@ -200,6 +199,11 @@ def _iter_events(
     graph_client = client or global_graph_client()
 
     next_cursor = None
+
+    variables = {}
+    if include_filters:
+        variables["include_filters"] = include_filters
+
     while True:
         result = graph_client.execute(
             statement=_EVENT_GQL_QUERY,
@@ -208,7 +212,7 @@ def _iter_events(
             cursor=next_cursor,
             start_time=start_time,
             end_time=end_time,
-            include_filters=include_filters,
+            **variables,
         )
 
         event_list = result["patient"]["eventList"]
@@ -247,8 +251,8 @@ def _reformat_event(event: dict):
 
 def get_patient_events(
     patient_id: str,
-    start_time: Optional[float] = None,
-    end_time: Optional[float] = None,
+    start_time: float,
+    end_time: float,
     include_filters: Optional[list] = None,
     client: Optional[GraphClient] = None,
 ) -> EventSet:
@@ -276,8 +280,8 @@ def get_patient_events(
 
 def get_patient_activity_events(
     patient_id: str,
-    start_time: Optional[float] = None,
-    end_time: Optional[float] = None,
+    start_time: float,
+    end_time: float,
     client: Optional[GraphClient] = None,
 ) -> EventSet:
     """Fetch a patient's activity Events.
@@ -305,8 +309,8 @@ def get_patient_activity_events(
 
 def get_patient_medication_events(
     patient_id: str,
-    start_time: Optional[float] = None,
-    end_time: Optional[float] = None,
+    start_time: float,
+    end_time: float,
     client: Optional[GraphClient] = None,
 ) -> EventSet:
     """Fetch a patient's medication Events, as recorded through
@@ -340,8 +344,8 @@ def get_patient_medication_events(
 
 def get_patient_wellbeing_events(
     patient_id: str,
-    start_time: Optional[float] = None,
-    end_time: Optional[float] = None,
+    start_time: float,
+    end_time: float,
     client: Optional[GraphClient] = None,
 ) -> EventSet:
     """Fetch a patient's wellbeing Events, as recorded through
