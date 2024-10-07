@@ -27,19 +27,19 @@ class TestEvent(TestCase):
         self.test_event = Event(
             id="id1",
             patient_id="abc",
-            display_name="Hello World",
             start_time=42.1,
             end_time=None,
-            payload={"hello": "world"},
-            # NOTE: these attributes are returned in the dict representation,
-            # but are not set as class attributes
             classification={
                 "namespace": "patient",
                 "category": "activity",
                 "enum": "testing",
             },
-            tags=[{"name": "test", "display_name": "Test"}],
+            display_name="Hello World",
+            payload={"hello": "world"},
             method="manual",
+            # NOTE: these attributes are returned in the dict representation,
+            # but are not set as class attributes
+            tags=[{"name": "test", "display_name": "Test"}],
             created_at=123,
             updated_at=456,
         )
@@ -55,6 +55,15 @@ class TestEvent(TestCase):
         self.assertEqual(self.test_event.start_time, 42.1)
         self.assertEqual(self.test_event.end_time, None)
         self.assertEqual(self.test_event.payload, {"hello": "world"})
+        self.assertEqual(
+            self.test_event.classification,
+            {
+                "namespace": "patient",
+                "category": "activity",
+                "enum": "testing",
+            },
+        )
+        self.assertEqual(self.test_event.method, "manual")
 
     def test_to_dict(self):
         """Test dictionary representation"""

@@ -8,11 +8,16 @@ many different categories, including:
     - Wellbeing
     - etc.
 
-Some utility functions are provided to fetch events of specific types.
+Utility functions are provided to query events of specific types.
 Other event categories may exist: use the get_patient_events function to
 fetch events of any type.
 
-TODO: touch up function docstrings; add tests for utils.
+NOTE: There is significant overlap between the Events that are selected by 
+this class and the ones that are available to be queried through the Stream APIs.
+One critical difference is that these Events can be updated if a StrivePD user makes
+a change in the app. Stream API events are not updated in every case.
+**We recommend using the classes in this module to query patient Events, whenever
+possible.**
 
 """
 
@@ -33,38 +38,66 @@ class Event(ItemBase):
         self,
         id: str,
         patient_id: str,
-        display_name: str,
         start_time: float,
         end_time: Optional[float],
-        payload: dict,
+        classification: dict,
+        display_name: str,
+        payload: Optional[dict] = None,
+        method: Optional[str] = None,
         **attributes,
     ):
         """
-        Initialize with metadata.
+        Initialize an Event: an item recorded by a user of the StrivePD app.
 
         Args:
-            id: event ID
-            patient_id: patient ID
+            id: Event ID
+            patient_id: Patient ID
+            start_time: Start time of the event
+            end_time: End time of the event
+            classification: Event classification (see below for details).
             display_name: display name of the event
-            start_time: start time of the event
-            end_time: end time of the event
-            payload: event payload
-            attributes: additional event metadata
+            payload: Event payload
+            **attributes: additional event metadata (included in the dict
+                representation of the Event).
+
+
+        Event classification is a three-level hierarchy, represented as a
+        dictionary with 2 or 3 keys:
+            - "namespace": the general source of the event (e.g. "patient")
+            - "category": the type of event (e.g. "activity", "medication")
+            - "enum": a specific enumeration within the category. Not all events
+                have an enumeration
+
+        Note that this classification uses similar (but not identical!) terminology to
+        the events that are queryable through the V2 Stream API.
 
         """
         self.patient_id = patient_id
-        self.display_name = display_name
         self.start_time = start_time
         self.end_time = end_time
-        self.payload = payload
+
+        # validate classification
+        expected_keys = {"namespace", "category"}
+        if not set(classification.keys()) == expected_keys:
+            raise ValueError(
+                f"Classification must have keys {expected_keys}, got {classification.keys()}"
+            )
+
+        self.classification = classification
+
+        self.display_name = display_name
+        self.payload = payload or {}
+        self.method = method
 
         super().__init__(
             id=id,
             patient_id=patient_id,
-            display_name=display_name,
             start_time=start_time,
             end_time=end_time,
+            classification=classification,
+            display_name=display_name,
             payload=payload,
+            method=method,
             **attributes,
         )
 
@@ -219,7 +252,17 @@ def get_patient_events(
     include_filters: Optional[list] = None,
     client: Optional[GraphClient] = None,
 ) -> EventSet:
-    """Fetch all patient events."""
+    """Fetch a patient's Events, in an optional time range.
+
+    Args:
+        patient_id: Patient ID
+        start_time: Optional start time for the query range
+        end_time: Optional end time for the query range
+        include_filters: Event classification filters to include. If
+            this is not specified, all events are returned.
+        client: GraphClient instance (optional)
+
+    """
     events = _iter_events(
         patient_id=patient_id,
         start_time=start_time,
@@ -237,7 +280,13 @@ def get_patient_activity_events(
     end_time: Optional[float] = None,
     client: Optional[GraphClient] = None,
 ) -> EventSet:
-    """Fetch activity events"""
+    """Fetch a patient's activity Events.
+
+    This includes activities that were manually logged through the
+    StrivePD app and activities ingested from HealthKit (which can
+    come from third party apps or devices).
+
+    """
     include_filters = [
         {
             "namespace": "patient",
@@ -260,7 +309,19 @@ def get_patient_medication_events(
     end_time: Optional[float] = None,
     client: Optional[GraphClient] = None,
 ) -> EventSet:
-    """Fetch medication events"""
+    """Fetch a patient's medication Events, as recorded through
+    the StrivePD app.
+
+    NOTES:
+    - There are several ways to log a medication in StrivePD,
+      including an "autolog" feature that automatically records a
+      medication on a schedule. The "method" attribute of the Event
+      object indicates how the medication event was created.
+    - The display name for custom medications is only queryable by
+      certain user roles. These event logs will default to a generic
+      display name.
+
+    """
     include_filters = [
         {
             "namespace": "patient",
@@ -283,7 +344,10 @@ def get_patient_wellbeing_events(
     end_time: Optional[float] = None,
     client: Optional[GraphClient] = None,
 ) -> EventSet:
-    """Fetch wellbeing events"""
+    """Fetch a patient's wellbeing Events, as recorded through
+    the StrivePD app.
+
+    """
     include_filters = [
         {
             "namespace": "patient",
