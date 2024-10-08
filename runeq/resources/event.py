@@ -163,7 +163,7 @@ class EventSet(ItemSet):
                 "payload",
                 "tags",
                 "created_at",
-                "uploaded_at",
+                "updated_at",
                 "id",
             ]
         )
