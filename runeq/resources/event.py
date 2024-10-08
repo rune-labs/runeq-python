@@ -78,12 +78,20 @@ class Event(ItemBase):
 
         # validate classification
         expected_keys = {"namespace", "category"}
-        if not set(classification.keys()) == expected_keys:
-            raise ValueError(
-                f"Classification must have keys {expected_keys}, got {classification.keys()}"
-            )
+        missing_keys = expected_keys - classification.keys()
+        if missing_keys:
+            raise ValueError(f"Classification missing required keys: {missing_keys}")
 
         self.classification = classification
+
+        # parse classification into the stringified version (which
+        # is a little more convenient for dataframes)
+        parts = [
+            classification["namespace"],
+            classification["category"],
+            classification.get("enum"),
+        ]
+        self.rune_classification = ".".join(filter(None, parts))
 
         self.display_name = display_name
         self.payload = payload or {}
@@ -95,6 +103,7 @@ class Event(ItemBase):
             start_time=start_time,
             end_time=end_time,
             classification=classification,
+            rune_classification=self.rune_classification,
             display_name=display_name,
             payload=payload,
             method=method,
@@ -169,7 +178,6 @@ query getEventList(
                 }
                 tags {
                     name
-                    display_name: displayName
                 }
                 method
                 created_at: createdAt
@@ -247,6 +255,10 @@ def _reformat_event(event: dict):
     # parse the payload as JSON
     payload = event.pop("payload") or "{}"
     event["payload"] = json.loads(payload)
+
+    # flatten tag names into a list
+    tags = event.pop("tags") or []
+    event["tags"] = [tag["name"] for tag in tags]
 
 
 def get_patient_events(

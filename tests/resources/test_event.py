@@ -63,6 +63,9 @@ class TestEvent(TestCase):
                 "enum": "testing",
             },
         )
+        self.assertEqual(
+            self.test_event.rune_classification, "patient.activity.testing"
+        )
         self.assertEqual(self.test_event.method, "manual")
 
     def test_to_dict(self):
@@ -81,6 +84,7 @@ class TestEvent(TestCase):
                     "category": "activity",
                     "enum": "testing",
                 },
+                "rune_classification": "patient.activity.testing",
                 "tags": [
                     {
                         "name": "test",
@@ -119,6 +123,7 @@ class TestEvent(TestCase):
                     "end_time": 99,
                     "end_time_max": None,
                 },
+                "tags": [],
                 "method": "manual",
             }
             _reformat_event(event)
@@ -132,6 +137,7 @@ class TestEvent(TestCase):
                     "start_time": 42.1,
                     "end_time": 99,
                     "payload": {"hello": "world"},
+                    "tags": [],
                     "method": "manual",
                 },
             )
@@ -149,6 +155,7 @@ class TestEvent(TestCase):
                     "end_time_max": 100,
                 },
                 "method": "manual",
+                "tags": [],
             }
             _reformat_event(event)
 
@@ -162,6 +169,7 @@ class TestEvent(TestCase):
                     "end_time": 100,
                     "payload": {"hello": "world"},
                     "method": "manual",
+                    "tags": [],
                 },
             )
 
@@ -178,6 +186,7 @@ class TestEvent(TestCase):
                     "end_time_max": None,
                 },
                 "method": "manual",
+                "tags": [],
             }
             _reformat_event(event)
 
@@ -190,6 +199,38 @@ class TestEvent(TestCase):
                     "start_time": 42.1,
                     "end_time": None,
                     "payload": {"hello": "world"},
+                    "method": "manual",
+                    "tags": [],
+                },
+            )
+
+        with self.subTest("tags"):
+            event = {
+                "id": "id1",
+                "patient_id": "abc",
+                "display_name": "Sleep",
+                "custom_detail": None,
+                "payload": '{"hello": "world"}',
+                "duration": {
+                    "start_time": 42.1,
+                    "end_time": 99,
+                    "end_time_max": None,
+                },
+                "tags": [{"name": "activity.aerobic"}, {"name": "activity.strength"}],
+                "method": "manual",
+            }
+            _reformat_event(event)
+
+            self.assertEqual(
+                event,
+                {
+                    "id": "id1",
+                    "patient_id": "abc",
+                    "display_name": "Sleep",
+                    "start_time": 42.1,
+                    "end_time": 99,
+                    "payload": {"hello": "world"},
+                    "tags": ["activity.aerobic", "activity.strength"],
                     "method": "manual",
                 },
             )
@@ -207,7 +248,7 @@ class TestEvent(TestCase):
                             "events": [
                                 {
                                     "id": "event1",
-                                    "display_name": "Running",
+                                    "display_name": "Boxing",
                                     "custom_detail": None,
                                     "duration": {
                                         "start_time": 1671267538,
@@ -218,13 +259,15 @@ class TestEvent(TestCase):
                                     "classification": {
                                         "namespace": "patient",
                                         "category": "activity",
-                                        "enum": "running",
+                                        "enum": "boxing",
                                     },
                                     "tags": [
                                         {
-                                            "name": "aerobic",
-                                            "display_name": "Aerobic",
-                                        }
+                                            "name": "activity.aerobic",
+                                        },
+                                        {
+                                            "name": "activity.strength",
+                                        },
                                     ],
                                     "method": "manual",
                                     "created_at": 1671268000,
@@ -254,7 +297,6 @@ class TestEvent(TestCase):
                                     "classification": {
                                         "namespace": "patient",
                                         "category": "medication",
-                                        "enum": "custom",
                                     },
                                     "tags": [],
                                     "method": "manual",
@@ -268,26 +310,24 @@ class TestEvent(TestCase):
             ]
         )
 
-        events = get_patient_events(patient_id="abc", client=self.mock_client)
+        events = get_patient_events(
+            patient_id="abc", start_time=1, end_time=2, client=self.mock_client
+        )
 
         expected = [
             {
                 "patient_id": "abc",
-                "display_name": "Running",
+                "display_name": "Boxing",
                 "start_time": 1671267538,
                 "end_time": 1671268000,
                 "payload": {},
                 "classification": {
                     "namespace": "patient",
                     "category": "activity",
-                    "enum": "running",
+                    "enum": "boxing",
                 },
-                "tags": [
-                    {
-                        "name": "aerobic",
-                        "display_name": "Aerobic",
-                    }
-                ],
+                "rune_classification": "patient.activity.boxing",
+                "tags": ["activity.aerobic", "activity.strength"],
                 "method": "manual",
                 "created_at": 1671268000,
                 "updated_at": 1671268000,
@@ -302,8 +342,8 @@ class TestEvent(TestCase):
                 "classification": {
                     "namespace": "patient",
                     "category": "medication",
-                    "enum": "custom",
                 },
+                "rune_classification": "patient.medication",
                 "tags": [],
                 "method": "manual",
                 "created_at": 1731267538.123,
