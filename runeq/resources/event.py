@@ -24,6 +24,8 @@ possible.**
 import json
 from typing import Iterable, Optional, Type
 
+from pandas.core.api import DataFrame as DataFrame
+
 from .client import GraphClient, global_graph_client
 from .common import ItemBase, ItemSet
 
@@ -84,15 +86,6 @@ class Event(ItemBase):
 
         self.classification = classification
 
-        # parse classification into the stringified version (which
-        # is a little more convenient for dataframes)
-        parts = [
-            classification["namespace"],
-            classification["category"],
-            classification.get("enum"),
-        ]
-        self.rune_classification = ".".join(filter(None, parts))
-
         self.display_name = display_name
         self.payload = payload or {}
         self.method = method
@@ -103,7 +96,6 @@ class Event(ItemBase):
             start_time=start_time,
             end_time=end_time,
             classification=classification,
-            rune_classification=self.rune_classification,
             display_name=display_name,
             payload=payload,
             method=method,
@@ -141,6 +133,40 @@ class EventSet(ItemSet):
 
         """
         return Event
+
+    def to_dataframe(self) -> DataFrame:
+        """
+        Return a dataframe of events, sorted by time.
+
+        """
+        df = super().to_dataframe()
+
+        df = df.sort_values(by=["start_time", "end_time"])
+        df = df.reset_index(drop=True)
+
+        # parse classification into fields (for easier querying)
+        df["namespace"] = df.classification.apply(lambda x: x.get("namespace"))
+        df["category"] = df.classification.apply(lambda x: x.get("category"))
+        df["enum"] = df.classification.apply(lambda x: x.get("enum"))
+
+        # Reorder columns before returning (dropping classification)
+        return df.reindex(
+            columns=[
+                "patient_id",
+                "start_time",
+                "end_time",
+                "namespace",
+                "category",
+                "enum",
+                "display_name",
+                "method",
+                "payload",
+                "tags",
+                "created_at",
+                "uploaded_at",
+                "id",
+            ]
+        )
 
 
 # GraphQL query to get patient events
@@ -191,6 +217,9 @@ query getEventList(
 }
 """
 
+# Each event query may only fetch up to 90 days of data
+MAX_QUERY_RANGE_SECS = 90 * 24 * 60 * 60
+
 
 def _iter_events(
     patient_id: str,
@@ -212,14 +241,18 @@ def _iter_events(
     if include_filters:
         variables["include_filters"] = include_filters
 
-    while True:
+    # query 90 days of events at a time
+    current_start_time = start_time
+    while current_start_time < end_time:
+        current_end_time = min(current_start_time + MAX_QUERY_RANGE_SECS, end_time)
+
         result = graph_client.execute(
             statement=_EVENT_GQL_QUERY,
             # GraphQL variables
             patient_id=patient_id,
             cursor=next_cursor,
-            start_time=start_time,
-            end_time=end_time,
+            start_time=current_start_time,
+            end_time=current_end_time,
             **variables,
         )
 
@@ -228,9 +261,11 @@ def _iter_events(
             _reformat_event(event)
             yield Event(patient_id=patient_id, **event)
 
+        # when pagination is exhausted for this time range, move to the
+        # next time window (if any)
         next_cursor = event_list.get("pageInfo", {}).get("endCursor")
         if not next_cursor:
-            break
+            current_start_time = current_end_time
 
 
 def _reformat_event(event: dict):

@@ -7,7 +7,7 @@ from unittest import TestCase, mock
 
 from runeq.config import Config
 from runeq.resources.client import GraphClient
-from runeq.resources.event import Event, _reformat_event, get_patient_events
+from runeq.resources.event import Event, EventSet, _reformat_event, get_patient_events
 
 
 class TestEvent(TestCase):
@@ -63,9 +63,6 @@ class TestEvent(TestCase):
                 "enum": "testing",
             },
         )
-        self.assertEqual(
-            self.test_event.rune_classification, "patient.activity.testing"
-        )
         self.assertEqual(self.test_event.method, "manual")
 
     def test_to_dict(self):
@@ -84,7 +81,6 @@ class TestEvent(TestCase):
                     "category": "activity",
                     "enum": "testing",
                 },
-                "rune_classification": "patient.activity.testing",
                 "tags": [
                     {
                         "name": "test",
@@ -242,6 +238,8 @@ class TestEvent(TestCase):
         """
         self.mock_client.execute = mock.Mock(
             side_effect=[
+                # empty response for the first "chunk" of time in the query range
+                {"patient": {"eventList": {"events": []}}},
                 {
                     "patient": {
                         "eventList": {
@@ -297,6 +295,7 @@ class TestEvent(TestCase):
                                     "classification": {
                                         "namespace": "patient",
                                         "category": "medication",
+                                        "enum": "custom-123",
                                     },
                                     "tags": [],
                                     "method": "manual",
@@ -310,8 +309,13 @@ class TestEvent(TestCase):
             ]
         )
 
+        # Use a time range that is longer than the max.
+        # The function should handle splitting it up into chunks.
         events = get_patient_events(
-            patient_id="abc", start_time=1, end_time=2, client=self.mock_client
+            patient_id="abc",
+            start_time=1,
+            end_time=10 + 90 * 24 * 60 * 60,
+            client=self.mock_client,
         )
 
         expected = [
@@ -326,7 +330,6 @@ class TestEvent(TestCase):
                     "category": "activity",
                     "enum": "boxing",
                 },
-                "rune_classification": "patient.activity.boxing",
                 "tags": ["activity.aerobic", "activity.strength"],
                 "method": "manual",
                 "created_at": 1671268000,
@@ -342,8 +345,8 @@ class TestEvent(TestCase):
                 "classification": {
                     "namespace": "patient",
                     "category": "medication",
+                    "enum": "custom-123",
                 },
-                "rune_classification": "patient.medication",
                 "tags": [],
                 "method": "manual",
                 "created_at": 1731267538.123,
@@ -353,3 +356,76 @@ class TestEvent(TestCase):
         ]
 
         self.assertEqual(expected, events.to_list())
+
+    def test_to_dataframe(self):
+        """
+        Test converting events to a dataframe
+
+        """
+        ev2 = Event(
+            id="id2",
+            patient_id="abc",
+            start_time=100,
+            end_time=140,
+            classification={
+                "namespace": "patient",
+                "category": "activity",
+                "enum": "healthkit-running",
+            },
+            display_name="Hello World",
+            payload={"hello": "world"},
+            method="healthkit",
+            tags=[],
+            created_at=123,
+            updated_at=456,
+        )
+
+        # same start time as ev2, but an earlier end time
+        ev3 = Event(
+            id="id3",
+            patient_id="abc",
+            start_time=100,
+            end_time=100,
+            classification={
+                "namespace": "patient",
+                "category": "note",
+            },
+            display_name="Hello World",
+            payload={"hello": "world"},
+            method="manual",
+            tags=[],
+            created_at=123,
+            updated_at=456,
+        )
+
+        # add events to the event set out of order (they should be sorted
+        # by time in the dataframe)
+        event_set = EventSet([ev3, self.test_event, ev2])
+
+        df = event_set.to_dataframe()
+        self.assertListEqual(
+            list(df.columns),
+            [
+                "patient_id",
+                "start_time",
+                "end_time",
+                "namespace",
+                "category",
+                "enum",
+                "display_name",
+                "method",
+                "payload",
+                "tags",
+                "created_at",
+                "uploaded_at",
+                "id",
+            ],
+        )
+
+        # check ids to make sure sorting was done correctly
+        self.assertEqual(list(df.id), ["id1", "id3", "id2"])
+
+        # check that classification was expanded into columns
+        self.assertEqual(list(df.namespace), ["patient", "patient", "patient"])
+        self.assertEqual(list(df.category), ["activity", "note", "activity"])
+        self.assertEqual(list(df.enum), ["testing", None, "healthkit-running"])
