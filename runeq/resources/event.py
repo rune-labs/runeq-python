@@ -24,7 +24,7 @@ possible.**
 import json
 from typing import Iterable, Optional, Type
 
-from pandas.core.api import DataFrame as DataFrame
+import pandas as pd
 
 from .client import GraphClient, global_graph_client
 from .common import ItemBase, ItemSet
@@ -134,7 +134,7 @@ class EventSet(ItemSet):
         """
         return Event
 
-    def to_dataframe(self) -> DataFrame:
+    def to_dataframe(self) -> pd.DataFrame:
         """
         Return a dataframe of events, sorted by time.
 
@@ -149,8 +149,8 @@ class EventSet(ItemSet):
         df["category"] = df.classification.apply(lambda x: x.get("category"))
         df["enum"] = df.classification.apply(lambda x: x.get("enum"))
 
-        # Reorder columns before returning (dropping classification)
-        return df.reindex(
+        # Reorder columns (dropping classification)
+        df = df.reindex(
             columns=[
                 "patient_id",
                 "start_time",
@@ -167,6 +167,14 @@ class EventSet(ItemSet):
                 "id",
             ]
         )
+
+        # parse datetime columns
+        df["start_time"] = pd.to_datetime(df["start_time"], unit="s")
+        df["end_time"] = pd.to_datetime(df["end_time"], unit="s")
+        df["created_at"] = pd.to_datetime(df["created_at"], unit="s")
+        df["updated_at"] = pd.to_datetime(df["updated_at"], unit="s")
+
+        return df
 
 
 # GraphQL query to get patient events

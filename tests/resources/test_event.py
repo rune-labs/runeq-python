@@ -7,7 +7,15 @@ from unittest import TestCase, mock
 
 from runeq.config import Config
 from runeq.resources.client import GraphClient
-from runeq.resources.event import Event, EventSet, _reformat_event, get_patient_events
+from runeq.resources.event import (
+    Event,
+    EventSet,
+    _reformat_event,
+    get_patient_events,
+    get_patient_activity_events,
+    get_patient_medication_events,
+    get_patient_wellbeing_events,
+)
 
 
 class TestEvent(TestCase):
@@ -429,3 +437,79 @@ class TestEvent(TestCase):
         self.assertEqual(list(df.namespace), ["patient", "patient", "patient"])
         self.assertEqual(list(df.category), ["activity", "note", "activity"])
         self.assertEqual(list(df.enum), ["testing", None, "healthkit-running"])
+
+    def test_event_type_helpers(self):
+        """Minimal test to exercise the helpers that fetch one type of event.
+
+        Only asserts that the expected filters were passed to the GraphQL client.
+
+        """
+        self.mock_client.execute = mock.Mock(
+            return_value={"patient": {"eventList": {"events": []}}},
+        )
+
+        # activity
+        get_patient_activity_events(
+            "abc", start_time=1, end_time=10, client=self.mock_client
+        )
+        self.mock_client.execute.assert_called_once_with(
+            statement=mock.ANY,
+            # GraphQL variables
+            patient_id="abc",
+            cursor=None,
+            start_time=1,
+            end_time=10,
+            include_filters=[
+                {
+                    "namespace": "patient",
+                    "category": "activity",
+                    "enum": "*",
+                }
+            ],
+        )
+
+        # medication
+        self.mock_client.execute.reset_mock()
+
+        get_patient_medication_events(
+            "abc", start_time=1, end_time=10, client=self.mock_client
+        )
+
+        self.mock_client.execute.assert_called_once_with(
+            statement=mock.ANY,
+            # GraphQL variables
+            patient_id="abc",
+            cursor=None,
+            start_time=1,
+            end_time=10,
+            include_filters=[
+                {
+                    "namespace": "patient",
+                    "category": "medication",
+                    "enum": "*",
+                }
+            ],
+        )
+
+        # wellbeing
+        self.mock_client.execute.reset_mock()
+
+        get_patient_wellbeing_events(
+            "abc", start_time=1, end_time=10, client=self.mock_client
+        )
+
+        self.mock_client.execute.assert_called_once_with(
+            statement=mock.ANY,
+            # GraphQL variables
+            patient_id="abc",
+            cursor=None,
+            start_time=1,
+            end_time=10,
+            include_filters=[
+                {
+                    "namespace": "patient",
+                    "category": "wellbeing",
+                    "enum": "*",
+                }
+            ],
+        )
