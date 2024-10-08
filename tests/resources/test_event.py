@@ -11,8 +11,8 @@ from runeq.resources.event import (
     Event,
     EventSet,
     _reformat_event,
-    get_patient_events,
     get_patient_activity_events,
+    get_patient_events,
     get_patient_medication_events,
     get_patient_wellbeing_events,
 )

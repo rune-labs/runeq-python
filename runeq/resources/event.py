@@ -12,7 +12,7 @@ Utility functions are provided to query events of specific types.
 Other event categories may exist: use the get_patient_events function to
 fetch events of any type.
 
-NOTE: There is significant overlap between the Events that are selected by 
+NOTE: There is significant overlap between the Events that are selected by
 this class and the ones that are available to be queried through the Stream APIs.
 One critical difference is that these Events can be updated if a StrivePD user makes
 a change in the app. Stream API events are not updated in every case.
