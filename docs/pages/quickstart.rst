@@ -305,7 +305,7 @@ Events fall into many categories, including:
     - Wellbeing
     - Free-text notes
 
-To query StrivePD events for a given user, you will need their `patient_id` and a time range:
+To query StrivePD events, you will need a **patient ID** and a **time range**:
 
 .. code-block:: python
 
@@ -321,7 +321,8 @@ To query StrivePD events for a given user, you will need their `patient_id` and 
     events_df = event_set.to_dataframe()
 
 
-To fetch events of a specific type, use the corresponding function. E.g., to fetch activity events:
+The :class:`~runeq.resources.event` module also provides helper functions to query
+events of a specific type. For example, to fetch activity events:
 
 .. code-block:: python
 
@@ -337,7 +338,7 @@ To fetch events of a specific type, use the corresponding function. E.g., to fet
     # Similarly, you can fetch medication events, wellbeing events, etc.
 
 .. note:: 
-    Many StrivePD events are also queryable as **streams** (with the algorithm `ingest-rune-events`).
+    Many StrivePD events are also queryable as **streams** (with the algorithm ``ingest-rune-events``).
     The stream representation of the data is less reliable and may not reflect the latest state
-    of user data. **We recommend using the `runeq.resources.event` module to query StrivePD Events, 
-    whenever possible.**
+    of user data. Whenever possible, we recommend querying StrivePD events with the 
+    functionality from the :class:`~runeq.resources.event` module.

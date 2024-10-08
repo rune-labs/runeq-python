@@ -60,13 +60,13 @@ class Event(ItemBase):
             **attributes: additional event metadata (included in the dict
                 representation of the Event).
 
-
         Event classification is a three-level hierarchy, represented as a
         dictionary with 2 or 3 keys:
-            - "namespace": the general source of the event (e.g. "patient")
-            - "category": the type of event (e.g. "activity", "medication")
-            - "enum": a specific enumeration within the category. Not all events
-                have an enumeration
+
+            - **namespace**: the general source of the event (e.g. "patient")
+            - **category**: the type of event (e.g. "activity", "medication")
+            - **enum**: a specific enumeration within the category (e.g. "running").
+              Not all events have an enumeration.
 
         Note that this classification uses similar (but not identical!) terminology to
         the events that are queryable through the V2 Stream API.
@@ -235,7 +235,6 @@ def _iter_events(
     client: Optional[GraphClient] = None,
 ):
     """Query events for a patient and iterate over the results.
-
     Formats each event as kwargs that can be passed to Event.
 
     """
@@ -372,6 +371,7 @@ def get_patient_medication_events(
     the StrivePD app.
 
     NOTES:
+
     - There are several ways to log a medication in StrivePD,
       including an "autolog" feature that automatically records a
       medication on a schedule. The "method" attribute of the Event
