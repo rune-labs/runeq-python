@@ -291,3 +291,53 @@ pandas dataframe:
 You can also work directly with responses from the V2 Stream API. See
 :class:`~runeq.resources.stream` and
 :class:`~runeq.resources.stream_metadata.StreamMetadata` for details.
+
+
+Fetch StrivePD Events
+*********************
+
+The StrivePD app allows users to log events related to their health and well-being. 
+Events fall into many categories, including:
+
+    - Activities (manually logged or ingested from HealthKit)
+    - Medication logs
+    - Supplement logs
+    - Wellbeing
+    - Free-text notes
+
+To query StrivePD events for a given user, you will need their `patient_id` and a time range:
+
+.. code-block:: python
+
+    from runeq.resources.event import get_patient_events
+
+    event_set = get_patient_events(
+        patient_id="TODO",
+        start_time=1662000000,
+        end_time=1663123000,
+    )
+
+    # For easy data manipulation, convert the EventSet to a pandas DataFrame
+    events_df = event_set.to_dataframe()
+
+
+To fetch events of a specific type, use the corresponding function. E.g., to fetch activity events:
+
+.. code-block:: python
+
+    from runeq.resources.event import get_patient_activity_events
+
+    activity_event_set = get_patient_activity_events(
+        patient_id="TODO",
+        start_time=1662000000,
+        end_time=1663123000,
+    )
+
+    activity_events_df = activity_event_set.to_dataframe()
+    # Similarly, you can fetch medication events, wellbeing events, etc.
+
+.. note:: 
+    Many StrivePD events are also queryable as **streams** (with the algorithm `ingest-rune-events`).
+    The stream representation of the data is less reliable and may not reflect the latest state
+    of user data. **We recommend using the `runeq.resources.event` module to query StrivePD Events, 
+    whenever possible.**

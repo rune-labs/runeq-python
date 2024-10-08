@@ -12,12 +12,9 @@ Utility functions are provided to query events of specific types.
 Other event categories may exist: use the get_patient_events function to
 fetch events of any type.
 
-NOTE: There is significant overlap between the Events that are selected by
-this class and the ones that are available to be queried through the Stream APIs.
-One critical difference is that these Events can be updated if a StrivePD user makes
-a change in the app. Stream API events are not updated in every case.
-**We recommend using the classes in this module to query patient Events, whenever
-possible.**
+NOTE: Many StrivePD events are also queryable as **streams** (with the algorithm `ingest-rune-events`).
+The stream representation of the data is **less reliable** and may not reflect the latest state
+of user data. **We recommend using this module to query StrivePD Events, whenever possible.**
 
 """
 
@@ -28,6 +25,7 @@ import pandas as pd
 
 from .client import GraphClient, global_graph_client
 from .common import ItemBase, ItemSet
+from .internal import _time_type, _time_type_to_unix_secs
 
 
 class Event(ItemBase):
@@ -231,8 +229,8 @@ MAX_QUERY_RANGE_SECS = 90 * 24 * 60 * 60
 
 def _iter_events(
     patient_id: str,
-    start_time: float,
-    end_time: float,
+    start_time: _time_type,
+    end_time: _time_type,
     include_filters: Optional[list] = None,
     client: Optional[GraphClient] = None,
 ):
@@ -242,6 +240,8 @@ def _iter_events(
 
     """
     graph_client = client or global_graph_client()
+    start_time = _time_type_to_unix_secs(start_time)
+    end_time = _time_type_to_unix_secs(end_time)
 
     next_cursor = None
 
@@ -306,8 +306,8 @@ def _reformat_event(event: dict):
 
 def get_patient_events(
     patient_id: str,
-    start_time: float,
-    end_time: float,
+    start_time: _time_type,
+    end_time: _time_type,
     include_filters: Optional[list] = None,
     client: Optional[GraphClient] = None,
 ) -> EventSet:
@@ -335,8 +335,8 @@ def get_patient_events(
 
 def get_patient_activity_events(
     patient_id: str,
-    start_time: float,
-    end_time: float,
+    start_time: _time_type,
+    end_time: _time_type,
     client: Optional[GraphClient] = None,
 ) -> EventSet:
     """Fetch a patient's activity Events.
@@ -364,8 +364,8 @@ def get_patient_activity_events(
 
 def get_patient_medication_events(
     patient_id: str,
-    start_time: float,
-    end_time: float,
+    start_time: _time_type,
+    end_time: _time_type,
     client: Optional[GraphClient] = None,
 ) -> EventSet:
     """Fetch a patient's medication Events, as recorded through
@@ -399,8 +399,8 @@ def get_patient_medication_events(
 
 def get_patient_wellbeing_events(
     patient_id: str,
-    start_time: float,
-    end_time: float,
+    start_time: _time_type,
+    end_time: _time_type,
     client: Optional[GraphClient] = None,
 ) -> EventSet:
     """Fetch a patient's wellbeing Events, as recorded through
