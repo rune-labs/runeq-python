@@ -127,6 +127,7 @@ StrivePD Events
 .. autofunction:: get_patient_events
 .. autofunction:: get_patient_activity_events
 .. autofunction:: get_patient_medication_events
+.. autofunction:: get_patient_symptom_events
 .. autofunction:: get_patient_wellbeing_events
 
 .. autoclass:: Event

@@ -300,9 +300,9 @@ The StrivePD app allows users to log events related to their health and well-bei
 Events fall into many categories, including:
 
     - Activities (manually logged or ingested from HealthKit)
-    - Medication logs
-    - Supplement logs
-    - Wellbeing
+    - Medication and supplement logs
+    - Symptom logs
+    - Wellbeing logs
     - Free-text notes
 
 To query StrivePD events, you will need a **patient ID** and a **time range**:
@@ -335,7 +335,7 @@ events of a specific type. For example, to fetch activity events:
     )
 
     activity_events_df = activity_event_set.to_dataframe()
-    # Similarly, you can fetch medication events, wellbeing events, etc.
+    # Similarly, you can fetch medication events, symptom events, wellbeing events, etc.
 
 .. note:: 
     Many StrivePD events are also queryable as **streams** (with the algorithm ``ingest-rune-events``).

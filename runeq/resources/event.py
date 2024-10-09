@@ -3,9 +3,10 @@ Events are created by users of the StrivePD app. They fall into
 many different categories, including:
 
     - Activities (manually logged or ingested from HealthKit)
-    - Medication logs
-    - Supplement logs
-    - Wellbeing
+    - Medication and supplement logs
+    - Symptom logs
+    - Wellbeing logs
+    - Free text notes
     - etc.
 
 Utility functions are provided to query events of specific types.
@@ -386,6 +387,32 @@ def get_patient_medication_events(
         {
             "namespace": "patient",
             "category": "medication",
+            "enum": "*",
+        },
+    ]
+    return get_patient_events(
+        patient_id=patient_id,
+        start_time=start_time,
+        end_time=end_time,
+        include_filters=include_filters,
+        client=client,
+    )
+
+
+def get_patient_symptom_events(
+    patient_id: str,
+    start_time: _time_type,
+    end_time: _time_type,
+    client: Optional[GraphClient] = None,
+) -> EventSet:
+    """Fetch a patient's symptom Events, as recorded through
+    the StrivePD app.
+
+    """
+    include_filters = [
+        {
+            "namespace": "patient",
+            "category": "symptom",
             "enum": "*",
         },
     ]

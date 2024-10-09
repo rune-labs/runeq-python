@@ -14,6 +14,7 @@ from runeq.resources.event import (
     get_patient_activity_events,
     get_patient_events,
     get_patient_medication_events,
+    get_patient_symptom_events,
     get_patient_wellbeing_events,
 )
 
@@ -490,6 +491,29 @@ class TestEvent(TestCase):
                 {
                     "namespace": "patient",
                     "category": "medication",
+                    "enum": "*",
+                }
+            ],
+        )
+
+        # symptom
+        self.mock_client.execute.reset_mock()
+
+        get_patient_symptom_events(
+            "abc", start_time=1, end_time=10, client=self.mock_client
+        )
+
+        self.mock_client.execute.assert_called_once_with(
+            statement=mock.ANY,
+            # GraphQL variables
+            patient_id="abc",
+            cursor=None,
+            start_time=1,
+            end_time=10,
+            include_filters=[
+                {
+                    "namespace": "patient",
+                    "category": "symptom",
                     "enum": "*",
                 }
             ],
