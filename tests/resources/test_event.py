@@ -370,6 +370,27 @@ class TestEvent(TestCase):
         Test converting events to a dataframe
 
         """
+        expected_columns = [
+            "patient_id",
+            "start_time",
+            "end_time",
+            "namespace",
+            "category",
+            "enum",
+            "display_name",
+            "method",
+            "payload",
+            "tags",
+            "created_at",
+            "updated_at",
+            "id",
+        ]
+
+        # Make sure empty dataframe works
+        empty_df = EventSet([]).to_dataframe()
+        self.assertListEqual(list(empty_df.columns), expected_columns)
+
+        # Test with a few events
         ev2 = Event(
             id="id2",
             patient_id="abc",
@@ -411,24 +432,7 @@ class TestEvent(TestCase):
         event_set = EventSet([ev3, self.test_event, ev2])
 
         df = event_set.to_dataframe()
-        self.assertListEqual(
-            list(df.columns),
-            [
-                "patient_id",
-                "start_time",
-                "end_time",
-                "namespace",
-                "category",
-                "enum",
-                "display_name",
-                "method",
-                "payload",
-                "tags",
-                "created_at",
-                "updated_at",
-                "id",
-            ],
-        )
+        self.assertListEqual(list(df.columns), expected_columns)
 
         # check ids to make sure sorting was done correctly
         self.assertEqual(list(df.id), ["id1", "id3", "id2"])
