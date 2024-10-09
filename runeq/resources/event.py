@@ -139,13 +139,20 @@ class EventSet(ItemSet):
         """
         df = super().to_dataframe()
 
-        df = df.sort_values(by=["start_time", "end_time"])
-        df = df.reset_index(drop=True)
+        if not df.empty:
+            df = df.sort_values(by=["start_time", "end_time"])
+            df = df.reset_index(drop=True)
 
-        # parse classification into fields (for easier querying)
-        df["namespace"] = df.classification.apply(lambda x: x.get("namespace"))
-        df["category"] = df.classification.apply(lambda x: x.get("category"))
-        df["enum"] = df.classification.apply(lambda x: x.get("enum"))
+            # parse classification into fields (for easier querying)
+            df["namespace"] = df.classification.apply(lambda x: x.get("namespace"))
+            df["category"] = df.classification.apply(lambda x: x.get("category"))
+            df["enum"] = df.classification.apply(lambda x: x.get("enum"))
+
+            # parse datetime columns
+            df["start_time"] = pd.to_datetime(df["start_time"], unit="s")
+            df["end_time"] = pd.to_datetime(df["end_time"], unit="s")
+            df["created_at"] = pd.to_datetime(df["created_at"], unit="s")
+            df["updated_at"] = pd.to_datetime(df["updated_at"], unit="s")
 
         # Reorder columns (dropping classification)
         df = df.reindex(
@@ -165,12 +172,6 @@ class EventSet(ItemSet):
                 "id",
             ]
         )
-
-        # parse datetime columns
-        df["start_time"] = pd.to_datetime(df["start_time"], unit="s")
-        df["end_time"] = pd.to_datetime(df["end_time"], unit="s")
-        df["created_at"] = pd.to_datetime(df["created_at"], unit="s")
-        df["updated_at"] = pd.to_datetime(df["updated_at"], unit="s")
 
         return df
 
