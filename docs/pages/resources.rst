@@ -68,7 +68,6 @@ Organization Metadata
 .. autofunction:: get_org
 .. autofunction:: get_orgs
 .. autofunction:: set_active_org
-.. autofunction:: active_org
 
 .. autoclass:: Org
    :special-members: __init__
@@ -78,7 +77,6 @@ Organization Metadata
    :special-members: __init__
    :members:
    :inherited-members:
-
 
 Stream Metadata
 ---------------
@@ -119,6 +117,27 @@ Stream Data
 
 .. autofunction:: get_stream_availability
 .. autofunction:: get_stream_data
+
+
+StrivePD Events
+---------------
+
+.. automodule:: runeq.resources.event
+
+.. autofunction:: get_patient_events
+.. autofunction:: get_patient_activity_events
+.. autofunction:: get_patient_medication_events
+.. autofunction:: get_patient_symptom_events
+.. autofunction:: get_patient_wellbeing_events
+
+.. autoclass:: Event
+   :special-members: __init__
+   :members:
+   :inherited-members:
+.. autoclass:: EventSet
+   :special-members: __init__
+   :members:
+   :inherited-members:
 
 User Metadata
 -------------
