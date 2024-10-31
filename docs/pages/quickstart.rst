@@ -172,39 +172,23 @@ You can find information about a single project:
 
 .. code-block:: python
 
-    from runeq.resources.project import get_project
+    from runeq.resources.project import get_project, get_project_patients, get_cohort_patients
 
-    project = get_project(project_id="example_id")
+    # Fetch basic metadata about a project (title, description, cohorts)
+    project = get_project(project_id="example_project_id")
     print(project.to_dict())
 
-To view all the patients in a project, and their related project metrics you can use the
-following example:
-
-.. code-block:: python
-
-    from runeq.resources.project import get_project_patients
-
-    project_patients = get_project_patients(project_id="example_id")
-
+    # Fetch metadata for the patients within a project
+    project_patients = get_project_patients(project_id="example_project_id")
     for project_patient in project_patients:
         print(project_patient)
-        for metric in project_patient.metrics:
-            print(' ', metric)
 
-        print('')
+    # You can create a dataframe of the project patient metadata
+    project_patient_metadata_df = project_patients.to_dataframe()
 
-It may be easier to view a single project patient in a dataframe which you can do by:
-
-.. code-block:: python
-
-    from runeq.resources.project import get_project_patients
-
-    project_patients = get_project_patients(project_id="example_id")
-    target_patient_id = "patient_id_example"
-
-    df = project_patients[target_patient_id].get_patient_metadata_dataframe()
-
-    df
+    # You can also fetch the list of patients in a cohort, using a cohort ID.
+    cohort_patients = get_cohort_patients(cohort_id="example_cohort_id")
+    cohort_patient_metadata_df = cohort_patients.to_dataframe()
 
 
 Fetch Timeseries Data
@@ -307,3 +291,54 @@ pandas dataframe:
 You can also work directly with responses from the V2 Stream API. See
 :class:`~runeq.resources.stream` and
 :class:`~runeq.resources.stream_metadata.StreamMetadata` for details.
+
+
+Fetch StrivePD Events
+*********************
+
+The StrivePD app allows users to log events related to their health and well-being. 
+Events fall into many categories, including:
+
+    - Activities (manually logged or ingested from HealthKit)
+    - Medication and supplement logs
+    - Symptom logs
+    - Wellbeing logs
+    - Free-text notes
+
+To query StrivePD events, you will need a **patient ID** and a **time range**:
+
+.. code-block:: python
+
+    from runeq.resources.event import get_patient_events
+
+    event_set = get_patient_events(
+        patient_id="TODO",
+        start_time=1662000000,
+        end_time=1663123000,
+    )
+
+    # For easy data manipulation, convert the EventSet to a pandas DataFrame
+    events_df = event_set.to_dataframe()
+
+
+The :class:`~runeq.resources.event` module also provides helper functions to query
+events of a specific type. For example, to fetch activity events:
+
+.. code-block:: python
+
+    from runeq.resources.event import get_patient_activity_events
+
+    activity_event_set = get_patient_activity_events(
+        patient_id="TODO",
+        start_time=1662000000,
+        end_time=1663123000,
+    )
+
+    activity_events_df = activity_event_set.to_dataframe()
+    # Similarly, you can fetch medication events, symptom events, wellbeing events, etc.
+
+.. note:: 
+    Many StrivePD events are also queryable as **streams** (with the algorithm ``ingest-rune-events``).
+    The stream representation of the data is less reliable and may not reflect the latest state
+    of user data. Whenever possible, we recommend querying StrivePD events with the 
+    functionality from the :class:`~runeq.resources.event` module.

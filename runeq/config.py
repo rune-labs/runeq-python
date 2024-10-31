@@ -4,9 +4,13 @@ Configuration for accessing Rune APIs.
 """
 
 import os
+from logging import getLogger
 
 import boto3
 import yaml
+
+log = getLogger(__name__)
+
 
 AUTH_METHOD_CLIENT_KEYS = "client_keys"
 """
@@ -286,6 +290,7 @@ class Config(BaseConfig):
         if not self._cognito_refresh_token:
             return False
 
+        log.debug("refreshing cognito JWT")
         response = self._cognito_client.initiate_auth(
             AuthFlow="REFRESH_TOKEN_AUTH",
             AuthParameters={

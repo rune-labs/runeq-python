@@ -2,23 +2,11 @@
 Query data directly from the V2 Stream API.
 
 """
-import time
-from datetime import date, datetime
+
 from typing import Iterable, Iterator, Optional, Union
 
 from .client import StreamClient, global_stream_client
-
-_time_type = Union[int, float, date, datetime]
-
-
-def _time_type_to_unix_secs(t: _time_type) -> Union[int, float]:
-    """Standardize time input as timestamp (in unix secs)"""
-    if isinstance(t, datetime):
-        return t.timestamp()
-    elif isinstance(t, date):
-        return time.mktime(t.timetuple())
-    else:
-        return t
+from .internal import _time_type, _time_type_to_unix_secs
 
 
 def get_stream_data(
