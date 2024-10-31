@@ -48,7 +48,6 @@ Documentation
    pages/quickstart
    pages/config
    pages/resources
-   pages/stream
    pages/errors
 
 Source
