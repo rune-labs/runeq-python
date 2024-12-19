@@ -265,7 +265,9 @@ def _iter_events(
             **variables,
         )
 
-        event_list = result["patient"]["eventList"]
+        # If the patient has no events, GraphQL will return None (not empty) - we need to explicitly
+        # check for None here, and otherwise set it to an empty dictionary.
+        event_list = result["patient"].get("eventList") or {}
         for event in event_list.get("events", []):
             _reformat_event(event)
             yield Event(patient_id=patient_id, **event)
