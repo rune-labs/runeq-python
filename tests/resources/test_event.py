@@ -248,7 +248,7 @@ class TestEvent(TestCase):
         self.mock_client.execute = mock.Mock(
             side_effect=[
                 # empty response for the first "chunk" of time in the query range
-                {"patient": {"eventList": {"events": []}}},
+                {"patient": {"eventList": None}},
                 {
                     "patient": {
                         "eventList": {
@@ -450,7 +450,7 @@ class TestEvent(TestCase):
 
         """
         self.mock_client.execute = mock.Mock(
-            return_value={"patient": {"eventList": {"events": []}}},
+            return_value={"patient": {"eventList": None}},
         )
 
         # activity
