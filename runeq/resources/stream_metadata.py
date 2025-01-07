@@ -405,15 +405,7 @@ class StreamMetadata(ItemBase):
         for resp in get_stream_data(client=stream_client, **params):
             all_stream_dfs.append(pd.read_csv(StringIO(resp), sep=","))
 
-        # Filter out empty DataFrames before concatenation
-        non_empty_dfs = [df for df in all_stream_dfs if not df.empty]
-
-        # Concatenate only non-empty DataFrames
-        if non_empty_dfs:
-            stream_df = pd.concat(non_empty_dfs, axis=0, ignore_index=True)
-        else:
-            # Handle the case where all DataFrames are empty
-            stream_df = pd.DataFrame()
+        stream_df = pd.concat(all_stream_dfs, axis=0, ignore_index=True)
 
         # Convert "dict" dimensions to native dicts (from strings)
         for dim in self.stream_type.dimensions:
@@ -478,15 +470,7 @@ class StreamMetadata(ItemBase):
         for resp in responses:
             all_stream_dfs.append(pd.read_csv(StringIO(resp), sep=","))
 
-        # Filter out empty DataFrames before concatenation
-        non_empty_dfs = [df for df in all_stream_dfs if not df.empty]
-
-        # Concatenate only non-empty DataFrames
-        if non_empty_dfs:
-            stream_df = pd.concat(non_empty_dfs, axis=0, ignore_index=True)
-        else:
-            # Handle the case where all DataFrames are empty
-            stream_df = pd.DataFrame()
+        stream_df = pd.concat(all_stream_dfs, axis=0, ignore_index=True)
         # Add metadata before returning the dataframe
         return self._add_metadata_to_dataframe(stream_df)
 
@@ -628,17 +612,7 @@ class StreamMetadataSet(ItemSet):
             )
             all_stream_dfs.append(stream_df)
 
-        # Filter out empty DataFrames before concatenation
-        non_empty_dfs = [df for df in all_stream_dfs if not df.empty]
-
-        # Concatenate only non-empty DataFrames
-        if non_empty_dfs:
-            stream_df = pd.concat(non_empty_dfs, axis=0, ignore_index=True)
-        else:
-            # Handle the case where all DataFrames are empty
-            stream_df = pd.DataFrame()
-
-        return stream_df
+        return pd.concat(all_stream_dfs, axis=0, ignore_index=True)
 
     def get_batch_availability_dataframe(
         self,
@@ -705,15 +679,7 @@ class StreamMetadataSet(ItemSet):
         for resp in responses:
             all_stream_dfs.append(pd.read_csv(StringIO(resp), sep=","))
 
-        # Filter out empty DataFrames before concatenation
-        non_empty_dfs = [df for df in all_stream_dfs if not df.empty]
-
-        # Concatenate only non-empty DataFrames
-        if non_empty_dfs:
-            stream_df = pd.concat(non_empty_dfs, axis=0, ignore_index=True)
-        else:
-            # Handle the case where all DataFrames are empty
-            stream_df = pd.DataFrame()
+        stream_df = pd.concat(all_stream_dfs, axis=0, ignore_index=True)
 
         return stream_df
 
@@ -1112,15 +1078,7 @@ def get_stream_availability_dataframe(
         for resp in responses:
             all_stream_dfs.append(pd.read_csv(StringIO(resp), sep=","))
 
-        # Filter out empty DataFrames before concatenation
-        non_empty_dfs = [df for df in all_stream_dfs if not df.empty]
-
-        # Concatenate only non-empty DataFrames
-        if non_empty_dfs:
-            stream_df = pd.concat(non_empty_dfs, axis=0, ignore_index=True)
-        else:
-            # Handle the case where all DataFrames are empty
-            stream_df = pd.DataFrame()
+        stream_df = pd.concat(all_stream_dfs, axis=0, ignore_index=True)
 
         return stream_df
 
