@@ -23,6 +23,7 @@ def get_sleep_metrics(
 
     client = client or global_strive_client()
     all_metrics = []
+    # fetch sleep in chunks of 30 days
     chunk_size = timedelta(days=30)
     chunk_start = start_date
     while chunk_start <= end_date:
