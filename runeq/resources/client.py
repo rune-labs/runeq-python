@@ -72,7 +72,7 @@ class StriveClient:
 
     def __init__(self, config: BaseConfig):
         """
-        Initialize the Stream API Client.
+        Initialize the Strive API Client.
 
         """
         self.config = config
