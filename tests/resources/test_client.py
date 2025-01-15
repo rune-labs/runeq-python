@@ -67,6 +67,7 @@ class TestInitialize(TestCase):
         config = mock.Mock(spec=BaseConfig)
         config.graph_url = "graph-url"
         config.stream_url = "stream-url"
+        config.strive_url = "strive_url"
         config.auth_headers = {"hello": "world"}
 
         initialize_with_config(config)
