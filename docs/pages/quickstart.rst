@@ -349,23 +349,18 @@ Fetch Sleep Events
 
 The Sleep module provides a way to query sleep metrics for a patient logged in healthkit.
 
-A night of sleep has the following metrics:
+A night of sleep has many metrics, including a patient's:
 
-    - **total_sleep_time**
-    - **total_stage_time_core**
-    - **total_stage_time_rem**
-    - **total_stage_time_deep**
-    - **waso** - Wake after sleep onset
-    - **sleep_start_time**
-    - **sleep_end_time**
-    - **timezone**
-The response also includes quality checks for sleep data:
-    - **qa_stage_overlap** - quality check for if any stages overlap in healthkit
-    - **qa_large_gaps** - quality check for if there are large gaps between stages in the sleep data
+    - Total sleep time
+    - Total time spent in each stage
+    - Wake after sleep onset score
+    - Start and end timestamps for sleep
+
+The response also includes quality checks for sleep data.
 
 
 
-To query sleep events, you will need a **patient ID** a **start date** and an **end_date**:
+To query sleep events, you will need a **patient ID**, a **start date**, and an **end_date**:
 
 .. code-block:: python
 
