@@ -351,10 +351,10 @@ The Sleep module provides a way to query sleep metrics for a patient logged in h
 
 A night of sleep has many metrics, including a patient's:
 
-    - Total sleep time
-    - Total time spent in each stage
-    - Wake after sleep onset score
-    - Start and end timestamps for sleep
+    - Total sleep time in seconds
+    - Total time spent in each stage in seconds
+    - Wake after sleep onset score in seconds
+    - Start and end time for sleep as timestamps
 
 The response also includes quality checks for sleep data.
 

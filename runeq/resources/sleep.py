@@ -14,6 +14,8 @@ def get_sleep_metrics(
 ) -> List[Dict]:
     """Fetch sleep metrics for a patient.
 
+    Data is fetched from the Strive API in segments of 30 days at a time.
+
     Args:
         patient_id: The patient ID.
         start_date: The start date for the query.
@@ -27,6 +29,8 @@ def get_sleep_metrics(
     chunk_size = timedelta(days=30)
     chunk_start = start_date
     while chunk_start <= end_date:
+        # the end is either the end of the next 30 days or the end date if
+        # earlier
         chunk_end = min(chunk_start + chunk_size, end_date)
         resp = client.get(
             "/api/v3/sleep_metrics",
