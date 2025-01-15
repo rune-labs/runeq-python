@@ -17,7 +17,9 @@ def get_sleep_metrics(
     Args:
         patient_id: The patient ID.
         start_date: The start date for the query.
-        end_date: The end date for the query."""
+        end_date: The end date for the query.
+        client: Optional StriveClient instance. If not provided, uses the global client.
+    """
 
     client = client or global_strive_client()
     all_metrics = []
