@@ -24,7 +24,7 @@ from typing import Iterable, Optional, Type
 
 import pandas as pd
 
-from .client import GraphClient, global_graph_client
+from .client import GraphClient, StriveClient, global_graph_client
 from .common import ItemBase, ItemSet
 from .internal import _time_type, _time_type_to_unix_secs
 

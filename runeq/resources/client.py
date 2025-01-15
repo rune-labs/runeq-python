@@ -28,6 +28,9 @@ _graph_client = None
 # Rune Stream API Client to query stream data.
 _stream_client = None
 
+# Rune Strive API Client to query strive data.
+_strive_client = None
+
 
 def _retry(exceptions, max_attempts=3, max_sleep_secs=0):
     """
@@ -58,6 +61,28 @@ def _retry(exceptions, max_attempts=3, max_sleep_secs=0):
         return wrapper
 
     return inner_func
+
+
+class StriveClient:
+    """
+    Rune Strive client to query strive data.
+    """
+
+    config: BaseConfig = None
+
+    def __init__(self, config: BaseConfig):
+        """
+        Initialize the Stream API Client.
+
+        """
+        self.config = config
+
+    def get(self, path: str, **kwargs):
+        """
+        Makes request(s) to an endpoint of the Strive API.
+        """
+        url = urllib.parse.urljoin(self.config.strive_url, path)
+        return requests.get(url, headers=self.config.auth_headers, **kwargs)
 
 
 class GraphClient:
@@ -256,9 +281,10 @@ def initialize_with_config(config: BaseConfig):
     for requests to the GraphQL API and the V2 Stream API.
 
     """
-    global _graph_client, _stream_client
+    global _graph_client, _stream_client, _strive_client
     _graph_client = GraphClient(config)
     _stream_client = StreamClient(config)
+    _strive_client = StriveClient(config)
 
 
 def global_graph_client() -> GraphClient:
@@ -290,3 +316,19 @@ def global_stream_client() -> StreamClient:
         raise INITIALIZATION_ERROR
 
     return _stream_client
+
+
+def global_strive_client() -> StriveClient:
+    """
+    Returns the globally configured Strive API client. Use
+    :class:`~runeq.resources.client.initialize` to configure the client.
+
+    Raises:
+        errors.InitializationError: if the library was not initialized.
+
+
+    """
+    if not _strive_client:
+        raise INITIALIZATION_ERROR
+
+    return _strive_client
