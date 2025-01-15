@@ -10,7 +10,10 @@ from .client import StriveClient, global_strive_client
 
 
 def get_sleep_metrics(
-    patient_id: str, start_date: date, end_date: date, client: Optional[StriveClient]
+    patient_id: str,
+    start_date: date,
+    end_date: date,
+    client: Optional[StriveClient] = None,
 ) -> List[Dict]:
     """Fetch sleep metrics for a patient.
 
