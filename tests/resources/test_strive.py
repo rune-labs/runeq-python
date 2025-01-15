@@ -3,12 +3,11 @@ Tests for fetching strive data.
 
 """
 
-from datetime import date, timezone
+from datetime import date
 from unittest import TestCase, mock
 
 from runeq.config import Config
 from runeq.resources.client import StriveClient
-from runeq.resources.stream import get_stream_availability, get_stream_data
 from runeq.resources.strive import get_sleep_metrics
 
 
