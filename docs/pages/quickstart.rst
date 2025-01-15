@@ -365,11 +365,12 @@ To query sleep events, you will need a **patient ID**, a **start date**, and an 
 .. code-block:: python
 
     from runeq.resources.sleep import get_patient_sleep_events
+    from datetime import datetime
 
     sleep_event_set = get_patient_sleep_events(
         patient_id="TODO",
-        start_date="2025-01-01",
-        end_date="2025-01-10",
+        start_date=datetime(2025,1,1),
+        end_date=datetime(2025,1,10)
     )
 
 
