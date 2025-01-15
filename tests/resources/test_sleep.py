@@ -8,7 +8,7 @@ from unittest import TestCase, mock
 
 from runeq.config import Config
 from runeq.resources.client import StriveClient
-from runeq.resources.strive import get_sleep_metrics
+from runeq.resources.sleep import get_sleep_metrics
 
 
 class TestStriveData(TestCase):

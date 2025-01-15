@@ -296,7 +296,7 @@ You can also work directly with responses from the V2 Stream API. See
 Fetch StrivePD Events
 *********************
 
-The StrivePD app allows users to log events related to their health and well-being. 
+The StrivePD app allows users to log events related to their health and well-being.
 Events fall into many categories, including:
 
     - Activities (manually logged or ingested from HealthKit)
@@ -337,8 +337,44 @@ events of a specific type. For example, to fetch activity events:
     activity_events_df = activity_event_set.to_dataframe()
     # Similarly, you can fetch medication events, symptom events, wellbeing events, etc.
 
-.. note:: 
+.. note::
     Many StrivePD events are also queryable as **streams** (with the algorithm ``ingest-rune-events``).
     The stream representation of the data is less reliable and may not reflect the latest state
-    of user data. Whenever possible, we recommend querying StrivePD events with the 
+    of user data. Whenever possible, we recommend querying StrivePD events with the
     functionality from the :class:`~runeq.resources.event` module.
+
+
+Fetch Sleep Events
+******************
+
+The Sleep module provides a way to query sleep metrics for a patient logged in healthkit.
+
+A night of sleep has the following metrics:
+
+    - **total_sleep_time**
+    - **total_stage_time_core**
+    - **total_stage_time_rem**
+    - **total_stage_time_deep**
+    - **waso** - Wake after sleep onset
+    - **sleep_start_time**
+    - **sleep_end_time**
+    - **timezone**
+The response also includes quality checks for sleep data:
+    - **qa_stage_overlap** - quality check for if any stages overlap in healthkit
+    - **qa_large_gaps** - quality check for if there are large gaps between stages in the sleep data
+
+
+
+To query sleep events, you will need a **patient ID** a **start date** and an **end_date**:
+
+.. code-block:: python
+
+    from runeq.resources.sleep import get_patient_sleep_events
+
+    sleep_event_set = get_patient_sleep_events(
+        patient_id="TODO",
+        start_date="2025-01-01",
+        end_date="2025-01-10",
+    )
+
+
