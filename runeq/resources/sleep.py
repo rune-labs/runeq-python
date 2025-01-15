@@ -1,5 +1,5 @@
 """
-Query data directly from the Strive API.
+Query sleep data directly from the Strive API.
 
 """
 
