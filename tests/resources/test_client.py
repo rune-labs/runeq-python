@@ -12,6 +12,7 @@ from runeq.resources.client import (
     StreamClient,
     global_graph_client,
     global_stream_client,
+    global_strive_client,
     initialize,
     initialize_with_config,
 )
@@ -66,15 +67,18 @@ class TestInitialize(TestCase):
         config = mock.Mock(spec=BaseConfig)
         config.graph_url = "graph-url"
         config.stream_url = "stream-url"
+        config.strive_url = "strive_url"
         config.auth_headers = {"hello": "world"}
 
         initialize_with_config(config)
 
         graph_client = global_graph_client()
         stream_client = global_stream_client()
+        strive_config = global_strive_client()
 
         self.assertIs(graph_client.config, config)
         self.assertIs(stream_client.config, config)
+        self.assertIs(strive_config.config, config)
 
 
 class TestStreamClient(TestCase):

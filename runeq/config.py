@@ -48,6 +48,7 @@ class BaseConfig:
 
     graph_url: str
     stream_url: str
+    strive_url: str
 
     def refresh_auth(self) -> bool:
         """
@@ -106,6 +107,7 @@ class Config(BaseConfig):
         """
         self.graph_url = "https://graph.runelabs.io"
         self.stream_url = "https://stream.runelabs.io"
+        self.strive_url = "https://strivepd.runelabs.io"
         self.auth_method = None
 
         self._access_token_id = None
@@ -160,6 +162,7 @@ class Config(BaseConfig):
         cognito_region_name="us-west-2",
         stream_url=None,
         graph_url=None,
+        strive_url=None,
         **kwargs,
     ):
         """
@@ -185,6 +188,9 @@ class Config(BaseConfig):
 
         if graph_url is not None:
             self.graph_url = graph_url
+
+        if strive_url is not None:
+            self.strive_url = strive_url
 
         if auth_method is None:
             num_auth_methods_set = sum(
