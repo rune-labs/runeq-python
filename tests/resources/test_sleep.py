@@ -48,9 +48,9 @@ class TestStriveData(TestCase):
                         "total_stage_time_core": 125,
                         "total_stage_time_deep": 250,
                         "total_stage_time_rem": 125,
-                        "total_stage_time_unspecified": 125
+                        "total_stage_time_unspecified": 125,
                         "waso": 25,
-                        "number_of_awakenings": 2
+                        "number_of_awakenings": 2,
                     }
                 ]
             }
@@ -70,9 +70,9 @@ class TestStriveData(TestCase):
                         "total_stage_time_core": 125,
                         "total_stage_time_deep": 250,
                         "total_stage_time_rem": 125,
-                        "total_stage_time_unspecified": 125
+                        "total_stage_time_unspecified": 125,
                         "waso": 25,
-                        "number_of_awakenings": 2
+                        "number_of_awakenings": 2,
                     }
                 ]
             }
@@ -91,9 +91,9 @@ class TestStriveData(TestCase):
                 "total_stage_time_core": 125,
                 "total_stage_time_deep": 250,
                 "total_stage_time_rem": 125,
-                "total_stage_time_unspecified": 125
+                "total_stage_time_unspecified": 125,
                 "waso": 25,
-                "number_of_awakenings": 2
+                "number_of_awakenings": 2,
             },
             {
                 "date": "2025-01-09",
@@ -107,9 +107,9 @@ class TestStriveData(TestCase):
                 "total_stage_time_core": 125,
                 "total_stage_time_deep": 250,
                 "total_stage_time_rem": 125,
-                "total_stage_time_unspecified": 125
+                "total_stage_time_unspecified": 125,
                 "waso": 25,
-                "number_of_awakenings": 2
+                "number_of_awakenings": 2,
             },
         ]
 
