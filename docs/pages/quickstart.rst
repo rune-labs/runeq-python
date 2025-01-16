@@ -354,6 +354,7 @@ A night of sleep has many metrics, including a patient's:
     - Total sleep time in seconds
     - Total time spent in each stage in seconds
     - Wake after sleep onset score in seconds
+    - Number of awakenings at night
     - Start and end time for sleep as timestamps
 
 The response also includes quality checks for sleep data.
