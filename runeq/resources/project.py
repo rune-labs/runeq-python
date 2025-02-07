@@ -7,6 +7,7 @@ from typing import Iterable, Optional, Type
 
 from .client import GraphClient, global_graph_client
 from .common import ItemBase, ItemSet
+from .org import Org
 
 
 class ProjectPatientMetadata(ItemBase):
@@ -20,6 +21,8 @@ class ProjectPatientMetadata(ItemBase):
         self,
         id: str,
         project_code_name: str,
+        start_time: float | None,
+        end_time: float | None,
         updated_at: float,
         created_at: float,
         created_by: str,
@@ -32,6 +35,8 @@ class ProjectPatientMetadata(ItemBase):
         Args:
             id: Patient ID
             project_code_name: Code name of the patient within the project
+            start_time: The project start time for the patient (unix timestamp)
+            end_time: The project end time for the patient (unix timestamp)
             created_at: Time patient was added to the project (unix timestamp)
             created_by: Display name of who added the patient to the project
             updated_at: Time project patient was last updated (unix timestamp)
@@ -39,6 +44,8 @@ class ProjectPatientMetadata(ItemBase):
             **attributes: Other attributes associated with the project
 
         """
+        self.start_time = start_time
+        self.end_time = end_time
         self.created_at = created_at
         self.updated_at = updated_at
         self.created_by = created_by
@@ -48,6 +55,8 @@ class ProjectPatientMetadata(ItemBase):
         super().__init__(
             id=id,
             project_code_name=project_code_name,
+            start_time=start_time,
+            end_time=end_time,
             created_at=created_at,
             updated_at=updated_at,
             created_by=created_by,
@@ -430,12 +439,22 @@ def get_project_patients(
     project_patients_query = """
         query($id: ID, $cursorInput: CursorInput) {
             project(id: $id) {
+                organization_id: organizationId,
                 projectPatientList(
                     cursorInput: $cursorInput
                 ){
                     projectPatients{
                         patient {
                             id
+                            patientAccessList {
+                                patientAccess {
+                                    org {
+                                        id
+                                    }
+                                    start_time: startTime
+                                    end_time: endTime
+                                }
+                            }
                         },
                         project_code_name: codeName,
                         created_at: createdAt,
@@ -462,6 +481,11 @@ def get_project_patients(
             cursor_input=cursor_input,
         )
 
+        # Fetch the project organization id and normalize it
+        project_org_id = Org.normalize_id(
+            org_id=result.get("project", {}).get("organization_id")
+        )
+
         # Loop over all project patients
         patient_list = result.get("project", {}).get("projectPatientList")
 
@@ -470,6 +494,23 @@ def get_project_patients(
 
             # Move patient id to top level attribute
             patient_attrs["id"] = patient_attrs.get("patient").get("id")
+
+            patient_access_list = (
+                patient_attrs.get("patient", {})
+                .get("patientAccessList", {})
+                .get("patientAccess", [])
+            )
+            for patient_access in patient_access_list:
+                # Fetch the patient access organization id and normalize it. Start/end times are set at the org level, so we
+                # only need to parse the start/end times for the patient access record for the org that matches the project org id.
+                patient_access_org_id = Org.normalize_id(
+                    org_id=patient_access.get("org", {}).get("id")
+                )
+                if patient_access_org_id == project_org_id:
+                    patient_attrs["start_time"] = patient_access.get("start_time")
+                    patient_attrs["end_time"] = patient_access.get("end_time")
+                    break
+
             del patient_attrs["patient"]
 
             patient = ProjectPatientMetadata(**patient_attrs)
@@ -503,10 +544,20 @@ def get_cohort_patients(
         query($id: ID, $cursorInput: CursorInput) {
             cohort(id: $id) {
                 id,
+                organization_id: organizationId,
                 cohortPatientList(cursorInput: $cursorInput) {
                     cohortPatients {
                         patient {
                             id
+                            patientAccessList {
+                                patientAccess {
+                                    org {
+                                        id
+                                    }
+                                    start_time: startTime
+                                    end_time: endTime
+                                }
+                            }
                         }
                         project_code_name: codeName,
                         created_at: createdAt,
@@ -534,11 +585,33 @@ def get_cohort_patients(
         cohort_patient_list = result.get("cohort").get("cohortPatientList", {})
         cohort_patients = cohort_patient_list.get("cohortPatients", [])
 
+        # Fetch the cohort organization id and normalize it
+        cohort_org_id = Org.normalize_id(
+            org_id=result.get("cohort", {}).get("organization_id")
+        )
+
         for patient_info in cohort_patients:
             patient_attrs = patient_info
 
             # Move patient id to top level attribute
             patient_attrs["id"] = patient_attrs.get("patient").get("id")
+
+            patient_access_list = (
+                patient_attrs.get("patient", {})
+                .get("patientAccessList", {})
+                .get("patientAccess", [])
+            )
+            for patient_access in patient_access_list:
+                # Fetch the patient access organization id and normalize it. Start/end times are set at the org level, so we
+                # only need to parse the start/end times for the patient access record for the org that matches the cohort org id.
+                patient_access_org_id = Org.normalize_id(
+                    org_id=patient_access.get("org", {}).get("id")
+                )
+                if patient_access_org_id == cohort_org_id:
+                    patient_attrs["start_time"] = patient_access.get("start_time")
+                    patient_attrs["end_time"] = patient_access.get("end_time")
+                    break
+
             del patient_attrs["patient"]
 
             patient = ProjectPatientMetadata(**patient_attrs)

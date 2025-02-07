@@ -368,6 +368,8 @@ class TestProject(TestCase):
         test_project = ProjectPatientMetadata(
             id="proj-patient-id",
             project_code_name="Code Name",
+            start_time=1630515986.9949625,
+            end_time=1630515986.9949625,
             created_at=1630515986.9949625,
             updated_at=1630515986.9949625,
             created_by="user-1",
@@ -377,6 +379,8 @@ class TestProject(TestCase):
 
         self.assertEqual("proj-patient-id", test_project.id)
         self.assertEqual("Code Name", test_project.project_code_name)
+        self.assertEqual(1630515986.9949625, test_project.start_time)
+        self.assertEqual(1630515986.9949625, test_project.end_time)
         self.assertEqual(1630515986.9949625, test_project.created_at)
         self.assertEqual(1630515986.9949625, test_project.updated_at)
         self.assertEqual("user-1", test_project.created_by)
@@ -414,6 +418,8 @@ class TestProject(TestCase):
             {
                 "id": "patient-1",
                 "project_code_name": "code name 1",
+                "start_time": 1673467625.063822,
+                "end_time": 1673467625.063822,
                 "created_at": 1673467625.063822,
                 "updated_at": 1673467625.063822,
                 "created_by": "user 1",
@@ -422,6 +428,8 @@ class TestProject(TestCase):
             {
                 "id": "patient-2",
                 "project_code_name": "code name 2",
+                "start_time": 1673467625.063822,
+                "end_time": 1673467625.063822,
                 "created_at": 1673467625.063822,
                 "updated_at": 1673467625.063822,
                 "created_by": "user 2",
@@ -431,10 +439,24 @@ class TestProject(TestCase):
 
         self.mock_client.execute.return_value = {
             "project": {
+                "organization_id": "org-rune",
                 "projectPatientList": {
                     "projectPatients": [
                         {
-                            "patient": {"id": "patient-1"},
+                            "patient": {
+                                "id": "patient-1",
+                                "patientAccessList": {
+                                    "patientAccess": [
+                                        {
+                                            "org": {
+                                                "id": "org-rune,org",
+                                            },
+                                            "start_time": 1673467625.063822,
+                                            "end_time": 1673467625.063822,
+                                        },
+                                    ]
+                                },
+                            },
                             "project_code_name": "code name 1",
                             "created_at": 1673467625.063822,
                             "updated_at": 1673467625.063822,
@@ -442,7 +464,20 @@ class TestProject(TestCase):
                             "updated_by": "user 2",
                         },
                         {
-                            "patient": {"id": "patient-2"},
+                            "patient": {
+                                "id": "patient-2",
+                                "patientAccessList": {
+                                    "patientAccess": [
+                                        {
+                                            "org": {
+                                                "id": "org-rune,org",
+                                            },
+                                            "start_time": 1673467625.063822,
+                                            "end_time": 1673467625.063822,
+                                        },
+                                    ]
+                                },
+                            },
                             "project_code_name": "code name 2",
                             "created_at": 1673467625.063822,
                             "updated_at": 1673467625.063822,
@@ -451,7 +486,107 @@ class TestProject(TestCase):
                         },
                     ],
                     "pageInfo": {"codeNameEndCursor": None},
-                }
+                },
+            }
+        }
+
+        project_patients = get_project_patients(
+            client=self.mock_client, project_id="test-project-1"
+        )
+
+        self.assertEqual(
+            project_patients_expected,
+            project_patients.to_list(),
+        )
+
+    def test_get_project_patients_patient_in_multiple_orgs(self):
+        """
+        Test get project patients for the initialized user. This tests to make sure
+        that the correct start/end times are returned for a project patient that belongs
+        to multiple organizations.
+
+        """
+        self.mock_client.execute = mock.Mock()
+        project_patients_expected = [
+            {
+                "id": "patient-1",
+                "project_code_name": "code name 1",
+                "start_time": 1673467625.063822,
+                "end_time": 1673467625.063822,
+                "created_at": 1673467625.063822,
+                "updated_at": 1673467625.063822,
+                "created_by": "user 1",
+                "updated_by": "user 2",
+            },
+            {
+                "id": "patient-2",
+                "project_code_name": "code name 2",
+                "start_time": 1673467625.063822,
+                "end_time": 1673467625.063822,
+                "created_at": 1673467625.063822,
+                "updated_at": 1673467625.063822,
+                "created_by": "user 2",
+                "updated_by": "user 3",
+            },
+        ]
+
+        self.mock_client.execute.return_value = {
+            "project": {
+                "organization_id": "org-rune",
+                "projectPatientList": {
+                    "projectPatients": [
+                        {
+                            "patient": {
+                                "id": "patient-1",
+                                "patientAccessList": {
+                                    "patientAccess": [
+                                        {
+                                            "org": {
+                                                "id": "org-other,org",
+                                            },
+                                            "start_time": 1704838800.0,
+                                            "end_time": None,
+                                        },
+                                        {
+                                            "org": {
+                                                "id": "org-rune,org",
+                                            },
+                                            "start_time": 1673467625.063822,
+                                            "end_time": 1673467625.063822,
+                                        },
+                                    ]
+                                },
+                            },
+                            "project_code_name": "code name 1",
+                            "created_at": 1673467625.063822,
+                            "updated_at": 1673467625.063822,
+                            "created_by": "user 1",
+                            "updated_by": "user 2",
+                        },
+                        {
+                            "patient": {
+                                "id": "patient-2",
+                                "patientAccessList": {
+                                    "patientAccess": [
+                                        {
+                                            "org": {
+                                                "id": "org-rune,org",
+                                            },
+                                            "start_time": 1673467625.063822,
+                                            "end_time": 1673467625.063822,
+                                        },
+                                    ]
+                                },
+                            },
+                            "project_code_name": "code name 2",
+                            "created_at": 1673467625.063822,
+                            "updated_at": 1673467625.063822,
+                            "created_by": "user 2",
+                            "updated_by": "user 3",
+                        },
+                    ],
+                    "pageInfo": {"codeNameEndCursor": None},
+                },
             }
         }
 
@@ -474,6 +609,8 @@ class TestProject(TestCase):
             {
                 "id": "patient-1",
                 "project_code_name": "code name 1",
+                "start_time": 1673467625.063822,
+                "end_time": 1673467625.063822,
                 "created_at": 1673467625.063822,
                 "updated_at": 1673467625.063822,
                 "created_by": "user 1",
@@ -482,6 +619,8 @@ class TestProject(TestCase):
             {
                 "id": "patient-2",
                 "project_code_name": "code name 2",
+                "start_time": 1673467625.063822,
+                "end_time": 1673467625.063822,
                 "created_at": 1673467625.063822,
                 "updated_at": 1673467625.063822,
                 "created_by": "user 2",
@@ -492,10 +631,24 @@ class TestProject(TestCase):
         self.mock_client.execute.side_effect = [
             {
                 "project": {
+                    "organization_id": "org-rune",
                     "projectPatientList": {
                         "projectPatients": [
                             {
-                                "patient": {"id": "patient-1"},
+                                "patient": {
+                                    "id": "patient-1",
+                                    "patientAccessList": {
+                                        "patientAccess": [
+                                            {
+                                                "org": {
+                                                    "id": "org-rune,org",
+                                                },
+                                                "start_time": 1673467625.063822,
+                                                "end_time": 1673467625.063822,
+                                            },
+                                        ]
+                                    },
+                                },
                                 "project_code_name": "code name 1",
                                 "created_at": 1673467625.063822,
                                 "updated_at": 1673467625.063822,
@@ -504,15 +657,29 @@ class TestProject(TestCase):
                             },
                         ],
                         "pageInfo": {"codeNameEndCursor": "code name 1"},
-                    }
+                    },
                 }
             },
             {
                 "project": {
+                    "organization_id": "org-rune",
                     "projectPatientList": {
                         "projectPatients": [
                             {
-                                "patient": {"id": "patient-2"},
+                                "patient": {
+                                    "id": "patient-2",
+                                    "patientAccessList": {
+                                        "patientAccess": [
+                                            {
+                                                "org": {
+                                                    "id": "org-rune,org",
+                                                },
+                                                "start_time": 1673467625.063822,
+                                                "end_time": 1673467625.063822,
+                                            },
+                                        ]
+                                    },
+                                },
                                 "project_code_name": "code name 2",
                                 "created_at": 1673467625.063822,
                                 "updated_at": 1673467625.063822,
@@ -521,7 +688,7 @@ class TestProject(TestCase):
                             },
                         ],
                         "pageInfo": {"codeNameEndCursor": None},
-                    }
+                    },
                 }
             },
         ]
@@ -545,6 +712,8 @@ class TestProject(TestCase):
             {
                 "id": "patient-1",
                 "project_code_name": "code name 1",
+                "start_time": 1673467625.063822,
+                "end_time": 1673467625.063822,
                 "created_at": 1673467625.063822,
                 "updated_at": 1673467625.063822,
                 "created_by": "user 1",
@@ -553,6 +722,8 @@ class TestProject(TestCase):
             {
                 "id": "patient-2",
                 "project_code_name": "code name 2",
+                "start_time": 1673467625.063822,
+                "end_time": 1673467625.063822,
                 "created_at": 1673467625.063822,
                 "updated_at": 1673467625.063822,
                 "created_by": "user 2",
@@ -562,10 +733,24 @@ class TestProject(TestCase):
 
         self.mock_client.execute.return_value = {
             "cohort": {
+                "organization_id": "org-rune",
                 "cohortPatientList": {
                     "cohortPatients": [
                         {
-                            "patient": {"id": "patient-1"},
+                            "patient": {
+                                "id": "patient-1",
+                                "patientAccessList": {
+                                    "patientAccess": [
+                                        {
+                                            "org": {
+                                                "id": "org-rune,org",
+                                            },
+                                            "start_time": 1673467625.063822,
+                                            "end_time": 1673467625.063822,
+                                        },
+                                    ]
+                                },
+                            },
                             "project_code_name": "code name 1",
                             "created_at": 1673467625.063822,
                             "updated_at": 1673467625.063822,
@@ -573,7 +758,20 @@ class TestProject(TestCase):
                             "updated_by": "user 2",
                         },
                         {
-                            "patient": {"id": "patient-2"},
+                            "patient": {
+                                "id": "patient-2",
+                                "patientAccessList": {
+                                    "patientAccess": [
+                                        {
+                                            "org": {
+                                                "id": "org-rune,org",
+                                            },
+                                            "start_time": 1673467625.063822,
+                                            "end_time": 1673467625.063822,
+                                        },
+                                    ]
+                                },
+                            },
                             "project_code_name": "code name 2",
                             "created_at": 1673467625.063822,
                             "updated_at": 1673467625.063822,
@@ -582,7 +780,7 @@ class TestProject(TestCase):
                         },
                     ],
                     "pageInfo": {"codeNameEndCursor": None},
-                }
+                },
             }
         }
 
@@ -605,6 +803,8 @@ class TestProject(TestCase):
             {
                 "id": "patient-1",
                 "project_code_name": "code name 1",
+                "start_time": 1673467625.063822,
+                "end_time": 1673467625.063822,
                 "created_at": 1673467625.063822,
                 "updated_at": 1673467625.063822,
                 "created_by": "user 1",
@@ -613,6 +813,8 @@ class TestProject(TestCase):
             {
                 "id": "patient-2",
                 "project_code_name": "code name 2",
+                "start_time": 1673467625.063822,
+                "end_time": 1673467625.063822,
                 "created_at": 1673467625.063822,
                 "updated_at": 1673467625.063822,
                 "created_by": "user 2",
@@ -623,10 +825,24 @@ class TestProject(TestCase):
         self.mock_client.execute.side_effect = [
             {
                 "cohort": {
+                    "organization_id": "org-rune",
                     "cohortPatientList": {
                         "cohortPatients": [
                             {
-                                "patient": {"id": "patient-1"},
+                                "patient": {
+                                    "id": "patient-1",
+                                    "patientAccessList": {
+                                        "patientAccess": [
+                                            {
+                                                "org": {
+                                                    "id": "org-rune,org",
+                                                },
+                                                "start_time": 1673467625.063822,
+                                                "end_time": 1673467625.063822,
+                                            },
+                                        ]
+                                    },
+                                },
                                 "project_code_name": "code name 1",
                                 "created_at": 1673467625.063822,
                                 "updated_at": 1673467625.063822,
@@ -635,15 +851,29 @@ class TestProject(TestCase):
                             },
                         ],
                         "pageInfo": {"codeNameEndCursor": "code name 1"},
-                    }
+                    },
                 }
             },
             {
                 "cohort": {
+                    "organization_id": "org-rune",
                     "cohortPatientList": {
                         "cohortPatients": [
                             {
-                                "patient": {"id": "patient-2"},
+                                "patient": {
+                                    "id": "patient-2",
+                                    "patientAccessList": {
+                                        "patientAccess": [
+                                            {
+                                                "org": {
+                                                    "id": "org-rune,org",
+                                                },
+                                                "start_time": 1673467625.063822,
+                                                "end_time": 1673467625.063822,
+                                            },
+                                        ]
+                                    },
+                                },
                                 "project_code_name": "code name 2",
                                 "created_at": 1673467625.063822,
                                 "updated_at": 1673467625.063822,
@@ -652,7 +882,7 @@ class TestProject(TestCase):
                             },
                         ],
                         "pageInfo": {"codeNameEndCursor": None},
-                    }
+                    },
                 }
             },
         ]
