@@ -139,6 +139,13 @@ StrivePD Events
    :members:
    :inherited-members:
 
+Sleep Metrics
+-------------
+
+.. automodule:: runeq.resources.sleep
+
+.. autofunction:: get_sleep_metrics
+
 User Metadata
 -------------
 
