@@ -344,7 +344,7 @@ events of a specific type. For example, to fetch activity events:
     functionality from the :class:`~runeq.resources.event` module.
 
 
-Fetch Sleep Events
+Fetch Sleep Metrics
 ******************
 
 The Sleep module provides a way to query sleep metrics for a patient logged in healthkit.
@@ -361,14 +361,14 @@ The response also includes quality checks for sleep data.
 
 
 
-To query sleep events, you will need a **patient ID**, a **start date**, and an **end_date**:
+To query sleep metrics, you will need a **patient ID**, a **start date**, and an **end_date**:
 
 .. code-block:: python
 
-    from runeq.resources.sleep import get_patient_sleep_events
+    from runeq.resources.sleep import get_sleep_metrics
     from datetime import datetime
 
-    sleep_event_set = get_patient_sleep_events(
+    sleep_event_set = get_sleep_metrics(
         patient_id="TODO",
         start_date=datetime(2025,1,1),
         end_date=datetime(2025,1,10)
