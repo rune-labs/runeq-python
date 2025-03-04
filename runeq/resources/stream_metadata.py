@@ -2,6 +2,7 @@
 Fetch metadata about streams, including stream types.
 
 """
+
 import datetime
 import json
 from io import StringIO
@@ -403,7 +404,10 @@ class StreamMetadata(ItemBase):
 
         all_stream_dfs = []
         for resp in get_stream_data(client=stream_client, **params):
-            all_stream_dfs.append(pd.read_csv(StringIO(resp), sep=","))
+            # add stream data frame if non-empty
+            stream_df = pd.read_csv(StringIO(resp), sep=",")
+            if not stream_df.empty:
+                all_stream_dfs.append(stream_df)
 
         stream_df = pd.concat(all_stream_dfs, axis=0, ignore_index=True)
 
