@@ -117,6 +117,8 @@ Stream Data
 
 .. autofunction:: get_stream_availability
 .. autofunction:: get_stream_data
+.. autofunction:: get_stream_aggregate_window
+.. autofunction:: get_stream_daily_aggregate
 
 
 StrivePD Events

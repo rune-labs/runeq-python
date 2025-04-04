@@ -396,7 +396,6 @@ class TestStreamData(TestCase):
             },
         }
 
-        # Mock response - only need one response now
         mock_response = mock.Mock()
         mock_response.ok = True
         mock_response.headers = {}
@@ -421,14 +420,12 @@ class TestStreamData(TestCase):
         """
         Check the request construction for fetching stream daily aggregate data.
         """
-        # Mock an empty response - this test is just for the request
         mock_response = mock.Mock()
         mock_response.ok = True
         mock_response.headers = {}
         mock_response.json.return_value = {}
         mock_requests.get.return_value = mock_response
 
-        # Call function - no need to consume iterator
         get_stream_daily_aggregate(
             "test-stream-id",
             start_time=1690848000,  # 2023-08-01T00:00:00Z
@@ -502,7 +499,6 @@ class TestStreamData(TestCase):
             },
         }
 
-        # Mock response
         mock_response = mock.Mock()
         mock_response.ok = True
         mock_response.headers = {}
@@ -529,14 +525,13 @@ class TestStreamData(TestCase):
         """
         Check the request construction for fetching stream aggregate window data.
         """
-        # Mock an empty response - this test is just for the request
         mock_response = mock.Mock()
         mock_response.ok = True
         mock_response.headers = {}
         mock_response.json.return_value = {}
         mock_requests.get.return_value = mock_response
 
-        # Call function with unix timestamp format (matching API example)
+        # Call function with unix timestamp format
         get_stream_aggregate_window(
             "test-stream-id",
             start_time=1661990400,  # 2022-09-01T00:00:00Z
@@ -576,7 +571,7 @@ class TestStreamData(TestCase):
             end_time=datetime(2022, 9, 5, tzinfo=timezone.utc),
             resolution=43200,  # 12 hours
             aggregate_function="sum",
-            timestamp="iso",  # Using ISO format which is different from the example
+            timestamp="iso",
             client=self.stream_client,
         )
 
