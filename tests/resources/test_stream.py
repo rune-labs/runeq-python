@@ -511,7 +511,7 @@ class TestStreamData(TestCase):
         mock_requests.get.return_value = mock_response
 
         aggregate_window = get_stream_aggregate_window(
-            "heart_rate_stream",
+            "test-stream-id",
             start_time=1661990400,  # 2022-09-01T00:00:00Z
             end_time=1662336000,  # 2022-09-05T00:00:00Z
             resolution=86400,  # 24 hours (daily)
@@ -538,7 +538,7 @@ class TestStreamData(TestCase):
 
         # Call function with unix timestamp format (matching API example)
         get_stream_aggregate_window(
-            "heart_rate_stream",
+            "test-stream-id",
             start_time=1661990400,  # 2022-09-01T00:00:00Z
             end_time=1662336000,  # 2022-09-05T00:00:00Z
             resolution=86400,  # 24 hours (daily)
@@ -553,7 +553,7 @@ class TestStreamData(TestCase):
         }
 
         mock_requests.get.assert_called_once_with(
-            "https://stream.runelabs.io/v2/streams/heart_rate_stream/aggregate_window",
+            "https://stream.runelabs.io/v2/streams/test-stream-id/aggregate_window",
             headers=expected_headers,
             params={
                 "start_time": 1661990400,
@@ -571,7 +571,7 @@ class TestStreamData(TestCase):
 
         # Test with ISO formatted datetime objects and different aggregate function
         get_stream_aggregate_window(
-            "activity_stream",
+            "test-stream-id",
             start_time=datetime(2022, 9, 1, tzinfo=timezone.utc),
             end_time=datetime(2022, 9, 5, tzinfo=timezone.utc),
             resolution=43200,  # 12 hours
@@ -581,7 +581,7 @@ class TestStreamData(TestCase):
         )
 
         mock_requests.get.assert_called_once_with(
-            "https://stream.runelabs.io/v2/streams/activity_stream/aggregate_window",
+            "https://stream.runelabs.io/v2/streams/test-stream-id/aggregate_window",
             headers=expected_headers,
             params={
                 "start_time": 1661990400.0,
