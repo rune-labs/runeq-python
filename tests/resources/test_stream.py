@@ -375,20 +375,23 @@ class TestStreamData(TestCase):
         Test get a stream daily aggregate with specific stream_id and parameters.
         """
         expected_data = {
-            "cardinality": 4,
+            "approx_available_duration_s": 900,
             "data": {
-                "time": [
-                    "2023-08-01T00:00:00Z",
-                    "2023-08-01T06:00:00Z",
-                    "2023-08-01T12:00:00Z",
-                    "2023-08-01T18:00:00Z",
-                ],
-                "avg_heart_rate": [
-                    72.5,
-                    68.3,
-                    75.2,
-                    79.6,
-                ],
+                "offset": ["03:00", "06:00", "09:00", "12:00", "15:00", "18:00"],
+                "values": [42.1, 0.123, 47.0001, None, 943, 0],
+                "n_days_with_data": [14, 8, 10, 0, 7, 1],
+            },
+            "cardinality": 6,
+            "summary": {
+                "n_days_with_data_total": 14,
+                "duration_mean_per_day": 900000000.5,
+                "duration_min_per_day": 300000000,
+                "duration_max_per_day": 1800000000,
+                "value_mean": 655.5,
+                "value_min": 2.321,
+                "value_max": 1001.1,
+                "value_med": 303.8,
+                "value_std": 1230.123,
             },
         }
 
@@ -404,7 +407,7 @@ class TestStreamData(TestCase):
             "test_stream_id",
             start_time=1690848000,  # 2023-08-01T00:00:00Z
             resolution=21600,  # 6 hours
-            n_days=3,
+            n_days=14,
             client=self.stream_client,
         )
 
