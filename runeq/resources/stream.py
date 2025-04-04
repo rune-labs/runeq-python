@@ -238,3 +238,75 @@ def get_stream_daily_aggregate(
     # Return just the first result from the iterator since this API does not return
     # paginated results.
     return next(client.get_data(path, **params))
+
+
+def get_stream_aggregate_window(
+    stream_id: Union[str, Iterable[str]],
+    start_time: _time_type,
+    end_time: _time_type,
+    resolution: int,
+    aggregate_function: str,
+    timestamp: Optional[str] = "iso",
+    timezone: Optional[int] = None,
+    timezone_name: Optional[str] = None,
+    client: Optional[StreamClient] = None,
+) -> dict:
+    """
+    Fetch aggregated data for a stream over time windows.
+
+    Args:
+        stream_id: ID of the stream
+        start_time: Start time for the query, provided as a unix timestamp
+            (in seconds), a datetime.datetime, or a datetime.date.
+        end_time: End time for the query, provided as a unix timestamp
+            (in seconds), a datetime.datetime, or a datetime.date.
+        resolution: Interval between returned timestamps, in seconds.
+        aggregate_function: The aggregation function to apply. Available
+            functions are "sum" and "mean".
+        timestamp: One of "unix", "unixns", or "iso", which determines
+            how timestamps are formatted in the response.
+        timezone: Timezone offset, in seconds, used to calculate
+            string-based timestamp formats such as datetime and iso.
+            For example, PST (UTC-0800) is represented as -28800.
+            If omitted, the timezone is UTC.
+        timezone_name: The name from the IANA timezone database used to
+            calculate string-based timestamp formats such as datetime and iso.
+            Returns the correct UTC offset for a given date/time in order to
+            account for daylight savings time.
+        client: If specified, this client is used to fetch data from the
+            API. Otherwise, the global
+            :class:`~runeq.resources.client.StreamClient` is used.
+
+    Returns:
+        A dictionary containing the aggregated data.
+    """
+    params = {
+        "start_time": _time_type_to_unix_secs(start_time),
+        "end_time": _time_type_to_unix_secs(end_time),
+        "resolution": resolution,
+        "aggregate_function": aggregate_function,
+        "timestamp": timestamp,
+        "timezone": timezone,
+        "timezone_name": timezone_name,
+    }
+
+    start_time = _time_type_to_unix_secs(start_time)
+    end_time = _time_type_to_unix_secs(end_time)
+
+    client = client or global_stream_client()
+    path = f"/v2/streams/{stream_id}/aggregate_window"
+
+    params = {
+        "start_time": start_time,
+        "end_time": end_time,
+        "resolution": resolution,
+        "aggregate_function": aggregate_function,
+        "timestamp": timestamp,
+        "timezone": timezone,
+        "timezone_name": timezone_name,
+        "format": "json",
+    }
+
+    # Return just the first result from the iterator since this API does not return
+    # paginated results.
+    return next(client.get_data(path, **params))

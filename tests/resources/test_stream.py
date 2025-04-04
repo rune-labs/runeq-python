@@ -8,6 +8,7 @@ from unittest import TestCase, mock
 from runeq.config import Config
 from runeq.resources.client import StreamClient
 from runeq.resources.stream import (
+    get_stream_aggregate_window,
     get_stream_availability,
     get_stream_daily_aggregate,
     get_stream_data,
@@ -470,6 +471,126 @@ class TestStreamData(TestCase):
                 "start_time": 1690848000.0,
                 "resolution": 7200,
                 "n_days": 14,
+                "format": "json",
+            },
+        )
+
+    @mock.patch("runeq.resources.client.requests")
+    def test_get_stream_aggregate_window(self, mock_requests):
+        """
+        Test get a stream aggregate window with specific stream_id and parameters.
+        """
+        expected_data = {
+            "cardinality": 5,
+            "data": {
+                "time": [1661990400, 1662076800, 1662163200, 1662249600, 1662336000],
+                "aggregate_values": [1.11, None, 30, 4.5, 5],
+                "duration_sum": [
+                    3600000000000,
+                    0,
+                    60000000000,
+                    10800000000000,
+                    7200000000000,
+                ],
+            },
+            "summary": {
+                "value_mean": 10.1525,
+                "value_min": 1.11,
+                "value_max": 30,
+                "value_med": 4.75,
+                "value_std": 13.34402581682155,
+            },
+        }
+
+        # Mock response
+        mock_response = mock.Mock()
+        mock_response.ok = True
+        mock_response.headers = {}
+        mock_response.json.return_value = expected_data
+
+        mock_requests.get.return_value = mock_response
+
+        aggregate_window = get_stream_aggregate_window(
+            "heart_rate_stream",
+            start_time=1661990400,  # 2022-09-01T00:00:00Z
+            end_time=1662336000,  # 2022-09-05T00:00:00Z
+            resolution=86400,  # 24 hours (daily)
+            aggregate_function="mean",
+            timestamp="unix",  # Match the timestamp format in the response
+            client=self.stream_client,
+        )
+
+        # Test that we get the data directly, not an iterator
+        self.assertEqual(expected_data, aggregate_window)
+        self.assertEqual(mock_requests.get.call_count, 1)
+
+    @mock.patch("runeq.resources.client.requests")
+    def test_get_stream_aggregate_window_params(self, mock_requests):
+        """
+        Check the request construction for fetching stream aggregate window data.
+        """
+        # Mock an empty response - this test is just for the request
+        mock_response = mock.Mock()
+        mock_response.ok = True
+        mock_response.headers = {}
+        mock_response.json.return_value = {}
+        mock_requests.get.return_value = mock_response
+
+        # Call function with unix timestamp format (matching API example)
+        get_stream_aggregate_window(
+            "heart_rate_stream",
+            start_time=1661990400,  # 2022-09-01T00:00:00Z
+            end_time=1662336000,  # 2022-09-05T00:00:00Z
+            resolution=86400,  # 24 hours (daily)
+            aggregate_function="mean",
+            timestamp="unix",
+            client=self.stream_client,
+        )
+
+        expected_headers = {
+            "X-Rune-Client-Key-ID": "test",
+            "X-Rune-Client-Access-Key": "config",
+        }
+
+        mock_requests.get.assert_called_once_with(
+            "https://stream.runelabs.io/v2/streams/heart_rate_stream/aggregate_window",
+            headers=expected_headers,
+            params={
+                "start_time": 1661990400,
+                "end_time": 1662336000,
+                "resolution": 86400,
+                "aggregate_function": "mean",
+                "timestamp": "unix",
+                "timezone": None,
+                "timezone_name": None,
+                "format": "json",
+            },
+        )
+
+        mock_requests.get.reset_mock()
+
+        # Test with ISO formatted datetime objects and different aggregate function
+        get_stream_aggregate_window(
+            "activity_stream",
+            start_time=datetime(2022, 9, 1, tzinfo=timezone.utc),
+            end_time=datetime(2022, 9, 5, tzinfo=timezone.utc),
+            resolution=43200,  # 12 hours
+            aggregate_function="sum",
+            timestamp="iso",  # Using ISO format which is different from the example
+            client=self.stream_client,
+        )
+
+        mock_requests.get.assert_called_once_with(
+            "https://stream.runelabs.io/v2/streams/activity_stream/aggregate_window",
+            headers=expected_headers,
+            params={
+                "start_time": 1661990400.0,
+                "end_time": 1662336000.0,
+                "resolution": 43200,
+                "aggregate_function": "sum",
+                "timestamp": "iso",
+                "timezone": None,
+                "timezone_name": None,
                 "format": "json",
             },
         )
