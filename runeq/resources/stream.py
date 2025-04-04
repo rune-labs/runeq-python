@@ -194,3 +194,47 @@ def get_stream_availability(
         params["stream_id"] = stream_ids
 
     yield from client.get_data(path, **params)
+
+
+def get_stream_daily_aggregate(
+    stream_id: str,
+    start_time: _time_type,
+    resolution: int,
+    n_days: int,
+    client: Optional[StreamClient] = None,
+) -> dict:
+    """
+    Fetch average aggregated stream data for each day divided into intervals.
+
+    Args:
+        stream_id: ID of the stream
+        start_time: Start time for the query, provided as a unix timestamp
+            (in seconds), a datetime.datetime, or a datetime.date.
+        resolution: Length of time (in seconds) for the window used to
+            calculate intervals. Must evenly divide into a 24 hour period.
+        n_days: Number of days across which to compute daily aggregate.
+            Each day is a 24 hour period beginning from the start_time. Max
+            value is 14.
+        client: If specified, this client is used to fetch data from the
+            API. Otherwise, the global
+            :class:`~runeq.resources.client.StreamClient` is used.
+
+    Returns:
+        A dictionary containing the daily aggregate data.
+
+    """
+    start_time = _time_type_to_unix_secs(start_time)
+
+    client = client or global_stream_client()
+    path = f"/v2/streams/{stream_id}/daily_aggregate"
+
+    params = {
+        "start_time": start_time,
+        "resolution": resolution,
+        "n_days": n_days,
+        "format": "json",
+    }
+
+    # Return just the first result from the iterator since this API does not return
+    # paginated results.
+    return next(client.get_data(path, **params))

@@ -7,7 +7,11 @@ from unittest import TestCase, mock
 
 from runeq.config import Config
 from runeq.resources.client import StreamClient
-from runeq.resources.stream import get_stream_availability, get_stream_data
+from runeq.resources.stream import (
+    get_stream_availability,
+    get_stream_daily_aggregate,
+    get_stream_data,
+)
 
 
 class TestStreamData(TestCase):
@@ -364,3 +368,105 @@ class TestStreamData(TestCase):
         expected = [expected_data, expected_data]
         actual = list(availability)
         self.assertEqual(expected, actual)
+
+    @mock.patch("runeq.resources.client.requests")
+    def test_get_stream_daily_aggregate(self, mock_requests):
+        """
+        Test get a stream daily aggregate with specific stream_id and parameters.
+        """
+        expected_data = {
+            "cardinality": 4,
+            "data": {
+                "time": [
+                    "2023-08-01T00:00:00Z",
+                    "2023-08-01T06:00:00Z",
+                    "2023-08-01T12:00:00Z",
+                    "2023-08-01T18:00:00Z",
+                ],
+                "avg_heart_rate": [
+                    72.5,
+                    68.3,
+                    75.2,
+                    79.6,
+                ],
+            },
+        }
+
+        # Mock response - only need one response now
+        mock_response = mock.Mock()
+        mock_response.ok = True
+        mock_response.headers = {}
+        mock_response.json.return_value = expected_data
+
+        mock_requests.get.return_value = mock_response
+
+        daily_aggregate = get_stream_daily_aggregate(
+            "test_stream_id",
+            start_time=1690848000,  # 2023-08-01T00:00:00Z
+            resolution=21600,  # 6 hours
+            n_days=3,
+            client=self.stream_client,
+        )
+
+        # Test that we get the data directly, not an iterator
+        self.assertEqual(expected_data, daily_aggregate)
+        self.assertEqual(mock_requests.get.call_count, 1)
+
+    @mock.patch("runeq.resources.client.requests")
+    def test_get_stream_daily_aggregate_params(self, mock_requests):
+        """
+        Check the request construction for fetching stream daily aggregate data.
+        """
+        # Mock an empty response - this test is just for the request
+        mock_response = mock.Mock()
+        mock_response.ok = True
+        mock_response.headers = {}
+        mock_response.json.return_value = {}
+        mock_requests.get.return_value = mock_response
+
+        # Call function - no need to consume iterator
+        get_stream_daily_aggregate(
+            "test-stream-id",
+            start_time=1690848000,  # 2023-08-01T00:00:00Z
+            resolution=3600,  # 1 hour
+            n_days=7,
+            client=self.stream_client,
+        )
+
+        expected_headers = {
+            "X-Rune-Client-Key-ID": "test",
+            "X-Rune-Client-Access-Key": "config",
+        }
+
+        mock_requests.get.assert_called_once_with(
+            "https://stream.runelabs.io/v2/streams/test-stream-id/daily_aggregate",
+            headers=expected_headers,
+            params={
+                "start_time": 1690848000,
+                "resolution": 3600,
+                "n_days": 7,
+                "format": "json",
+            },
+        )
+
+        mock_requests.get.reset_mock()
+
+        # Test timestamp conversion
+        get_stream_daily_aggregate(
+            "test-stream-id",
+            start_time=datetime(2023, 8, 1, tzinfo=timezone.utc),
+            resolution=7200,  # 2 hours
+            n_days=14,
+            client=self.stream_client,
+        )
+
+        mock_requests.get.assert_called_once_with(
+            "https://stream.runelabs.io/v2/streams/test-stream-id/daily_aggregate",
+            headers=expected_headers,
+            params={
+                "start_time": 1690848000.0,
+                "resolution": 7200,
+                "n_days": 14,
+                "format": "json",
+            },
+        )
