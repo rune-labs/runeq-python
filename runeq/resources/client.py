@@ -171,7 +171,7 @@ class StreamClient:
         Make a GET request to the Stream API.
 
         Args:
-            url: The URL to make the request to.
+            path: The URL path to make the request to.
             params: Query parameters to include in the request.
 
         Returns:

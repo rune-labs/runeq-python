@@ -96,6 +96,43 @@ class TestStreamClient(TestCase):
         return mock_response
 
     @mock.patch("runeq.resources.client.requests.get")
+    def test_get_successful(self, mock_get):
+        """Test successful request with get() method"""
+        config = mock.Mock(spec=BaseConfig)
+        config.stream_url = "https://stream.example.com"
+        config.auth_headers = {"X-Auth": "token"}
+
+        stream_client = StreamClient(config)
+
+        # Set up successful response
+        mock_response = mock.Mock()
+        mock_response.ok = True
+        mock_response.json.return_value = {"data": "test_data"}
+        mock_get.return_value = mock_response
+
+        response = stream_client.get("/v2/streams/123", {"param1": "value1"})
+
+        self.assertEqual(response, mock_response)
+
+        # Verify the request was made correctly
+        mock_get.assert_called_once_with(
+            "https://stream.example.com/v2/streams/123",
+            headers={"X-Auth": "token"},
+            params={"param1": "value1"},
+        )
+
+    def test_get_path_validation(self):
+        """Test path validation in get() method"""
+        config = mock.Mock(spec=BaseConfig)
+        config.stream_url = "https://stream.example.com"
+
+        stream_client = StreamClient(config)
+
+        # Test with invalid path
+        with self.assertRaises(ValueError):
+            stream_client.get("/invalid/path", {})
+
+    @mock.patch("runeq.resources.client.requests.get")
     def test_refresh_auth_on_4xx(self, mock_get):
         """If a request fails with a 4xx status code, refresh auth and retry"""
         config = mock.Mock(spec=BaseConfig)
