@@ -435,7 +435,7 @@ class TestStreamData(TestCase):
 
         expected_headers = {
             "X-Rune-Client-Key-ID": "test",
-            "X-Rune-Client-Access-Key": "client-key",
+            "X-Rune-Client-Access-Key": "config",
         }
 
         mock_requests.get.assert_called_once_with(
@@ -540,7 +540,7 @@ class TestStreamData(TestCase):
 
         expected_headers = {
             "X-Rune-Client-Key-ID": "test",
-            "X-Rune-Client-Access-Key": "client-key",
+            "X-Rune-Client-Access-Key": "config",
         }
 
         mock_requests.get.assert_called_once_with(
