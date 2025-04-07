@@ -3,7 +3,7 @@ Query data directly from the V2 Stream API.
 
 """
 
-from typing import Iterable, Iterator, Optional, Union
+from typing import Iterable, Iterator, Literal, Optional, Union
 
 from .client import StreamClient, global_stream_client
 from .internal import _time_type, _time_type_to_unix_secs
@@ -204,7 +204,13 @@ def get_stream_daily_aggregate(
     client: Optional[StreamClient] = None,
 ) -> dict:
     """
-    Fetch average aggregated stream data for each day divided into intervals.
+    Returns stream data that represents an average aggregated day divided into intervals.
+
+    Daily aggregates are only supported for stream types with two dimensions
+    (i.e. a timestamp and a numeric value).
+
+    Please see the `Daily Aggregate` section of the Stream API documentation
+    (docs.runelabs.io) for more details.
 
     Args:
         stream_id: ID of the stream
@@ -232,27 +238,29 @@ def get_stream_daily_aggregate(
         "start_time": start_time,
         "resolution": resolution,
         "n_days": n_days,
-        "format": "json",
     }
 
-    # Return just the first result from the iterator since this API does not return
-    # paginated results.
-    return next(client.get_data(path, **params))
+    response = client.get(path, params)
+    return response.json()
 
 
 def get_stream_aggregate_window(
-    stream_id: Union[str, Iterable[str]],
+    stream_id: str,
     start_time: _time_type,
     end_time: _time_type,
     resolution: int,
-    aggregate_function: str,
+    aggregate_function: Literal["sum", "mean"],
     timestamp: Optional[str] = "iso",
     timezone: Optional[int] = None,
     timezone_name: Optional[str] = None,
     client: Optional[StreamClient] = None,
 ) -> dict:
     """
-    Fetch aggregated data for a stream over time windows.
+    Returns downsampled data into windows of resolution seconds and applies the
+    specified aggregate_function to the data points that fall within each window.
+
+    Please see the `Aggregate Window` section of the Stream API documentation
+    (docs.runelabs.io) for more details.
 
     Args:
         stream_id: ID of the stream
@@ -280,16 +288,6 @@ def get_stream_aggregate_window(
     Returns:
         A dictionary containing the aggregated data.
     """
-    params = {
-        "start_time": _time_type_to_unix_secs(start_time),
-        "end_time": _time_type_to_unix_secs(end_time),
-        "resolution": resolution,
-        "aggregate_function": aggregate_function,
-        "timestamp": timestamp,
-        "timezone": timezone,
-        "timezone_name": timezone_name,
-    }
-
     start_time = _time_type_to_unix_secs(start_time)
     end_time = _time_type_to_unix_secs(end_time)
 
@@ -304,9 +302,7 @@ def get_stream_aggregate_window(
         "timestamp": timestamp,
         "timezone": timezone,
         "timezone_name": timezone_name,
-        "format": "json",
     }
 
-    # Return just the first result from the iterator since this API does not return
-    # paginated results.
-    return next(client.get_data(path, **params))
+    response = client.get(path, params)
+    return response.json()

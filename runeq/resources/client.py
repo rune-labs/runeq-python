@@ -166,6 +166,26 @@ class StreamClient:
         """
         self.config = config
 
+    def get(self, path: str, params: dict) -> requests.Response:
+        """
+        Make a GET request to the Stream API.
+
+        Args:
+            url: The URL to make the request to.
+            params: Query parameters to include in the request.
+
+        Returns:
+            The response from the API.
+
+        Raises:
+            errors.APIError: On API errors.
+        """
+        if not path.startswith("/v2"):
+            raise ValueError("path must begin with /v2")
+
+        url = urllib.parse.urljoin(self.config.stream_url, path)
+        return self._get(url, params)
+
     def get_data(self, path: str, **params) -> Iterator[Union[str, dict]]:
         """
         Makes request(s) to an endpoint of the V2 Stream API. Iterates over

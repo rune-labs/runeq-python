@@ -411,7 +411,6 @@ class TestStreamData(TestCase):
             client=self.stream_client,
         )
 
-        # Test that we get the data directly, not an iterator
         self.assertEqual(expected_data, daily_aggregate)
         self.assertEqual(mock_requests.get.call_count, 1)
 
@@ -446,7 +445,6 @@ class TestStreamData(TestCase):
                 "start_time": 1690848000,
                 "resolution": 3600,
                 "n_days": 7,
-                "format": "json",
             },
         )
 
@@ -468,7 +466,6 @@ class TestStreamData(TestCase):
                 "start_time": 1690848000.0,
                 "resolution": 7200,
                 "n_days": 14,
-                "format": "json",
             },
         )
 
@@ -516,7 +513,6 @@ class TestStreamData(TestCase):
             client=self.stream_client,
         )
 
-        # Test that we get the data directly, not an iterator
         self.assertEqual(expected_data, aggregate_window)
         self.assertEqual(mock_requests.get.call_count, 1)
 
@@ -558,7 +554,6 @@ class TestStreamData(TestCase):
                 "timestamp": "unix",
                 "timezone": None,
                 "timezone_name": None,
-                "format": "json",
             },
         )
 
@@ -586,6 +581,5 @@ class TestStreamData(TestCase):
                 "timestamp": "iso",
                 "timezone": None,
                 "timezone_name": None,
-                "format": "json",
             },
         )
