@@ -3,7 +3,7 @@ Query data directly from the V2 Stream API.
 
 """
 
-from typing import Iterable, Iterator, Optional, Union
+from typing import Iterable, Iterator, Literal, Optional, Union
 
 from .client import StreamClient, global_stream_client
 from .internal import _time_type, _time_type_to_unix_secs
@@ -194,3 +194,115 @@ def get_stream_availability(
         params["stream_id"] = stream_ids
 
     yield from client.get_data(path, **params)
+
+
+def get_stream_daily_aggregate(
+    stream_id: str,
+    start_time: _time_type,
+    resolution: int,
+    n_days: int,
+    client: Optional[StreamClient] = None,
+) -> dict:
+    """
+    Returns stream data that represents an average aggregated day divided into intervals.
+
+    Daily aggregates are only supported for stream types with two dimensions
+    (i.e. a timestamp and a numeric value).
+
+    Please see the `Daily Aggregate` section of the Stream API documentation
+    (docs.runelabs.io) for more details.
+
+    Args:
+        stream_id: ID of the stream
+        start_time: Start time for the query, provided as a unix timestamp
+            (in seconds), a datetime.datetime, or a datetime.date.
+        resolution: Length of time (in seconds) for the window used to
+            calculate intervals. Must evenly divide into a 24 hour period.
+        n_days: Number of days across which to compute daily aggregate.
+            Each day is a 24 hour period beginning from the start_time. Max
+            value is 14.
+        client: If specified, this client is used to fetch data from the
+            API. Otherwise, the global
+            :class:`~runeq.resources.client.StreamClient` is used.
+
+    Returns:
+        A dictionary containing the daily aggregate data.
+
+    """
+    start_time = _time_type_to_unix_secs(start_time)
+
+    client = client or global_stream_client()
+    path = f"/v2/streams/{stream_id}/daily_aggregate"
+
+    params = {
+        "start_time": start_time,
+        "resolution": resolution,
+        "n_days": n_days,
+    }
+
+    response = client.get(path, params)
+    return response.json()
+
+
+def get_stream_aggregate_window(
+    stream_id: str,
+    start_time: _time_type,
+    end_time: _time_type,
+    resolution: int,
+    aggregate_function: Literal["sum", "mean"],
+    timestamp: Optional[str] = "iso",
+    timezone: Optional[int] = None,
+    timezone_name: Optional[str] = None,
+    client: Optional[StreamClient] = None,
+) -> dict:
+    """
+    Returns downsampled data into windows of resolution seconds and applies the
+    specified aggregate_function to the data points that fall within each window.
+
+    Please see the `Aggregate Window` section of the Stream API documentation
+    (docs.runelabs.io) for more details.
+
+    Args:
+        stream_id: ID of the stream
+        start_time: Start time for the query, provided as a unix timestamp
+            (in seconds), a datetime.datetime, or a datetime.date.
+        end_time: End time for the query, provided as a unix timestamp
+            (in seconds), a datetime.datetime, or a datetime.date.
+        resolution: Interval between returned timestamps, in seconds.
+        aggregate_function: The aggregation function to apply. Available
+            functions are "sum" and "mean".
+        timestamp: One of "unix", "unixns", or "iso", which determines
+            how timestamps are formatted in the response.
+        timezone: Timezone offset, in seconds, used to calculate
+            string-based timestamp formats such as datetime and iso.
+            For example, PST (UTC-0800) is represented as -28800.
+            If omitted, the timezone is UTC.
+        timezone_name: The name from the IANA timezone database used to
+            calculate string-based timestamp formats such as datetime and iso.
+            Returns the correct UTC offset for a given date/time in order to
+            account for daylight savings time.
+        client: If specified, this client is used to fetch data from the
+            API. Otherwise, the global
+            :class:`~runeq.resources.client.StreamClient` is used.
+
+    Returns:
+        A dictionary containing the aggregated data.
+    """
+    start_time = _time_type_to_unix_secs(start_time)
+    end_time = _time_type_to_unix_secs(end_time)
+
+    client = client or global_stream_client()
+    path = f"/v2/streams/{stream_id}/aggregate_window"
+
+    params = {
+        "start_time": start_time,
+        "end_time": end_time,
+        "resolution": resolution,
+        "aggregate_function": aggregate_function,
+        "timestamp": timestamp,
+        "timezone": timezone,
+        "timezone_name": timezone_name,
+    }
+
+    response = client.get(path, params)
+    return response.json()
