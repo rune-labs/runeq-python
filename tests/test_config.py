@@ -108,6 +108,21 @@ class TestConfig(TestCase):
         with self.assertRaises(ValueError):
             _ = cfg.access_token_auth_headers
 
+        # custom auth headers
+        cfg = Config(custom_auth_headers={"X-Rune-Custom-Auth-Header": "abc123"})
+        custom_headers = {"X-Rune-Custom-Auth-Header": "abc123"}
+        self.assertEqual(custom_headers, cfg.auth_headers)
+        self.assertEqual(custom_headers, cfg.custom_auth_headers)
+
+        with self.assertRaises(ValueError):
+            _ = cfg.jwt_auth_headers
+
+        with self.assertRaises(ValueError):
+            _ = cfg.client_auth_headers
+
+        with self.assertRaises(ValueError):
+            _ = cfg.access_token_auth_headers
+
         # cognito refresh token
         with mock.patch("runeq.config.boto3.client") as boto3_client:
             mock_cognito = mock.Mock()
