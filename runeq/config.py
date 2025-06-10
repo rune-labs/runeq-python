@@ -36,6 +36,12 @@ Auth method to use a user access token for authentication.
 
 """
 
+AUTH_METHOD_CUSTOM = "custom"
+"""
+Auth method to use custom authentication headers.
+
+"""
+
 DEFAULT_CONFIG_YAML = "~/.rune/config"
 """
 Default path for the config file (yaml formatted)
@@ -117,6 +123,7 @@ class Config(BaseConfig):
         self._jwt = None
         self._cognito_client_id = None
         self._cognito_refresh_token = None
+        self._custom_auth_headers = None
 
         if args and kwargs:
             raise TypeError(
@@ -163,6 +170,7 @@ class Config(BaseConfig):
         stream_url=None,
         graph_url=None,
         strive_url=None,
+        custom_auth_headers=None,
         **kwargs,
     ):
         """
@@ -180,6 +188,8 @@ class Config(BaseConfig):
             jwt: JWT
             stream_url: base URL to use for the stream API
             graph_url: base URL to use for the graph API
+            strive_url: base URL to use for the strive API
+            custom_auth_headers: custom authentication headers to use for the request
             **kwargs: Arbitrary values may be provided, but they are ignored.
 
         """
@@ -199,6 +209,7 @@ class Config(BaseConfig):
                     bool(client_access_key or client_key_id),
                     bool(jwt),
                     bool(cognito_refresh_token and cognito_client_id),
+                    bool(custom_auth_headers),
                 ]
             )
 
@@ -215,6 +226,8 @@ class Config(BaseConfig):
                 auth_method = AUTH_METHOD_JWT
             elif cognito_refresh_token and cognito_client_id:
                 auth_method = AUTH_METHOD_COGNITO_REFRESH
+            elif custom_auth_headers:
+                auth_method = AUTH_METHOD_CUSTOM
             else:
                 raise ValueError(
                     "Cannot infer auth method: a complete set of credentials "
@@ -243,6 +256,9 @@ class Config(BaseConfig):
 
         if cognito_refresh_token is not None:
             self._cognito_refresh_token = cognito_refresh_token
+
+        if custom_auth_headers is not None:
+            self._custom_auth_headers = custom_auth_headers
 
         self._cognito_client = boto3.client(
             "cognito-idp",
@@ -325,6 +341,16 @@ class Config(BaseConfig):
         }
 
     @property
+    def custom_auth_headers(self):
+        """
+        Authentication headers for HTTP requests, using custom authentication headers.
+        """
+        if not self._custom_auth_headers:
+            raise ValueError("Custom authentication headers are not set")
+
+        return self._custom_auth_headers
+
+    @property
     def auth_headers(self):
         """
         Authentication headers for HTTP requests to Rune APIs.
@@ -338,6 +364,8 @@ class Config(BaseConfig):
             return self.jwt_auth_headers
         elif self.auth_method == AUTH_METHOD_COGNITO_REFRESH:
             return self.jwt_auth_headers
+        elif self.auth_method == AUTH_METHOD_CUSTOM:
+            return self.custom_auth_headers
         else:
             raise ValueError(
                 f'Invalid auth_method "{self.auth_method}": expected one of '
