@@ -372,5 +372,6 @@ class Config(BaseConfig):
                 f"({AUTH_METHOD_ACCESS_TOKEN}, "
                 f"{AUTH_METHOD_CLIENT_KEYS}, "
                 f"{AUTH_METHOD_JWT}, "
-                f"{AUTH_METHOD_COGNITO_REFRESH})"
+                f"{AUTH_METHOD_COGNITO_REFRESH}, "
+                f"{AUTH_METHOD_CUSTOM})"
             )
