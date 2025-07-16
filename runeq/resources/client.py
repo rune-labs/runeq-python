@@ -86,7 +86,7 @@ class StriveClient:
 
     def post(self, path: str, **kwargs):
         """
-        Makes postrequest(s) to an endpoint of the Strive API.
+        Makes post request(s) to an endpoint of the Strive API.
         """
         url = urllib.parse.urljoin(self.config.strive_url, path)
         return requests.post(url, headers=self.config.auth_headers, **kwargs)
