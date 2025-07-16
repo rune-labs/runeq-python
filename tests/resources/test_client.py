@@ -10,6 +10,7 @@ from runeq.config import BaseConfig
 from runeq.resources.client import (
     GraphClient,
     StreamClient,
+    StriveClient,
     global_graph_client,
     global_stream_client,
     global_strive_client,
@@ -193,3 +194,63 @@ class TestGraphClient(TestCase):
 
         self.assertEqual(mock_execute.call_count, 2)
         config.refresh_auth.assert_called_once()
+
+
+class TestStriveClient(TestCase):
+    """
+    Unit tests for StriveClient
+
+    """
+
+    @mock.patch("runeq.resources.client.requests.get")
+    def test_get_successful(self, mock_get):
+        """Test successful GET request with get() method"""
+        config = mock.Mock(spec=BaseConfig)
+        config.strive_url = "https://strive.example.com"
+        config.auth_headers = {"X-Auth": "token"}
+
+        strive_client = StriveClient(config)
+
+        # Set up successful response
+        mock_response = mock.Mock()
+        mock_response.ok = True
+        mock_response.json.return_value = {"data": "test_data"}
+        mock_get.return_value = mock_response
+
+        response = strive_client.get("/api/endpoint", param1="value1")
+
+        self.assertEqual(response, mock_response)
+
+        # Verify the request was made correctly
+        mock_get.assert_called_once_with(
+            "https://strive.example.com/api/endpoint",
+            headers={"X-Auth": "token"},
+            param1="value1",
+        )
+
+    @mock.patch("runeq.resources.client.requests.post")
+    def test_post_successful(self, mock_post):
+        """Test successful POST request with post() method"""
+        config = mock.Mock(spec=BaseConfig)
+        config.strive_url = "https://strive.example.com"
+        config.auth_headers = {"X-Auth": "token"}
+
+        strive_client = StriveClient(config)
+
+        # Set up successful response
+        mock_response = mock.Mock()
+        mock_response.ok = True
+        mock_response.json.return_value = {"success": True}
+        mock_post.return_value = mock_response
+
+        test_json = {"key": "value"}
+        response = strive_client.post("/api/endpoint", json=test_json)
+
+        self.assertEqual(response, mock_response)
+
+        # Verify the request was made correctly
+        mock_post.assert_called_once_with(
+            "https://strive.example.com/api/endpoint",
+            headers={"X-Auth": "token"},
+            json=test_json,
+        )
