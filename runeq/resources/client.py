@@ -79,10 +79,17 @@ class StriveClient:
 
     def get(self, path: str, **kwargs):
         """
-        Makes request(s) to an endpoint of the Strive API.
+        Makes get request(s) to an endpoint of the Strive API.
         """
         url = urllib.parse.urljoin(self.config.strive_url, path)
         return requests.get(url, headers=self.config.auth_headers, **kwargs)
+
+    def post(self, path: str, **kwargs):
+        """
+        Makes post request(s) to an endpoint of the Strive API.
+        """
+        url = urllib.parse.urljoin(self.config.strive_url, path)
+        return requests.post(url, headers=self.config.auth_headers, **kwargs)
 
 
 class GraphClient:
