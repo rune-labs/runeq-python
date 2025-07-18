@@ -10,7 +10,7 @@ with open("requirements/common.txt", "r") as r:
 
 setup(
     name=package_name,
-    version="0.17.4",
+    version="0.17.5",
     author="Rune Labs",
     maintainer_email="support@runelabs.io",
     description="Query data from Rune Labs APIs",
