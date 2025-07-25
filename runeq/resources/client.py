@@ -91,6 +91,13 @@ class StriveClient:
         url = urllib.parse.urljoin(self.config.strive_url, path)
         return requests.post(url, headers=self.config.auth_headers, **kwargs)
 
+    def patch(self, path: str, **kwargs):
+        """
+        Makes patch request(s) to an endpoint of the Strive API.
+        """
+        url = urllib.parse.urljoin(self.config.strive_url, path)
+        return requests.patch(url, headers=self.config.auth_headers, **kwargs)
+
 
 class GraphClient:
     """
