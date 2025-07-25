@@ -254,3 +254,30 @@ class TestStriveClient(TestCase):
             headers={"X-Auth": "token"},
             json=test_json,
         )
+
+    @mock.patch("runeq.resources.client.requests.patch")
+    def test_patch_successful(self, mock_patch):
+        """Test successful PATCH request with patch() method"""
+        config = mock.Mock(spec=BaseConfig)
+        config.strive_url = "https://strive.example.com"
+        config.auth_headers = {"X-Auth": "token"}
+
+        strive_client = StriveClient(config)
+
+        # Set up successful response
+        mock_response = mock.Mock()
+        mock_response.ok = True
+        mock_response.json.return_value = {"updated": True}
+        mock_patch.return_value = mock_response
+
+        test_json = {"updated_field": "new_value"}
+        response = strive_client.patch("/api/endpoint", json=test_json)
+
+        self.assertEqual(response, mock_response)
+
+        # Verify the request was made correctly
+        mock_patch.assert_called_once_with(
+            "https://strive.example.com/api/endpoint",
+            headers={"X-Auth": "token"},
+            json=test_json,
+        )
