@@ -100,7 +100,7 @@ class StreamType(ItemBase):
         return attrs
 
 
-class StreamTypeSet(ItemSet):
+class StreamTypeSet(ItemSet[StreamType]):
     """
     A collection of StreamTypes.
 
@@ -475,7 +475,7 @@ class StreamMetadata(ItemBase):
         return self._add_metadata_to_dataframe(stream_df)
 
 
-class StreamMetadataSet(ItemSet):
+class StreamMetadataSet(ItemSet[StreamMetadata]):
     """
     A collection of StreamMetadata.
 

@@ -98,7 +98,7 @@ class Device(ItemBase):
         )
 
 
-class DeviceSet(ItemSet):
+class DeviceSet(ItemSet[Device]):
     """
     A collection of Devices.
 
@@ -215,7 +215,7 @@ class Patient(ItemBase):
         return attrs
 
 
-class PatientSet(ItemSet):
+class PatientSet(ItemSet[Patient]):
     """
     A collection of Patients.
 

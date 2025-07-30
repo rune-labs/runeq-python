@@ -83,7 +83,7 @@ class ProjectPatientMetadata(ItemBase):
         return attrs
 
 
-class ProjectPatientMetadataSet(ItemSet):
+class ProjectPatientMetadataSet(ItemSet[ProjectPatientMetadata]):
     """
     A collection of ProjectPatientMetadata.
 
@@ -160,7 +160,7 @@ class Cohort(ItemBase):
         return f"{self.__class__.__name__}" f'(id="{self.id}", title="{self.title}")'
 
 
-class CohortSet(ItemSet):
+class CohortSet(ItemSet[Cohort]):
     """
     A collection of Cohorts.
 
@@ -267,7 +267,7 @@ class Project(ItemBase):
         return attrs
 
 
-class ProjectSet(ItemSet):
+class ProjectSet(ItemSet[Project]):
     """
     A collection of Projects.
 

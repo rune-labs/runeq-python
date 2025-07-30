@@ -80,7 +80,7 @@ class Org(ItemBase):
         return org_id
 
 
-class OrgSet(ItemSet):
+class OrgSet(ItemSet[Org]):
     """
     A collection of Organizations.
 
