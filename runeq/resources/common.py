@@ -5,7 +5,7 @@ Common utilities and base classes.
 
 from abc import ABC, abstractmethod
 from collections import OrderedDict
-from typing import Any, Dict, Iterable, Iterator, List, Type, Union
+from typing import Any, Dict, Generic, Iterable, Iterator, List, Type, TypeVar, Union
 
 import pandas as pd
 
@@ -81,16 +81,19 @@ class ItemBase:
         return self._attributes
 
 
-class ItemSet(ABC):
+Item = TypeVar("Item", bound=ItemBase)
+
+
+class ItemSet(ABC, Generic[Item]):
     """
     Base class for representing a set of items.
 
     """
 
     # The Items in this set. Maps id to item.
-    _items: Dict[str, ItemBase]
+    _items: Dict[str, Item]
 
-    def __init__(self, items: Iterable[ItemBase] = ()):
+    def __init__(self, items: Iterable[Item] = ()):
         """
         Initialize items set representational state.
 
@@ -99,7 +102,7 @@ class ItemSet(ABC):
         for item in items:
             self.add(item)
 
-    def __iter__(self) -> Iterator[ItemBase]:
+    def __iter__(self) -> Iterator[Item]:
         """
         Iterate over the items of the set.
 
@@ -129,7 +132,7 @@ class ItemSet(ABC):
         """
         pass
 
-    def get(self, id: str) -> ItemBase:
+    def get(self, id: str) -> Item:
         """
         Get an item by id.
 
@@ -147,7 +150,7 @@ class ItemSet(ABC):
             f"{self._item_class.__name__} with ID {id}"
         )
 
-    def add(self, item: ItemBase):
+    def add(self, item: Item):
         """
         Add a single item to the set. Must be the same type as other members
         of the collection
@@ -160,7 +163,7 @@ class ItemSet(ABC):
 
         self._items[item.id] = item
 
-    def update(self, items: Iterable[ItemBase]):
+    def update(self, items: Iterable[Item]):
         """
         Add an iterable of item(s) to this set. All items must be the same
         class as members of this collection.
@@ -175,7 +178,7 @@ class ItemSet(ABC):
 
             self._items[item.id] = item
 
-    def remove(self, *items: Union[str, ItemBase]):
+    def remove(self, *items: Union[str, Item]):
         """
         Remove item(s) from this set.
 
@@ -185,7 +188,7 @@ class ItemSet(ABC):
                 # item is an id
                 self._items.pop(item, None)
             else:
-                # item is an instance of ItemBase
+                # item is an instance of Item
                 self._items.pop(item.id, None)
 
     def ids(self) -> Iterator[str]:

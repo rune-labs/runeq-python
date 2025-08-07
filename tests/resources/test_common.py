@@ -38,7 +38,7 @@ class PatientItem(ItemBase):
         super().__init__(id=id, name=name, **attributes)
 
 
-class PatientItemSet(ItemSet):
+class PatientItemSet(ItemSet[PatientItem]):
     """
     Test ItemSet class that represents a Patient
 

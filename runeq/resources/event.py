@@ -112,7 +112,7 @@ class Event(ItemBase):
         )
 
 
-class EventSet(ItemSet):
+class EventSet(ItemSet[Event]):
     """
     A collection of Events.
 
