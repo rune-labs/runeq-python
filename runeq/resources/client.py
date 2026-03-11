@@ -6,6 +6,7 @@ Clients for Rune's GraphQL API and V2 Stream API.
 import time
 import urllib.parse
 from functools import wraps
+from threading import Lock
 from typing import Dict, Iterator, Union
 
 import requests
@@ -21,6 +22,8 @@ INITIALIZATION_ERROR = errors.InitializationError(
     "runeq must be initialized by calling"
     "`initialize` before this function can be used"
 )
+
+GQL_LOCK = Lock()
 
 # Rune GraphQL Client to query stream metadata.
 _graph_client = None
@@ -142,10 +145,11 @@ class GraphClient:
         """
         for i in range(2):
             try:
-                return self._gql_client.execute(
-                    gql(statement),
-                    variable_values=variables,
-                )
+                with GQL_LOCK:
+                    return self._gql_client.execute(
+                        gql(statement),
+                        variable_values=variables,
+                    )
             except Exception:
                 # The GraphQL client doesn't give us a good way to check
                 # specifically for auth errors. After any error, try
