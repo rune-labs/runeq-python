@@ -10,7 +10,14 @@ SKIP_MODULES = ["client", "common"]
 
 
 class TestConfig(TestCase):
+    """
+    Test the Session object.
+    """
+
     def test_coverage(self):
+        """
+        Test the coverage of the Session object.
+        """
         session = Session(Config())
 
         for module_name, module in inspect.getmembers(resources):

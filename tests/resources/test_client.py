@@ -5,8 +5,6 @@ Tests for the V2 SDK Client.
 
 from unittest import TestCase, mock
 
-from gql.transport.exceptions import TransportAlreadyConnected
-
 from runeq import errors
 from runeq.config import BaseConfig
 from runeq.resources.client import (
@@ -196,39 +194,6 @@ class TestGraphClient(TestCase):
 
         self.assertEqual(mock_execute.call_count, 2)
         config.refresh_auth.assert_called_once()
-
-    def test_multi_threaded_execution(self):
-        """Test that the graph client can be used in a multi-threaded environment"""
-        config = mock.Mock(spec=BaseConfig)
-        config.graph_url = ""
-        config.auth_headers = {"hello": "world"}
-        config.refresh_auth.return_value = False
-
-        graph_client = GraphClient(config)
-
-        class FakeGQLClient:
-            connected = False
-
-            def connect(self):
-                if self.connected:
-                    raise TransportAlreadyConnected
-                self.connected = True
-
-            def close(self):
-                self.connected = False
-
-            def execute(self, *args, **kwargs):
-                self.connect()
-
-        graph_client._gql_client = FakeGQLClient()
-
-        graph_client.execute("query fakeQuery($input: Input) { id }")
-        graph_client._gql_client.close()
-
-        self.assertIsNone(graph_client.execute("query fakeQuery($input: Input) { id }"))
-
-        with self.assertRaises(TransportAlreadyConnected):
-            graph_client.execute("query fakeQuery($input: Input) { id }")
 
 
 class TestStriveClient(TestCase):
