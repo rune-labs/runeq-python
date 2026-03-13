@@ -1,8 +1,8 @@
 import warnings
 
 from runeq.config import BaseConfig
+from runeq.errors import InitializationError
 from runeq.resources.client import (
-    INITIALIZATION_ERROR,
     GraphClient,
     StreamClient,
     StriveClient,
@@ -69,7 +69,7 @@ class Session:
             global_graph_client()
             global_stream_client()
             global_strive_client()
-        except INITIALIZATION_ERROR:
+        except InitializationError:
             pass
         else:
             warnings.warn(

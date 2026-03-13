@@ -1,10 +1,13 @@
 import inspect
+import os
 from types import ModuleType
 from typing import Callable
 from unittest import TestCase
 
 from runeq import Config, resources
 from runeq.resources.session.session import Session
+
+TEST_ROOT = os.path.dirname(os.path.realpath(__file__))
 
 SKIP_MODULES = ["client", "common"]
 
@@ -14,11 +17,15 @@ class TestConfig(TestCase):
     Test the Session object.
     """
 
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.access_token_good_config = f"{TEST_ROOT}/data/access_token_good_config.yaml"
+
     def test_coverage(self):
         """
         Test the coverage of the Session object.
         """
-        session = Session(Config())
+        session = Session(Config(self.access_token_good_config))
 
         for module_name, module in inspect.getmembers(resources):
             if self.valid_module(module_name, module):
