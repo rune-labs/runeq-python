@@ -14,7 +14,7 @@ from runeq.resources.event import (
     get_patient_wellbeing_events,
 )
 from runeq.resources.internal import _time_type
-from runeq.resources.org import Org, get_org, get_orgs, set_active_org
+from runeq.resources.org import Org, OrgSet, get_org, get_orgs, set_active_org
 from runeq.resources.patient import (
     Device,
     DeviceSet,
@@ -64,7 +64,7 @@ class OrgNamespace:
     def get_org(self, org_id: str) -> Org:
         return get_org(org_id, client=self.client)
 
-    def get_orgs(self) -> list[Org]:
+    def get_orgs(self) -> OrgSet:
         return get_orgs(client=self.client)
 
     def set_active_org(self, org: Union[str, Org]) -> Org:
@@ -231,13 +231,13 @@ class StreamMetadataNamespace:
         self.stream_client = stream_client
 
     def get_all_stream_types(self) -> StreamTypeSet:
-        return get_all_stream_types(client=self.client)
+        return get_all_stream_types(client=self.graph_client)
 
     def get_stream_metadata(
         self,
         stream_ids: Union[str, Iterable[str]],
     ) -> Union[StreamMetadata, StreamMetadataSet]:
-        return get_stream_metadata(stream_ids, client=self.client)
+        return get_stream_metadata(stream_ids, client=self.graph_client)
 
     def get_patient_stream_metadata(
         self,
@@ -311,7 +311,7 @@ class StreamMetadataNamespace:
             timestamp=timestamp,
             timezone=timezone,
             stream_client=self.stream_client,
-            graph_client=self.client,
+            graph_client=self.graph_client,
         )
 
 

@@ -1,5 +1,14 @@
+import warnings
 from runeq.config import BaseConfig
-from runeq.resources.client import GraphClient, StreamClient, StriveClient
+from runeq.resources.client import (
+    INITIALIZATION_ERROR,
+    GraphClient,
+    StreamClient,
+    StriveClient,
+    global_graph_client,
+    global_stream_client,
+    global_strive_client,
+)
 from runeq.resources.session.namespaces import (
     EventNamespace,
     OrgNamespace,
@@ -34,6 +43,8 @@ class Session:
         self,
         config: BaseConfig,
     ):
+        self._check_initialized()
+
         self.graph_client = GraphClient(config)
         self.stream_client = StreamClient(config)
         self.strive_client = StriveClient(config)
@@ -48,3 +59,19 @@ class Session:
         )
         self.stream = StreamNamespace(self.stream_client)
         self.user = UserNamespace(self.graph_client)
+
+    def _check_initialized(self):
+        """
+        Check if runeq has been globally initialized.
+        """
+        try:
+            global_graph_client()
+            global_stream_client()
+            global_strive_client()
+        except INITIALIZATION_ERROR:
+            pass
+        else:
+            warnings.warn(
+                "runeq has been globally initialized, and you are using a session-based client. You probably want to use one or the other.",
+                stacklevel=2,
+            )

@@ -7,7 +7,7 @@ APIs.
 from . import resources
 from .config import Config
 from .resources.client import initialize
-from .resources.session.session import Session
+from .resources import Session
 
 __all__ = [
     "Config",
