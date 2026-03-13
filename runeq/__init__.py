@@ -6,8 +6,8 @@ APIs.
 
 from . import resources
 from .config import Config
-from .resources.client import initialize
 from .resources import Session
+from .resources.client import initialize
 
 __all__ = [
     "Config",
