@@ -345,7 +345,7 @@ events of a specific type. For example, to fetch activity events:
 
 
 Fetch Sleep Metrics
-******************
+*******************
 
 The Sleep module provides a way to query sleep metrics for a patient logged in healthkit.
 
