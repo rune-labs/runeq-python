@@ -14,7 +14,19 @@ using a :class:`~runeq.resources.client.StreamClient`.
 
 """
 
-from . import client, common, event, org, patient, stream, stream_metadata, user
+from . import (
+    client,
+    common,
+    event,
+    org,
+    patient,
+    project,
+    sleep,
+    stream,
+    stream_metadata,
+    user,
+)
+from .session import Session
 
 __all__ = [
     "client",
@@ -22,7 +34,10 @@ __all__ = [
     "event",
     "org",
     "patient",
-    "stream_metadata",
     "stream",
+    "stream_metadata",
     "user",
+    "sleep",
+    "project",
+    "Session",
 ]

@@ -48,6 +48,7 @@ Documentation
    pages/quickstart
    pages/config
    pages/resources
+   pages/session
    pages/errors
 
 Source

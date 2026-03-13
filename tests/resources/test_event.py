@@ -5,6 +5,8 @@ Tests for fetching org metadata.
 
 from unittest import TestCase, mock
 
+import pandas as pd
+
 from runeq.config import Config
 from runeq.resources.client import GraphClient
 from runeq.resources.event import (
@@ -441,7 +443,17 @@ class TestEvent(TestCase):
         # check that classification was expanded into columns
         self.assertEqual(list(df.namespace), ["patient", "patient", "patient"])
         self.assertEqual(list(df.category), ["activity", "note", "activity"])
-        self.assertEqual(list(df.enum), ["testing", None, "healthkit-running"])
+
+        # Pandas 3.0 defaults infer_string to True. The Noneish enum is
+        # then coerced into NaN instead of None (since the string is now converted
+        # to StringDtype, not object). So, old versions of python return None
+        # while new versions return NaN. Eventually, we should drop support for
+        # older versions of python and pandas, but in the meantime, this is a hack
+        # to handle the difference.
+        enum_values = list(df.enum)
+        self.assertEqual(enum_values[0], "testing")
+        self.assertTrue(pd.isna(enum_values[1]))
+        self.assertEqual(enum_values[2], "healthkit-running")
 
     def test_event_type_helpers(self):
         """Minimal test to exercise the helpers that fetch one type of event.
