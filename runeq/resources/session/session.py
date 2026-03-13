@@ -8,6 +8,7 @@ from runeq.resources.session.namespaces import (
     SleepNamespace,
     StreamMetadataNamespace,
     StreamNamespace,
+    UserNamespace,
 )
 
 
@@ -23,19 +24,27 @@ class Session:
     sleep: SleepNamespace
     stream_metadata: StreamMetadataNamespace
     stream: StreamNamespace
+    user: UserNamespace
+
+    graph_client: GraphClient
+    stream_client: StreamClient
+    strive_client: StriveClient
 
     def __init__(
         self,
         config: BaseConfig,
     ):
-        graph_client = GraphClient(config)
-        stream_client = StreamClient(config)
-        strive_client = StriveClient(config)
+        self.graph_client = GraphClient(config)
+        self.stream_client = StreamClient(config)
+        self.strive_client = StriveClient(config)
 
-        self.org = OrgNamespace(graph_client)
-        self.event = EventNamespace(graph_client)
-        self.patient = PatientNamespace(graph_client)
-        self.project = ProjectNamespace(graph_client)
-        self.sleep = SleepNamespace(strive_client)
-        self.stream_metadata = StreamMetadataNamespace(graph_client)
-        self.stream = StreamNamespace(stream_client)
+        self.org = OrgNamespace(self.graph_client)
+        self.event = EventNamespace(self.graph_client)
+        self.patient = PatientNamespace(self.graph_client)
+        self.project = ProjectNamespace(self.graph_client)
+        self.sleep = SleepNamespace(self.strive_client)
+        self.stream_metadata = StreamMetadataNamespace(
+            self.graph_client, self.stream_client
+        )
+        self.stream = StreamNamespace(self.stream_client)
+        self.user = UserNamespace(self.graph_client)
