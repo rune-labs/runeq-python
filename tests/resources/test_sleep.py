@@ -27,7 +27,7 @@ class TestStriveData(TestCase):
         )
         self.maxDiff = None
 
-    @mock.patch("runeq.resources.client.requests.get")
+    @mock.patch("runeq.resources.client.requests.request")
     def test_get_sleep_metrics(self, mock_requests):
         """
         Test get sleep metrics for a given patient.

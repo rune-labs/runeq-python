@@ -202,8 +202,8 @@ class TestStriveClient(TestCase):
 
     """
 
-    @mock.patch("runeq.resources.client.requests.get")
-    def test_get_successful(self, mock_get):
+    @mock.patch("runeq.resources.client.requests.request")
+    def test_get_successful(self, mock_request):
         """Test successful GET request with get() method"""
         config = mock.Mock(spec=BaseConfig)
         config.strive_url = "https://strive.example.com"
@@ -215,21 +215,22 @@ class TestStriveClient(TestCase):
         mock_response = mock.Mock()
         mock_response.ok = True
         mock_response.json.return_value = {"data": "test_data"}
-        mock_get.return_value = mock_response
+        mock_request.return_value = mock_response
 
         response = strive_client.get("/api/endpoint", param1="value1")
 
         self.assertEqual(response, mock_response)
 
         # Verify the request was made correctly
-        mock_get.assert_called_once_with(
+        mock_request.assert_called_once_with(
+            "GET",
             "https://strive.example.com/api/endpoint",
             headers={"X-Auth": "token"},
             param1="value1",
         )
 
-    @mock.patch("runeq.resources.client.requests.post")
-    def test_post_successful(self, mock_post):
+    @mock.patch("runeq.resources.client.requests.request")
+    def test_post_successful(self, mock_request):
         """Test successful POST request with post() method"""
         config = mock.Mock(spec=BaseConfig)
         config.strive_url = "https://strive.example.com"
@@ -241,7 +242,7 @@ class TestStriveClient(TestCase):
         mock_response = mock.Mock()
         mock_response.ok = True
         mock_response.json.return_value = {"success": True}
-        mock_post.return_value = mock_response
+        mock_request.return_value = mock_response
 
         test_json = {"key": "value"}
         response = strive_client.post("/api/endpoint", json=test_json)
@@ -249,14 +250,15 @@ class TestStriveClient(TestCase):
         self.assertEqual(response, mock_response)
 
         # Verify the request was made correctly
-        mock_post.assert_called_once_with(
+        mock_request.assert_called_once_with(
+            "POST",
             "https://strive.example.com/api/endpoint",
             headers={"X-Auth": "token"},
             json=test_json,
         )
 
-    @mock.patch("runeq.resources.client.requests.patch")
-    def test_patch_successful(self, mock_patch):
+    @mock.patch("runeq.resources.client.requests.request")
+    def test_patch_successful(self, mock_request):
         """Test successful PATCH request with patch() method"""
         config = mock.Mock(spec=BaseConfig)
         config.strive_url = "https://strive.example.com"
@@ -268,7 +270,7 @@ class TestStriveClient(TestCase):
         mock_response = mock.Mock()
         mock_response.ok = True
         mock_response.json.return_value = {"updated": True}
-        mock_patch.return_value = mock_response
+        mock_request.return_value = mock_response
 
         test_json = {"updated_field": "new_value"}
         response = strive_client.patch("/api/endpoint", json=test_json)
@@ -276,7 +278,8 @@ class TestStriveClient(TestCase):
         self.assertEqual(response, mock_response)
 
         # Verify the request was made correctly
-        mock_patch.assert_called_once_with(
+        mock_request.assert_called_once_with(
+            "PATCH",
             "https://strive.example.com/api/endpoint",
             headers={"X-Auth": "token"},
             json=test_json,
