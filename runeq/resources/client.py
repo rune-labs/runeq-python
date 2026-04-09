@@ -1,5 +1,4 @@
-"""
-Clients for Rune's GraphQL API and V2 Stream API.
+"""Clients for Rune's GraphQL API and V2 Stream API.
 
 """
 
@@ -18,8 +17,7 @@ from runeq.config import BaseConfig, Config
 
 # Error when a client is not initialized
 INITIALIZATION_ERROR = errors.InitializationError(
-    "runeq must be initialized by calling"
-    "`initialize` before this function can be used"
+    "runeq must be initialized by calling`initialize` before this function can be used"
 )
 
 # Rune GraphQL Client to query stream metadata.
@@ -33,10 +31,7 @@ _strive_client = None
 
 
 def _retry(exceptions, max_attempts=3, max_sleep_secs=0):
-    """
-    Returns an exponential retry decorator.
-
-    """
+    """Returns an exponential retry decorator."""
     if isinstance(exceptions, type):
         exceptions = (exceptions,)
     else:
@@ -64,46 +59,38 @@ def _retry(exceptions, max_attempts=3, max_sleep_secs=0):
 
 
 class StriveClient:
-    """
-    Rune Strive client to query strive data.
-    """
+    """Rune Strive client to query strive data."""
 
     config: BaseConfig = None
 
     def __init__(self, config: BaseConfig):
-        """
-        Initialize the Strive API Client.
-
-        """
+        """Initialize the Strive API Client."""
         self.config = config
 
-    def get(self, path: str, **kwargs):
-        """
-        Makes get request(s) to an endpoint of the Strive API.
-        """
+    def request(self, method: str, path: str, **kwargs):
+        """Makes a request to an endpoint of the Strive API."""
         url = urllib.parse.urljoin(self.config.strive_url, path)
-        return requests.get(url, headers=self.config.auth_headers, **kwargs)
+        return requests.request(method, url, headers=self.config.auth_headers, **kwargs)
+
+    def get(self, path: str, **kwargs):
+        """Makes get request(s) to an endpoint of the Strive API."""
+        return self.request("GET", path, **kwargs)
 
     def post(self, path: str, **kwargs):
-        """
-        Makes post request(s) to an endpoint of the Strive API.
-        """
-        url = urllib.parse.urljoin(self.config.strive_url, path)
-        return requests.post(url, headers=self.config.auth_headers, **kwargs)
+        """Makes post request(s) to an endpoint of the Strive API."""
+        return self.request("POST", path, **kwargs)
 
     def patch(self, path: str, **kwargs):
-        """
-        Makes patch request(s) to an endpoint of the Strive API.
-        """
-        url = urllib.parse.urljoin(self.config.strive_url, path)
-        return requests.patch(url, headers=self.config.auth_headers, **kwargs)
+        """Makes patch request(s) to an endpoint of the Strive API."""
+        return self.request("PATCH", path, **kwargs)
+
+    def head(self, path: str, **kwargs):
+        """Makes head request(s) to an endpoint of the Strive API."""
+        return self.request("HEAD", path, **kwargs)
 
 
 class GraphClient:
-    """
-    Rune GraphQL Client to query stream metadata.
-
-    """
+    """Rune GraphQL Client to query stream metadata."""
 
     # Configuration details for the graph client.
     config: BaseConfig = None
@@ -112,18 +99,12 @@ class GraphClient:
     _gql_client: GQLClient
 
     def __init__(self, config: BaseConfig):
-        """
-        Initialize the Graph API Client.
-
-        """
+        """Initialize the Graph API Client."""
         self.config = config
         self._set_gql_client()
 
     def _set_gql_client(self):
-        """
-        Use the config to create a GQL client
-
-        """
+        """Use the config to create a GQL client"""
         transport = RequestsHTTPTransport(
             # NOTE: retries are managed by the requests.HTTPAdapter, which
             # doesn't retry failed connections
@@ -136,10 +117,7 @@ class GraphClient:
 
     @_retry(requests.exceptions.ConnectionError)
     def execute(self, statement: str, **variables) -> Dict:
-        """
-        Execute a GraphQL query against the API.
-
-        """
+        """Execute a GraphQL query against the API."""
         for i in range(2):
             try:
                 return self._gql_client.execute(
@@ -162,10 +140,7 @@ class GraphClient:
 
 
 class StreamClient:
-    """
-    Client to query the V2 Stream API.
-
-    """
+    """Client to query the V2 Stream API."""
 
     # Pagination token to get the next page of results.
     HEADER_NEXT_PAGE = "X-Rune-Next-Page-Token"
@@ -174,15 +149,11 @@ class StreamClient:
     config: BaseConfig = None
 
     def __init__(self, config: BaseConfig):
-        """
-        Initialize the Stream API Client.
-
-        """
+        """Initialize the Stream API Client."""
         self.config = config
 
     def get(self, path: str, params: dict) -> requests.Response:
-        """
-        Make a GET request to the Stream API.
+        """Make a GET request to the Stream API.
 
         Args:
             path: The URL path to make the request to.
@@ -201,8 +172,7 @@ class StreamClient:
         return self._get(url, params)
 
     def get_data(self, path: str, **params) -> Iterator[Union[str, dict]]:
-        """
-        Makes request(s) to an endpoint of the V2 Stream API. Iterates over
+        """Makes request(s) to an endpoint of the V2 Stream API. Iterates over
         responses, following pagination headers until all data has been
         fetched.
 
@@ -274,8 +244,7 @@ class StreamClient:
 
 
 def initialize(*args, **kwargs):
-    """
-    Initializes the library with specified configuration options. Sets global
+    """Initializes the library with specified configuration options. Sets global
     clients for requests to the GraphQL API and the V2 Stream API.
 
     Parameters
@@ -322,8 +291,7 @@ def initialize_with_config(config: BaseConfig):
 
 
 def global_graph_client() -> GraphClient:
-    """
-    Returns the globally configured GraphQL client. Use
+    """Returns the globally configured GraphQL client. Use
     :class:`~runeq.resources.client.initialize` to configure the client.
 
     Raises:
@@ -337,8 +305,7 @@ def global_graph_client() -> GraphClient:
 
 
 def global_stream_client() -> StreamClient:
-    """
-    Returns the globally configured Stream API client. Use
+    """Returns the globally configured Stream API client. Use
     :class:`~runeq.resources.client.initialize` to configure the client.
 
     Raises:
@@ -353,8 +320,7 @@ def global_stream_client() -> StreamClient:
 
 
 def global_strive_client() -> StriveClient:
-    """
-    Returns the globally configured Strive API client. Use
+    """Returns the globally configured Strive API client. Use
     :class:`~runeq.resources.client.initialize` to configure the client.
 
     Raises:
