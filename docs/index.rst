@@ -32,11 +32,11 @@ Installation
 
 Install using pip:
 
-   >>> pip install runeq
+   pip install runeq
 
 Or directly from source:
 
-   >>> python3 setup.py install
+   python3 setup.py install
 
 
 Documentation
